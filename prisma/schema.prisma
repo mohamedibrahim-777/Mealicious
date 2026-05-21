@@ -1,0 +1,187 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  phone     String?
+  avatar    String?
+  role      String   @default("customer")
+  addresses String?  // JSON string of addresses
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  orders    Order[]
+  reviews   Review[]
+  wishlist  Wishlist[]
+}
+
+model Category {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  image     String?
+  icon      String?
+  featured  Boolean  @default(false)
+  sortOrder Int      @default(0)
+  products  Product[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Product {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String
+  shortDesc   String?
+  price       Float
+  salePrice   Float?
+  images      String    // JSON array of image URLs
+  categoryId  String
+  category    Category  @relation(fields: [categoryId], references: [id])
+  variants    String?   // JSON: [{type: "weight", options: ["250g", "500g", "1kg"]}]
+  tags        String?   // JSON array of tags
+  nutrition   String?   // JSON: {calories: "", protein: "", fat: "", carbs: ""}
+  stock       Int       @default(100)
+  lowStock    Int       @default(10)
+  sku         String?
+  featured    Boolean   @default(false)
+  bestSeller  Boolean   @default(false)
+  isNew       Boolean   @default(false)
+  rating      Float     @default(0)
+  reviewCount Int      @default(0)
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  reviews     Review[]
+  orderItems  OrderItem[]
+  wishlist    Wishlist[]
+}
+
+model Order {
+  id            String      @id @default(cuid())
+  orderNumber   String      @unique
+  userId        String
+  user          User        @relation(fields: [userId], references: [id])
+  status        String      @default("pending") // pending, confirmed, processing, shipped, delivered, cancelled
+  items         OrderItem[]
+  subtotal      Float
+  shipping      Float
+  discount      Float       @default(0)
+  tax           Float       @default(0)
+  total         Float
+  paymentMethod String?     // cod, prepaid, upi
+  paymentStatus String      @default("pending") // pending, paid, failed, refunded
+  shippingAddr  String      // JSON
+  billingAddr   String?     // JSON
+  trackingId    String?
+  trackingUrl   String?
+  shippingProvider String?
+  notes         String?
+  couponCode    String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id])
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  name      String
+  image     String
+  price     Float
+  quantity  Int
+  variant   String?
+  subtotal  Float
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  rating    Int
+  title     String?
+  comment   String
+  approved  Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model Wishlist {
+  id        String  @id @default(cuid())
+  userId    String
+  user      User    @relation(fields: [userId], references: [id])
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@unique([userId, productId])
+}
+
+model Coupon {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  type        String   // percentage, fixed
+  value       Float
+  minOrder    Float    @default(0)
+  maxDiscount Float?
+  usageLimit  Int?
+  usedCount   Int      @default(0)
+  validFrom   DateTime
+  validTo     DateTime
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+}
+
+model BlogPost {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  excerpt     String?
+  content     String
+  image       String?
+  author      String?
+  category    String?
+  tags        String?  // JSON array
+  published   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  subject   String
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model Subscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+}
+
+model Banner {
+  id        String   @id @default(cuid())
+  title     String
+  subtitle  String?
+  image     String?
+  link      String?
+  isActive  Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+}
