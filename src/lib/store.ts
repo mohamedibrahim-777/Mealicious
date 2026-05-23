@@ -21,6 +21,7 @@ export type Page =
   | 'register' 
   | 'profile'
   | 'wishlist'
+  | 'admin'
 
 export interface CartItem {
   productId: string
@@ -67,10 +68,11 @@ interface AppStore {
 
   // Auth
   isLoggedIn: boolean
-  user: { name: string; email: string; phone: string } | null
+  user: { name: string; email: string; phone: string; role: 'admin' | 'user' } | null
   login: (email: string, password: string) => boolean
   register: (name: string, email: string, phone: string, password: string) => boolean
   logout: () => void
+  updateProfile: (data: Partial<{ name: string; email: string; phone: string }>) => void
 
   // Search
   searchQuery: string
@@ -89,7 +91,10 @@ export const useAppStore = create<AppStore>()(
       pageParams: {},
       navigate: (page, params = {}) => {
         set({ currentPage: page, pageParams: params, mobileMenuOpen: false })
-        window.scrollTo({ top: 0, behavior: 'smooth' })
+        if (typeof window !== 'undefined') {
+          window.history.pushState({ page, params }, '', '#' + page)
+          window.scrollTo({ top: 0, behavior: 'smooth' })
+        }
       },
 
       // Cart
@@ -148,24 +153,36 @@ export const useAppStore = create<AppStore>()(
       // Auth
       isLoggedIn: false,
       user: null,
-      login: (email, _password) => {
+      login: (email, password) => {
+        const isAdmin =
+          email.toLowerCase() === 'admin@mealicious.com' && password === 'admin123'
         set({
           isLoggedIn: true,
-          user: { name: email.split('@')[0], email, phone: '' },
-          currentPage: 'home',
+          user: {
+            name: isAdmin ? 'Admin' : email.split('@')[0],
+            email,
+            phone: '',
+            role: isAdmin ? 'admin' : 'user',
+          },
+          currentPage: isAdmin ? 'admin' : 'home',
         })
         return true
       },
       register: (name, email, phone, _password) => {
         set({
           isLoggedIn: true,
-          user: { name, email, phone },
+          user: { name, email, phone, role: 'user' },
           currentPage: 'home',
         })
         return true
       },
       logout: () => {
         set({ isLoggedIn: false, user: null, currentPage: 'home' })
+      },
+      updateProfile: (data) => {
+        const { user } = get()
+        if (!user) return
+        set({ user: { ...user, ...data } })
       },
 
       // Search

@@ -12,19 +12,18 @@ import {
   ArrowRight,
   ChevronRight,
   Send,
+  Nut,
+  Grape,
+  Soup,
 } from 'lucide-react'
+import { CategoryIcon } from '@/lib/category-icons'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { useAppStore } from '@/lib/store'
-import {
-  categories,
-  testimonials,
-  getFeaturedProducts,
-  getBestSellers,
-  getNewArrivals,
-} from '@/lib/data'
+import { useCatalogStore } from '@/lib/catalog-store'
+import { testimonials } from '@/lib/data'
 import ProductCard from '@/components/mealicious/ProductCard'
 
 /* ─────────────────────── animation helpers ─────────────────────── */
@@ -101,29 +100,29 @@ const whyChooseItems = [
     icon: Leaf,
     title: 'Farm Fresh Quality',
     desc: 'Directly sourced from premium farms',
-    color: 'text-emerald-600',
-    bg: 'bg-emerald-50',
+    color: 'text-orange-400',
+    bg: 'bg-blue-50',
   },
   {
     icon: ShieldCheck,
     title: 'No Preservatives',
     desc: '100% natural, no artificial additives',
-    color: 'text-emerald-600',
-    bg: 'bg-emerald-50',
+    color: 'text-orange-400',
+    bg: 'bg-blue-50',
   },
   {
     icon: Package,
     title: 'Secure Packaging',
     desc: 'Vacuum-sealed for maximum freshness',
-    color: 'text-emerald-600',
-    bg: 'bg-emerald-50',
+    color: 'text-orange-400',
+    bg: 'bg-blue-50',
   },
   {
     icon: Truck,
     title: 'Fast Delivery',
     desc: '3-7 days delivery across India',
-    color: 'text-emerald-600',
-    bg: 'bg-emerald-50',
+    color: 'text-orange-400',
+    bg: 'bg-blue-50',
   },
 ]
 
@@ -131,17 +130,19 @@ const whyChooseItems = [
 
 export default function HomePage() {
   const navigate = useAppStore((s) => s.navigate)
-  const featuredProducts = getFeaturedProducts()
-  const bestSellers = getBestSellers()
-  const newArrivals = getNewArrivals()
+  const products = useCatalogStore((s) => s.products)
+  const categories = useCatalogStore((s) => s.categories)
+  const featuredProducts = products.filter((p) => p.featured)
+  const bestSellers = products.filter((p) => p.bestSeller)
+  const newArrivals = products.filter((p) => p.isNew)
 
   return (
     <div className="flex flex-col">
       {/* ──────── 1. Hero Section ──────── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-800">
+      <section className="relative overflow-hidden bg-gradient-to-br from-orange-400 via-orange-400 to-orange-400">
         {/* Decorative circles */}
-        <div className="absolute -top-32 -right-32 h-96 w-96 rounded-full bg-emerald-500/20 blur-3xl" />
-        <div className="absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-emerald-400/15 blur-3xl" />
+        <div className="absolute -top-32 -right-32 h-96 w-96 rounded-full bg-orange-400/20 blur-3xl" />
+        <div className="absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-blue-400/15 blur-3xl" />
 
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28">
           <div className="grid lg:grid-cols-2 gap-10 items-center">
@@ -152,21 +153,21 @@ export default function HomePage() {
               transition={{ duration: 0.7, ease: 'easeOut' }}
               className="text-center lg:text-left"
             >
-              <Badge className="bg-emerald-500/40 text-emerald-100 border-emerald-400/30 mb-4 text-sm px-3 py-1">
-                🌿 100% Natural & Premium Quality
+              <Badge className="bg-orange-400/40 text-blue-100 border-blue-400/30 mb-4 text-sm px-3 py-1 inline-flex items-center gap-1.5">
+                <Leaf className="h-3.5 w-3.5" /> 100% Natural & Premium Quality
               </Badge>
               <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-extrabold text-white leading-tight tracking-tight">
                 Premium Dry Fruits
                 <br />
                 &amp; Healthy Snacks
               </h1>
-              <p className="mt-4 sm:mt-6 text-base sm:text-lg text-emerald-100 max-w-lg mx-auto lg:mx-0">
+              <p className="mt-4 sm:mt-6 text-base sm:text-lg text-blue-100 max-w-lg mx-auto lg:mx-0">
                 Handpicked from the finest farms. Delivered fresh to your doorstep.
               </p>
               <div className="mt-8 flex flex-wrap gap-3 justify-center lg:justify-start">
                 <Button
                   size="lg"
-                  className="bg-white text-emerald-700 hover:bg-emerald-50 font-semibold shadow-lg"
+                  className="bg-white text-orange-400 hover:bg-blue-50 font-semibold shadow-lg"
                   onClick={() => navigate('shop')}
                 >
                   Shop Now
@@ -175,7 +176,7 @@ export default function HomePage() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="border-white/40 text-white hover:bg-white/10 font-semibold"
+                  className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-orange-500 font-semibold"
                   onClick={() => navigate('shop', { category: 'combo-packs' })}
                 >
                   Explore Combos
@@ -192,22 +193,22 @@ export default function HomePage() {
             >
               <div className="relative w-80 h-80 xl:w-96 xl:h-96">
                 {/* Background circle */}
-                <div className="absolute inset-0 rounded-full bg-emerald-500/30 blur-xl" />
-                <div className="absolute inset-4 rounded-full bg-emerald-400/20 flex items-center justify-center">
+                <div className="absolute inset-0 rounded-full bg-orange-400/30 blur-xl" />
+                <div className="absolute inset-4 rounded-full bg-blue-400/20 flex items-center justify-center">
                   <div className="grid grid-cols-2 gap-4 p-6">
                     {[
-                      { emoji: '🥜', label: 'Cashews' },
-                      { emoji: '🌰', label: 'Almonds' },
-                      { emoji: '🍇', label: 'Berries' },
-                      { emoji: '🥣', label: 'Trail Mix' },
-                    ].map((item) => (
+                      { Icon: Nut, label: 'Cashews' },
+                      { Icon: Nut, label: 'Almonds' },
+                      { Icon: Grape, label: 'Berries' },
+                      { Icon: Soup, label: 'Trail Mix' },
+                    ].map(({ Icon, label }) => (
                       <div
-                        key={item.label}
+                        key={label}
                         className="flex flex-col items-center gap-1 rounded-2xl bg-white/15 backdrop-blur-sm p-4"
                       >
-                        <span className="text-4xl">{item.emoji}</span>
-                        <span className="text-xs text-emerald-100 font-medium">
-                          {item.label}
+                        <Icon className="h-9 w-9 text-white" />
+                        <span className="text-xs text-blue-100 font-medium">
+                          {label}
                         </span>
                       </div>
                     ))}
@@ -219,7 +220,7 @@ export default function HomePage() {
         </div>
 
         {/* Stats bar */}
-        <div className="bg-emerald-900/60 backdrop-blur-sm border-t border-emerald-500/20">
+        <div className="bg-orange-400/60 backdrop-blur-sm border-t border-orange-400/20">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4">
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
               {stats.map((stat) => (
@@ -227,7 +228,7 @@ export default function HomePage() {
                   <div className="text-xl sm:text-2xl font-bold text-white">
                     {stat.value}
                   </div>
-                  <div className="text-xs sm:text-sm text-emerald-200">
+                  <div className="text-xs sm:text-sm text-blue-200">
                     {stat.label}
                   </div>
                 </div>
@@ -268,7 +269,7 @@ export default function HomePage() {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
                     <div className="absolute bottom-3 left-3 right-3 flex items-end gap-2">
-                      <span className="text-2xl">{cat.icon}</span>
+                      <CategoryIcon name={cat.icon} className="h-6 w-6 text-white drop-shadow" />
                       <div>
                         <h3 className="font-semibold text-white text-sm leading-tight drop-shadow">
                           {cat.name}
@@ -301,7 +302,7 @@ export default function HomePage() {
               </div>
               <Button
                 variant="ghost"
-                className="text-emerald-600 hover:text-emerald-700 font-semibold"
+                className="text-orange-400 hover:text-orange-400 font-semibold"
                 onClick={() => navigate('shop')}
               >
                 View All
@@ -335,7 +336,7 @@ export default function HomePage() {
               </div>
               <Button
                 variant="ghost"
-                className="text-emerald-600 hover:text-emerald-700 font-semibold"
+                className="text-orange-400 hover:text-orange-400 font-semibold"
                 onClick={() => navigate('shop')}
               >
                 View All
@@ -416,7 +417,7 @@ export default function HomePage() {
               </div>
               <Button
                 variant="ghost"
-                className="text-emerald-600 hover:text-emerald-700 font-semibold"
+                className="text-orange-400 hover:text-orange-400 font-semibold"
                 onClick={() => navigate('shop')}
               >
                 View All
@@ -456,7 +457,7 @@ export default function HomePage() {
                   <CardContent className="p-5 sm:p-6 space-y-4">
                     {/* Avatar + info */}
                     <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 font-bold text-sm">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-100 text-orange-400 font-bold text-sm">
                         {t.avatar}
                       </div>
                       <div className="min-w-0">
@@ -476,7 +477,7 @@ export default function HomePage() {
                           key={i}
                           className={`h-3.5 w-3.5 ${
                             i < t.rating
-                              ? 'fill-amber-400 text-amber-400'
+                              ? 'fill-orange-400 text-orange-400'
                               : 'fill-muted text-muted'
                           }`}
                         />
@@ -496,9 +497,9 @@ export default function HomePage() {
       </section>
 
       {/* ──────── 8. Newsletter Section ──────── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-800">
-        <div className="absolute -top-20 -right-20 h-60 w-60 rounded-full bg-emerald-400/20 blur-3xl" />
-        <div className="absolute -bottom-16 -left-16 h-48 w-48 rounded-full bg-emerald-500/15 blur-3xl" />
+      <section className="relative overflow-hidden bg-gradient-to-br from-orange-400 via-orange-400 to-orange-400">
+        <div className="absolute -top-20 -right-20 h-60 w-60 rounded-full bg-blue-400/20 blur-3xl" />
+        <div className="absolute -bottom-16 -left-16 h-48 w-48 rounded-full bg-orange-400/15 blur-3xl" />
 
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-14 sm:py-20">
           <FadeInWhenVisible>
@@ -506,24 +507,24 @@ export default function HomePage() {
               <h2 className="text-2xl sm:text-3xl font-bold text-white">
                 Join the Mealicious Family
               </h2>
-              <p className="text-emerald-100">
+              <p className="text-blue-100">
                 Subscribe for exclusive offers and health tips
               </p>
               <div className="flex flex-col sm:flex-row gap-3 mt-6">
                 <Input
                   type="email"
                   placeholder="Enter your email address"
-                  className="h-11 bg-white/10 border-white/20 text-white placeholder:text-emerald-200 focus-visible:border-white/50 focus-visible:ring-white/30"
+                  className="h-11 bg-white/10 border-white/20 text-white placeholder:text-blue-200 focus-visible:border-white/50 focus-visible:ring-white/30"
                 />
                 <Button
                   size="lg"
-                  className="bg-white text-emerald-700 hover:bg-emerald-50 font-semibold shrink-0"
+                  className="bg-white text-orange-400 hover:bg-blue-50 font-semibold shrink-0"
                 >
                   <Send className="h-4 w-4 mr-1" />
                   Subscribe
                 </Button>
               </div>
-              <p className="text-xs text-emerald-200/80 mt-2">
+              <p className="text-xs text-blue-200/80 mt-2">
                 No spam, unsubscribe anytime. We respect your privacy.
               </p>
             </div>

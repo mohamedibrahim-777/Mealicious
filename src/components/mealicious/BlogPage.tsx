@@ -108,9 +108,9 @@ export default function BlogPage() {
   return (
     <div className="flex flex-col">
       {/* ──────── 1. Hero Section ──────── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-800">
-        <div className="absolute -top-32 -right-32 h-96 w-96 rounded-full bg-emerald-500/20 blur-3xl" />
-        <div className="absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-emerald-400/15 blur-3xl" />
+      <section className="relative overflow-hidden bg-gradient-to-br from-orange-400 via-orange-400 to-orange-400">
+        <div className="absolute -top-32 -right-32 h-96 w-96 rounded-full bg-orange-400/20 blur-3xl" />
+        <div className="absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-blue-400/15 blur-3xl" />
 
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
           <motion.div
@@ -122,7 +122,7 @@ export default function BlogPage() {
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight tracking-tight">
               The Mealicious Blog
             </h1>
-            <p className="mt-4 sm:mt-6 text-base sm:text-lg text-emerald-100 max-w-2xl mx-auto">
+            <p className="mt-4 sm:mt-6 text-base sm:text-lg text-blue-100 max-w-2xl mx-auto">
               Health tips, recipes, and guides to help you make the most of your snacking experience.
             </p>
           </motion.div>
@@ -166,15 +166,15 @@ export default function BlogPage() {
                           className="object-cover transition-transform duration-500 group-hover:scale-105"
                           sizes="(max-width: 768px) 100vw, 50vw"
                         />
-                        <Badge className="absolute top-3 left-3 bg-emerald-600 text-white">
+                        <Badge className="absolute top-3 left-3 bg-orange-400 text-white">
                           Featured
                         </Badge>
                       </div>
                       <div className="p-6 sm:p-8 flex flex-col justify-center">
-                        <Badge variant="outline" className="w-fit text-emerald-600 border-emerald-200 mb-3">
+                        <Badge variant="outline" className="w-fit text-orange-400 border-blue-200 mb-3">
                           {featuredPost.category}
                         </Badge>
-                        <h2 className="text-xl sm:text-2xl font-bold text-foreground group-hover:text-emerald-600 transition-colors leading-tight">
+                        <h2 className="text-xl sm:text-2xl font-bold text-foreground group-hover:text-orange-400 transition-colors leading-tight">
                           {featuredPost.title}
                         </h2>
                         <p className="mt-3 text-sm text-muted-foreground leading-relaxed line-clamp-3">
@@ -210,8 +210,8 @@ export default function BlogPage() {
                   variant={!selectedCategory ? 'default' : 'outline'}
                   className={`cursor-pointer transition-colors ${
                     !selectedCategory
-                      ? 'bg-emerald-600 text-white hover:bg-emerald-700'
-                      : 'hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-200'
+                      ? 'bg-orange-400 text-white hover:bg-orange-400'
+                      : 'hover:bg-blue-50 hover:text-orange-400 hover:border-blue-200'
                   }`}
                   onClick={() => setSelectedCategory(null)}
                 >
@@ -223,8 +223,8 @@ export default function BlogPage() {
                     variant={selectedCategory === cat ? 'default' : 'outline'}
                     className={`cursor-pointer transition-colors ${
                       selectedCategory === cat
-                        ? 'bg-emerald-600 text-white hover:bg-emerald-700'
-                        : 'hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-200'
+                        ? 'bg-orange-400 text-white hover:bg-orange-400'
+                        : 'hover:bg-blue-50 hover:text-orange-400 hover:border-blue-200'
                     }`}
                     onClick={() => setSelectedCategory(cat)}
                   >
@@ -250,12 +250,12 @@ export default function BlogPage() {
                             className="object-cover transition-transform duration-500 group-hover:scale-105"
                             sizes="(max-width: 640px) 100vw, 50vw"
                           />
-                          <Badge className="absolute top-3 left-3 bg-emerald-600/90 text-white text-xs">
+                          <Badge className="absolute top-3 left-3 bg-orange-400/90 text-white text-xs">
                             {post.category}
                           </Badge>
                         </div>
                         <CardContent className="p-4 sm:p-5 space-y-3">
-                          <h3 className="font-bold text-sm sm:text-base group-hover:text-emerald-600 transition-colors leading-tight line-clamp-2">
+                          <h3 className="font-bold text-sm sm:text-base group-hover:text-orange-400 transition-colors leading-tight line-clamp-2">
                             {post.title}
                           </h3>
                           <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed line-clamp-2">
@@ -314,14 +314,14 @@ export default function BlogPage() {
               <Card>
                 <CardContent className="p-5 space-y-4">
                   <h3 className="font-semibold text-foreground flex items-center gap-2">
-                    <Tag className="h-4 w-4 text-emerald-600" />
+                    <Tag className="h-4 w-4 text-orange-400" />
                     Categories
                   </h3>
                   <div className="space-y-1.5">
                     <button
                       className={`flex items-center justify-between w-full text-sm py-1.5 px-2 rounded-md transition-colors ${
                         !selectedCategory
-                          ? 'bg-emerald-50 text-emerald-700 font-medium'
+                          ? 'bg-blue-50 text-orange-400 font-medium'
                           : 'text-muted-foreground hover:bg-muted'
                       }`}
                       onClick={() => setSelectedCategory(null)}
@@ -336,7 +336,7 @@ export default function BlogPage() {
                           key={cat}
                           className={`flex items-center justify-between w-full text-sm py-1.5 px-2 rounded-md transition-colors ${
                             selectedCategory === cat
-                              ? 'bg-emerald-50 text-emerald-700 font-medium'
+                              ? 'bg-blue-50 text-orange-400 font-medium'
                               : 'text-muted-foreground hover:bg-muted'
                           }`}
                           onClick={() => setSelectedCategory(cat)}
@@ -371,7 +371,7 @@ export default function BlogPage() {
                           />
                         </div>
                         <div className="min-w-0 flex-1">
-                          <h4 className="text-sm font-medium group-hover:text-emerald-600 transition-colors line-clamp-2 leading-tight">
+                          <h4 className="text-sm font-medium group-hover:text-orange-400 transition-colors line-clamp-2 leading-tight">
                             {post.title}
                           </h4>
                           <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
@@ -390,10 +390,10 @@ export default function BlogPage() {
               </Card>
 
               {/* Newsletter Signup */}
-              <Card className="bg-gradient-to-br from-emerald-50 to-white border-emerald-200">
+              <Card className="bg-gradient-to-br from-blue-50 to-white border-blue-200">
                 <CardContent className="p-5 space-y-4">
-                  <div className="rounded-full bg-emerald-100 p-2.5 w-fit">
-                    <Send className="h-5 w-5 text-emerald-600" />
+                  <div className="rounded-full bg-blue-100 p-2.5 w-fit">
+                    <Send className="h-5 w-5 text-orange-400" />
                   </div>
                   <h3 className="font-semibold text-foreground">Newsletter</h3>
                   <p className="text-sm text-muted-foreground">
@@ -403,7 +403,7 @@ export default function BlogPage() {
                     <Input placeholder="Enter your email" className="h-9" />
                     <Button
                       size="sm"
-                      className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
+                      className="w-full bg-orange-400 hover:bg-orange-400 text-white"
                     >
                       <Send className="h-3 w-3 mr-1" />
                       Subscribe

@@ -63,11 +63,11 @@ export default function Footer() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="border-gray-700 bg-gray-800 text-gray-200 placeholder:text-gray-500 focus:border-emerald-500 focus:ring-emerald-500"
+                className="border-gray-700 bg-gray-800 text-gray-200 placeholder:text-gray-500 focus:border-orange-400 focus:ring-orange-400"
               />
               <Button
                 type="submit"
-                className="shrink-0 bg-emerald-600 hover:bg-emerald-700 text-white"
+                className="shrink-0 bg-orange-400 hover:bg-orange-400 text-white"
               >
                 {subscribed ? 'Subscribed!' : 'Subscribe'}
               </Button>
@@ -82,10 +82,10 @@ export default function Footer() {
           {/* Column 1: Brand Info */}
           <div className="sm:col-span-2 lg:col-span-1">
             <div className="flex items-center gap-2">
-              <Leaf className="h-7 w-7 text-emerald-500" />
+              <Leaf className="h-7 w-7 text-orange-400" />
               <span className="text-xl font-extrabold tracking-wide text-white">MEALICIOUS</span>
             </div>
-            <p className="mt-1 text-sm font-medium text-emerald-400">
+            <p className="mt-1 text-sm font-medium text-blue-400">
               Premium Health Snacks &amp; Dry Fruits
             </p>
             <p className="mt-3 text-sm leading-relaxed text-gray-400">
@@ -98,7 +98,7 @@ export default function Footer() {
                   key={label}
                   href={href}
                   aria-label={label}
-                  className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-800 text-gray-400 transition-colors hover:bg-emerald-600 hover:text-white"
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-800 text-gray-400 transition-colors hover:bg-orange-400 hover:text-white"
                 >
                   <Icon className="h-4 w-4" />
                 </a>
@@ -116,7 +116,7 @@ export default function Footer() {
                 <li key={page}>
                   <button
                     onClick={() => navigate(page)}
-                    className="text-sm text-gray-400 transition-colors hover:text-emerald-400"
+                    className="text-sm text-gray-400 transition-colors hover:text-blue-400"
                   >
                     {label}
                   </button>
@@ -135,7 +135,7 @@ export default function Footer() {
                 <li key={page}>
                   <button
                     onClick={() => navigate(page)}
-                    className="text-sm text-gray-400 transition-colors hover:text-emerald-400"
+                    className="text-sm text-gray-400 transition-colors hover:text-blue-400"
                   >
                     {label}
                   </button>
@@ -151,15 +151,15 @@ export default function Footer() {
             </h4>
             <ul className="space-y-3">
               <li className="flex items-start gap-3">
-                <Mail className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
+                <Mail className="mt-0.5 h-4 w-4 shrink-0 text-orange-400" />
                 <span className="text-sm text-gray-400">support@mealicious.store</span>
               </li>
               <li className="flex items-start gap-3">
-                <Phone className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
+                <Phone className="mt-0.5 h-4 w-4 shrink-0 text-orange-400" />
                 <span className="text-sm text-gray-400">+91-9876543210</span>
               </li>
               <li className="flex items-start gap-3">
-                <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
+                <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-orange-400" />
                 <span className="text-sm text-gray-400">
                   Mealicious Ventures Pvt. Ltd.,
                   <br />

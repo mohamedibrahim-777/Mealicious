@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
-import { Star, Heart, ShoppingCart } from 'lucide-react'
+import { Star, Heart, ShoppingCart, PackageSearch } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -70,8 +70,8 @@ export default function ProductCard({ product }: ProductCardProps) {
             onError={() => setImgError(true)}
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center text-4xl text-muted-foreground bg-emerald-50">
-            🥜
+          <div className="flex h-full w-full items-center justify-center text-muted-foreground bg-blue-50">
+            <PackageSearch className="h-10 w-10" />
           </div>
         )}
 
@@ -84,7 +84,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
         {/* New badge */}
         {product.isNew && (
-          <Badge className="absolute top-2 right-10 bg-emerald-600 text-white hover:bg-emerald-700 border-0 text-[11px] font-semibold px-1.5 py-0.5">
+          <Badge className="absolute top-2 right-10 bg-orange-400 text-white hover:bg-orange-400 border-0 text-[11px] font-semibold px-1.5 py-0.5">
             NEW
           </Badge>
         )}
@@ -124,7 +124,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                 key={star}
                 className={`h-3 w-3 ${
                   star <= Math.round(product.rating)
-                    ? 'fill-amber-400 text-amber-400'
+                    ? 'fill-orange-400 text-orange-400'
                     : 'fill-muted text-muted'
                 }`}
               />
@@ -137,7 +137,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
         {/* Price */}
         <div className="flex items-baseline gap-2">
-          <span className="text-lg font-bold text-emerald-700">
+          <span className="text-lg font-bold text-orange-400">
             ₹{displayPrice}
           </span>
           {product.salePrice && (
@@ -149,7 +149,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
         {/* Add to Cart */}
         <Button
-          className="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm h-8 sm:h-9"
+          className="w-full bg-orange-400 hover:bg-orange-400 text-white text-xs sm:text-sm h-8 sm:h-9"
           onClick={handleAddToCart}
         >
           <ShoppingCart className="h-3.5 w-3.5 mr-1" />

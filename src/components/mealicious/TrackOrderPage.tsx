@@ -126,9 +126,9 @@ export default function TrackOrderPage() {
   return (
     <div className="flex flex-col">
       {/* ──────── 1. Hero Section ──────── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-800">
-        <div className="absolute -top-32 -right-32 h-96 w-96 rounded-full bg-emerald-500/20 blur-3xl" />
-        <div className="absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-emerald-400/15 blur-3xl" />
+      <section className="relative overflow-hidden bg-gradient-to-br from-orange-400 via-orange-400 to-orange-400">
+        <div className="absolute -top-32 -right-32 h-96 w-96 rounded-full bg-orange-400/20 blur-3xl" />
+        <div className="absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-blue-400/15 blur-3xl" />
 
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
           <motion.div
@@ -140,7 +140,7 @@ export default function TrackOrderPage() {
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight tracking-tight">
               Track Your Order
             </h1>
-            <p className="mt-4 sm:mt-6 text-base sm:text-lg text-emerald-100 max-w-2xl mx-auto">
+            <p className="mt-4 sm:mt-6 text-base sm:text-lg text-blue-100 max-w-2xl mx-auto">
               Enter your order number to check the current status of your delivery.
             </p>
           </motion.div>
@@ -164,7 +164,7 @@ export default function TrackOrderPage() {
                   />
                   <Button
                     size="lg"
-                    className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shrink-0"
+                    className="bg-orange-400 hover:bg-orange-400 text-white font-semibold shrink-0"
                     onClick={handleTrack}
                   >
                     <Search className="h-4 w-4 mr-2" />
@@ -191,7 +191,7 @@ export default function TrackOrderPage() {
                   </p>
                   <Button
                     variant="outline"
-                    className="border-emerald-200 text-emerald-600 hover:bg-emerald-50"
+                    className="border-blue-200 text-orange-400 hover:bg-blue-50"
                     onClick={() => navigate('contact')}
                   >
                     Contact Support
@@ -207,7 +207,7 @@ export default function TrackOrderPage() {
             <FadeInWhenVisible>
               <Card className="mt-6">
                 <CardContent className="p-8 text-center">
-                  <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-emerald-600 mx-auto mb-4" />
+                  <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-orange-400 mx-auto mb-4" />
                   <p className="text-sm text-muted-foreground">Tracking your order...</p>
                 </CardContent>
               </Card>
@@ -225,7 +225,7 @@ export default function TrackOrderPage() {
                       <div>
                         <div className="flex items-center gap-2 mb-1">
                           <h3 className="text-lg font-bold text-foreground">Order #{orderNumber || 'ML-DEMO1234'}</h3>
-                          <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200">
+                          <Badge className="bg-blue-100 text-orange-400 border-blue-200">
                             In Transit
                           </Badge>
                         </div>
@@ -245,14 +245,14 @@ export default function TrackOrderPage() {
                 </Card>
 
                 {/* Estimated Delivery */}
-                <Card className="bg-emerald-50 border-emerald-200">
+                <Card className="bg-blue-50 border-blue-200">
                   <CardContent className="p-5 flex items-center gap-4">
-                    <div className="rounded-full bg-emerald-100 p-3 shrink-0">
-                      <Clock className="h-6 w-6 text-emerald-600" />
+                    <div className="rounded-full bg-blue-100 p-3 shrink-0">
+                      <Clock className="h-6 w-6 text-orange-400" />
                     </div>
                     <div>
-                      <p className="font-semibold text-emerald-800">Estimated Delivery</p>
-                      <p className="text-emerald-600 text-sm">March 5, 2025 (Wednesday) by 8:00 PM</p>
+                      <p className="font-semibold text-orange-400">Estimated Delivery</p>
+                      <p className="text-orange-400 text-sm">March 5, 2025 (Wednesday) by 8:00 PM</p>
                     </div>
                   </CardContent>
                 </Card>
@@ -272,16 +272,16 @@ export default function TrackOrderPage() {
                               <div
                                 className={`rounded-full p-2 shrink-0 ${
                                   step.status === 'completed'
-                                    ? 'bg-emerald-100'
+                                    ? 'bg-blue-100'
                                     : step.status === 'current'
-                                    ? 'bg-emerald-500 ring-4 ring-emerald-100'
+                                    ? 'bg-orange-400 ring-4 ring-blue-100'
                                     : 'bg-muted'
                                 }`}
                               >
                                 <Icon
                                   className={`h-4 w-4 ${
                                     step.status === 'completed'
-                                      ? 'text-emerald-600'
+                                      ? 'text-orange-400'
                                       : step.status === 'current'
                                       ? 'text-white'
                                       : 'text-muted-foreground/50'
@@ -291,7 +291,7 @@ export default function TrackOrderPage() {
                               {!isLast && (
                                 <div
                                   className={`w-0.5 flex-1 min-h-[40px] ${
-                                    step.status === 'completed' ? 'bg-emerald-300' : 'bg-muted'
+                                    step.status === 'completed' ? 'bg-blue-300' : 'bg-muted'
                                   }`}
                                 />
                               )}
@@ -303,21 +303,21 @@ export default function TrackOrderPage() {
                                 <h4
                                   className={`font-semibold text-sm ${
                                     step.status === 'completed'
-                                      ? 'text-emerald-700'
+                                      ? 'text-orange-400'
                                       : step.status === 'current'
-                                      ? 'text-emerald-600'
+                                      ? 'text-orange-400'
                                       : 'text-muted-foreground'
                                   }`}
                                 >
                                   {step.label}
                                 </h4>
                                 {step.status === 'current' && (
-                                  <Badge className="bg-emerald-500 text-white text-[10px] px-1.5 py-0">
+                                  <Badge className="bg-orange-400 text-white text-[10px] px-1.5 py-0">
                                     CURRENT
                                   </Badge>
                                 )}
                                 {step.status === 'completed' && (
-                                  <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                                  <CheckCircle2 className="h-4 w-4 text-orange-400" />
                                 )}
                               </div>
                               <p className="text-xs text-muted-foreground mt-0.5">{step.date}</p>
@@ -353,7 +353,7 @@ export default function TrackOrderPage() {
                       <div className="space-y-3">
                         <div>
                           <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">AWB Number</p>
-                          <p className="text-sm text-emerald-600 mt-1 font-mono">BD1234567890</p>
+                          <p className="text-sm text-orange-400 mt-1 font-mono">BD1234567890</p>
                         </div>
                         <div>
                           <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">Items in Order</p>
@@ -381,7 +381,7 @@ export default function TrackOrderPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="border-emerald-200 text-emerald-600 hover:bg-emerald-50"
+                        className="border-blue-200 text-orange-400 hover:bg-blue-50"
                         onClick={() => navigate('contact')}
                       >
                         Contact Us
@@ -389,7 +389,7 @@ export default function TrackOrderPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="border-emerald-200 text-emerald-600 hover:bg-emerald-50"
+                        className="border-blue-200 text-orange-400 hover:bg-blue-50"
                         onClick={() => navigate('faq')}
                       >
                         FAQ

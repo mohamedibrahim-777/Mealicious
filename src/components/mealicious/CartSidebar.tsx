@@ -93,10 +93,10 @@ export default function CartSidebar() {
         <SheetHeader className="border-b px-6 py-4">
           <div className="flex items-center justify-between">
             <SheetTitle className="flex items-center gap-2 text-lg font-bold">
-              <ShoppingBag className="size-5 text-emerald-600" />
+              <ShoppingBag className="size-5 text-orange-400" />
               Your Cart
               {totalItems > 0 && (
-                <span className="ml-1 inline-flex size-6 items-center justify-center rounded-full bg-emerald-600 text-xs font-semibold text-white">
+                <span className="ml-1 inline-flex size-6 items-center justify-center rounded-full bg-orange-400 text-xs font-semibold text-white">
                   {totalItems}
                 </span>
               )}
@@ -110,8 +110,8 @@ export default function CartSidebar() {
         {cartItems.length === 0 ? (
           /* Empty Cart State */
           <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 py-12">
-            <div className="flex size-20 items-center justify-center rounded-full bg-emerald-50">
-              <ShoppingBag className="size-10 text-emerald-400" />
+            <div className="flex size-20 items-center justify-center rounded-full bg-blue-50">
+              <ShoppingBag className="size-10 text-blue-400" />
             </div>
             <h3 className="text-lg font-semibold text-gray-900">
               Your cart is empty
@@ -122,7 +122,7 @@ export default function CartSidebar() {
             </p>
             <Button
               onClick={handleStartShopping}
-              className="mt-2 bg-emerald-600 hover:bg-emerald-700"
+              className="mt-2 bg-orange-400 hover:bg-orange-400"
               size="lg"
             >
               Start Shopping
@@ -223,7 +223,7 @@ export default function CartSidebar() {
                             {item.salePrice !== undefined &&
                             item.salePrice < item.price ? (
                               <div className="flex flex-col items-end">
-                                <span className="text-sm font-bold text-emerald-600">
+                                <span className="text-sm font-bold text-orange-400">
                                   ₹{lineTotal}
                                 </span>
                                 <span className="text-xs text-gray-400 line-through">
@@ -249,13 +249,13 @@ export default function CartSidebar() {
               {/* Coupon Code */}
               <div className="mb-4">
                 {appliedCoupon ? (
-                  <div className="flex items-center justify-between rounded-md bg-emerald-50 px-3 py-2">
+                  <div className="flex items-center justify-between rounded-md bg-blue-50 px-3 py-2">
                     <div className="flex items-center gap-2">
-                      <Tag className="size-4 text-emerald-600" />
-                      <span className="text-sm font-medium text-emerald-700">
+                      <Tag className="size-4 text-orange-400" />
+                      <span className="text-sm font-medium text-orange-400">
                         {appliedCoupon}
                       </span>
-                      <span className="text-xs text-emerald-600">
+                      <span className="text-xs text-orange-400">
                         -10% applied
                       </span>
                     </div>
@@ -288,7 +288,7 @@ export default function CartSidebar() {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="h-9 border-emerald-200 text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800"
+                      className="h-9 border-blue-200 text-orange-400 hover:bg-blue-50 hover:text-orange-400"
                       onClick={handleApplyCoupon}
                     >
                       Apply
@@ -313,7 +313,7 @@ export default function CartSidebar() {
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-gray-600">Shipping</span>
                   {shipping === 0 ? (
-                    <span className="font-medium text-emerald-600">Free</span>
+                    <span className="font-medium text-orange-400">Free</span>
                   ) : (
                     <span className="font-medium text-gray-900">₹{shipping}</span>
                   )}
@@ -321,7 +321,7 @@ export default function CartSidebar() {
                 {discount > 0 && (
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-gray-600">Discount</span>
-                    <span className="font-medium text-emerald-600">
+                    <span className="font-medium text-orange-400">
                       -₹{discount}
                     </span>
                   </div>
@@ -345,7 +345,7 @@ export default function CartSidebar() {
 
               {/* Action Buttons */}
               <Button
-                className="h-11 w-full bg-emerald-600 text-base font-semibold hover:bg-emerald-700"
+                className="h-11 w-full bg-orange-400 text-base font-semibold hover:bg-orange-400"
                 size="lg"
                 onClick={handleCheckout}
               >
@@ -355,7 +355,7 @@ export default function CartSidebar() {
 
               <Button
                 variant="ghost"
-                className="mt-2 w-full text-sm text-gray-500 hover:text-emerald-600"
+                className="mt-2 w-full text-sm text-gray-500 hover:text-orange-400"
                 onClick={handleContinueShopping}
               >
                 Continue Shopping

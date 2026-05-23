@@ -5,40 +5,40 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useAppStore } from '@/lib/store'
-import { products } from '@/lib/data'
+import { useCatalogStore } from '@/lib/catalog-store'
 import ProductCard from '@/components/mealicious/ProductCard'
 
 export default function WishlistPage() {
   const wishlistItems = useAppStore((s) => s.wishlistItems)
   const navigate = useAppStore((s) => s.navigate)
+  const products = useCatalogStore((s) => s.products)
 
-  // Filter wishlisted products from the products data
   const wishlistedProducts = products.filter((p) => wishlistItems.includes(p.id))
 
   const isEmpty = wishlistedProducts.length === 0
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-emerald-50/40 via-white to-white">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50/40 via-white to-white">
       {/* Breadcrumb */}
       <div className="border-b bg-white/70 backdrop-blur-sm">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-3">
           <nav className="flex items-center text-sm text-muted-foreground" aria-label="Breadcrumb">
             <button
               onClick={() => navigate('home')}
-              className="flex items-center gap-1 hover:text-emerald-700 transition-colors"
+              className="flex items-center gap-1 hover:text-orange-400 transition-colors"
             >
               <Home className="h-3.5 w-3.5" />
               <span>Home</span>
             </button>
             <ChevronRight className="h-3.5 w-3.5 mx-1.5 text-muted-foreground/50" />
-            <span className="font-medium text-emerald-700">Wishlist</span>
+            <span className="font-medium text-orange-400">Wishlist</span>
           </nav>
         </div>
       </div>
 
       {/* Hero Section */}
       <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 via-emerald-700 to-emerald-800" />
+        <div className="absolute inset-0 bg-gradient-to-r from-orange-400 via-orange-400 to-orange-400" />
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-6 left-10 h-24 w-24 rounded-full bg-white/30 blur-2xl" />
           <div className="absolute bottom-4 right-16 h-32 w-32 rounded-full bg-white/20 blur-3xl" />
@@ -54,7 +54,7 @@ export default function WishlistPage() {
                 <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white tracking-tight">
                   My Wishlist
                 </h1>
-                <p className="mt-1 text-emerald-100 text-sm sm:text-base">
+                <p className="mt-1 text-blue-100 text-sm sm:text-base">
                   Your curated collection of favorites
                 </p>
               </div>
@@ -76,13 +76,13 @@ export default function WishlistPage() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         {isEmpty ? (
           /* Empty State */
-          <Card className="border-dashed border-2 border-emerald-200 bg-white">
+          <Card className="border-dashed border-2 border-blue-200 bg-white">
             <CardContent className="flex flex-col items-center justify-center py-16 sm:py-24 px-6 text-center">
               <div className="relative mb-6">
-                <div className="flex h-24 w-24 items-center justify-center rounded-full bg-emerald-50 border-2 border-emerald-100">
-                  <Heart className="h-10 w-10 text-emerald-300" />
+                <div className="flex h-24 w-24 items-center justify-center rounded-full bg-blue-50 border-2 border-blue-100">
+                  <Heart className="h-10 w-10 text-blue-300" />
                 </div>
-                <div className="absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100 border-2 border-white">
+                <div className="absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 border-2 border-white">
                   <span className="text-sm">0</span>
                 </div>
               </div>
@@ -96,7 +96,7 @@ export default function WishlistPage() {
               <div className="flex flex-col sm:flex-row gap-3">
                 <Button
                   onClick={() => navigate('shop')}
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 h-11 text-sm font-medium"
+                  className="bg-orange-400 hover:bg-orange-400 text-white px-6 h-11 text-sm font-medium"
                 >
                   <ShoppingBag className="h-4 w-4 mr-2" />
                   Explore Products
@@ -105,7 +105,7 @@ export default function WishlistPage() {
                 <Button
                   variant="outline"
                   onClick={() => navigate('home')}
-                  className="border-emerald-200 text-emerald-700 hover:bg-emerald-50 px-6 h-11 text-sm font-medium"
+                  className="border-blue-200 text-orange-400 hover:bg-blue-50 px-6 h-11 text-sm font-medium"
                 >
                   Back to Home
                 </Button>
@@ -125,7 +125,7 @@ export default function WishlistPage() {
                 variant="ghost"
                 size="sm"
                 onClick={() => navigate('shop')}
-                className="text-emerald-700 hover:text-emerald-800 hover:bg-emerald-50"
+                className="text-orange-400 hover:text-orange-400 hover:bg-blue-50"
               >
                 <ShoppingBag className="h-4 w-4 mr-1.5" />
                 Continue Shopping
@@ -144,7 +144,7 @@ export default function WishlistPage() {
               <Button
                 onClick={() => navigate('shop')}
                 variant="outline"
-                className="border-emerald-200 text-emerald-700 hover:bg-emerald-50 px-8 h-11 text-sm font-medium"
+                className="border-blue-200 text-orange-400 hover:bg-blue-50 px-8 h-11 text-sm font-medium"
               >
                 <ShoppingBag className="h-4 w-4 mr-2" />
                 Discover More Products

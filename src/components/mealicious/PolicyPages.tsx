@@ -50,7 +50,7 @@ function PolicyBreadcrumb({ current }: { current: string }) {
     <nav className="flex items-center gap-1.5 text-sm text-muted-foreground mb-6">
       <button
         onClick={() => navigate('home')}
-        className="flex items-center gap-1 hover:text-emerald-600 transition-colors"
+        className="flex items-center gap-1 hover:text-orange-400 transition-colors"
       >
         <Home className="h-3.5 w-3.5" />
         Home
@@ -86,7 +86,7 @@ function TableOfContents({
               onClick={() => handleClick(item.id)}
               className={`block text-xs sm:text-sm text-left w-full py-1 px-2 rounded transition-colors ${
                 activeId === item.id
-                  ? 'bg-emerald-50 text-emerald-700 font-medium'
+                  ? 'bg-blue-50 text-orange-400 font-medium'
                   : 'text-muted-foreground hover:bg-muted hover:text-foreground'
               }`}
             >
@@ -120,8 +120,8 @@ export function PrivacyPolicyPage() {
   return (
     <div className="flex flex-col">
       {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-800">
-        <div className="absolute -top-32 -right-32 h-96 w-96 rounded-full bg-emerald-500/20 blur-3xl" />
+      <section className="relative overflow-hidden bg-gradient-to-br from-orange-400 via-orange-400 to-orange-400">
+        <div className="absolute -top-32 -right-32 h-96 w-96 rounded-full bg-orange-400/20 blur-3xl" />
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -129,11 +129,11 @@ export function PrivacyPolicyPage() {
             transition={{ duration: 0.7, ease: 'easeOut' }}
             className="text-center max-w-3xl mx-auto"
           >
-            <ShieldCheck className="h-12 w-12 text-emerald-200 mx-auto mb-4" />
+            <ShieldCheck className="h-12 w-12 text-blue-200 mx-auto mb-4" />
             <h1 className="text-3xl sm:text-4xl font-extrabold text-white leading-tight tracking-tight">
               Privacy Policy
             </h1>
-            <p className="mt-3 text-emerald-100">Last updated: March 1, 2025</p>
+            <p className="mt-3 text-blue-100">Last updated: March 1, 2025</p>
           </motion.div>
         </div>
       </section>
@@ -310,8 +310,8 @@ export function TermsPage() {
   return (
     <div className="flex flex-col">
       {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-800">
-        <div className="absolute -top-32 -right-32 h-96 w-96 rounded-full bg-emerald-500/20 blur-3xl" />
+      <section className="relative overflow-hidden bg-gradient-to-br from-orange-400 via-orange-400 to-orange-400">
+        <div className="absolute -top-32 -right-32 h-96 w-96 rounded-full bg-orange-400/20 blur-3xl" />
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -319,11 +319,11 @@ export function TermsPage() {
             transition={{ duration: 0.7, ease: 'easeOut' }}
             className="text-center max-w-3xl mx-auto"
           >
-            <FileText className="h-12 w-12 text-emerald-200 mx-auto mb-4" />
+            <FileText className="h-12 w-12 text-blue-200 mx-auto mb-4" />
             <h1 className="text-3xl sm:text-4xl font-extrabold text-white leading-tight tracking-tight">
               Terms &amp; Conditions
             </h1>
-            <p className="mt-3 text-emerald-100">Last updated: March 1, 2025</p>
+            <p className="mt-3 text-blue-100">Last updated: March 1, 2025</p>
           </motion.div>
         </div>
       </section>
@@ -478,8 +478,8 @@ export function RefundPolicyPage() {
   return (
     <div className="flex flex-col">
       {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-800">
-        <div className="absolute -top-32 -right-32 h-96 w-96 rounded-full bg-emerald-500/20 blur-3xl" />
+      <section className="relative overflow-hidden bg-gradient-to-br from-orange-400 via-orange-400 to-orange-400">
+        <div className="absolute -top-32 -right-32 h-96 w-96 rounded-full bg-orange-400/20 blur-3xl" />
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -487,11 +487,11 @@ export function RefundPolicyPage() {
             transition={{ duration: 0.7, ease: 'easeOut' }}
             className="text-center max-w-3xl mx-auto"
           >
-            <RotateCcw className="h-12 w-12 text-emerald-200 mx-auto mb-4" />
+            <RotateCcw className="h-12 w-12 text-blue-200 mx-auto mb-4" />
             <h1 className="text-3xl sm:text-4xl font-extrabold text-white leading-tight tracking-tight">
               Refund &amp; Return Policy
             </h1>
-            <p className="mt-3 text-emerald-100">Last updated: March 1, 2025</p>
+            <p className="mt-3 text-blue-100">Last updated: March 1, 2025</p>
           </motion.div>
         </div>
       </section>
@@ -519,12 +519,12 @@ export function RefundPolicyPage() {
                       the date of delivery. This policy applies to all products purchased through our website
                       mealicious.store.
                     </p>
-                    <Card className="mt-4 bg-emerald-50 border-emerald-200">
+                    <Card className="mt-4 bg-blue-50 border-blue-200">
                       <CardContent className="p-4 flex items-start gap-3">
-                        <RotateCcw className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
+                        <RotateCcw className="h-5 w-5 text-orange-400 shrink-0 mt-0.5" />
                         <div>
-                          <p className="font-semibold text-emerald-800 text-sm">7-Day Easy Returns</p>
-                          <p className="text-xs text-emerald-600 mt-0.5">
+                          <p className="font-semibold text-orange-400 text-sm">7-Day Easy Returns</p>
+                          <p className="text-xs text-orange-400 mt-0.5">
                             Return any product within 7 days of delivery if you&apos;re not satisfied.
                           </p>
                         </div>
@@ -557,8 +557,8 @@ export function RefundPolicyPage() {
                     </p>
                     <div className="space-y-4">
                       <div className="flex items-start gap-3">
-                        <div className="rounded-full bg-emerald-100 p-1.5 mt-0.5">
-                          <span className="text-xs font-bold text-emerald-700">1</span>
+                        <div className="rounded-full bg-blue-100 p-1.5 mt-0.5">
+                          <span className="text-xs font-bold text-orange-400">1</span>
                         </div>
                         <div>
                           <p className="font-medium text-foreground text-sm">Initiate Return</p>
@@ -566,8 +566,8 @@ export function RefundPolicyPage() {
                         </div>
                       </div>
                       <div className="flex items-start gap-3">
-                        <div className="rounded-full bg-emerald-100 p-1.5 mt-0.5">
-                          <span className="text-xs font-bold text-emerald-700">2</span>
+                        <div className="rounded-full bg-blue-100 p-1.5 mt-0.5">
+                          <span className="text-xs font-bold text-orange-400">2</span>
                         </div>
                         <div>
                           <p className="font-medium text-foreground text-sm">Review &amp; Approval</p>
@@ -575,8 +575,8 @@ export function RefundPolicyPage() {
                         </div>
                       </div>
                       <div className="flex items-start gap-3">
-                        <div className="rounded-full bg-emerald-100 p-1.5 mt-0.5">
-                          <span className="text-xs font-bold text-emerald-700">3</span>
+                        <div className="rounded-full bg-blue-100 p-1.5 mt-0.5">
+                          <span className="text-xs font-bold text-orange-400">3</span>
                         </div>
                         <div>
                           <p className="font-medium text-foreground text-sm">Pickup / Self-Ship</p>
@@ -584,8 +584,8 @@ export function RefundPolicyPage() {
                         </div>
                       </div>
                       <div className="flex items-start gap-3">
-                        <div className="rounded-full bg-emerald-100 p-1.5 mt-0.5">
-                          <span className="text-xs font-bold text-emerald-700">4</span>
+                        <div className="rounded-full bg-blue-100 p-1.5 mt-0.5">
+                          <span className="text-xs font-bold text-orange-400">4</span>
                         </div>
                         <div>
                           <p className="font-medium text-foreground text-sm">Refund Issued</p>
@@ -650,14 +650,14 @@ export function RefundPolicyPage() {
                       <CardContent className="p-5 space-y-3">
                         <div className="space-y-2 text-sm">
                           <p><strong className="text-foreground">MEALICIOUS VENTURES PRIVATE LIMITED</strong></p>
-                          <p className="text-muted-foreground">Email: <span className="text-emerald-600">support@mealicious.store</span></p>
-                          <p className="text-muted-foreground">Phone: <span className="text-emerald-600">+91-9876543210</span></p>
-                          <p className="text-muted-foreground">WhatsApp: <span className="text-emerald-600">+91-9876543210</span></p>
+                          <p className="text-muted-foreground">Email: <span className="text-orange-400">support@mealicious.store</span></p>
+                          <p className="text-muted-foreground">Phone: <span className="text-orange-400">+91-9876543210</span></p>
+                          <p className="text-muted-foreground">WhatsApp: <span className="text-orange-400">+91-9876543210</span></p>
                           <p className="text-muted-foreground">Hours: Monday - Saturday, 10 AM - 8 PM IST</p>
                           <p className="text-muted-foreground">Address: 123 Health Street, Mumbai, Maharashtra 400001, India</p>
                         </div>
                         <Button
-                          className="bg-emerald-600 hover:bg-emerald-700 text-white mt-2"
+                          className="bg-orange-400 hover:bg-orange-400 text-white mt-2"
                           onClick={() => navigate('contact')}
                         >
                           Contact Support

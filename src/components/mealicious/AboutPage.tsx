@@ -80,10 +80,10 @@ const staggerChild = {
 /* ─────────────────────── data ─────────────────────── */
 
 const stats = [
-  { icon: Users, label: 'Customers', value: '10,000+', color: 'text-emerald-600' },
-  { icon: Package, label: 'Products', value: '50+', color: 'text-emerald-600' },
-  { icon: MapPin, label: 'Cities', value: '100+', color: 'text-emerald-600' },
-  { icon: Star, label: 'Rating', value: '4.8★', color: 'text-amber-500' },
+  { icon: Users, label: 'Customers', value: '10,000+', color: 'text-orange-400' },
+  { icon: Package, label: 'Products', value: '50+', color: 'text-orange-400' },
+  { icon: MapPin, label: 'Cities', value: '100+', color: 'text-orange-400' },
+  { icon: Star, label: 'Rating', value: '4.8★', color: 'text-orange-400' },
 ]
 
 const teamValues = [
@@ -91,8 +91,8 @@ const teamValues = [
     icon: ShieldCheck,
     title: 'Quality First',
     desc: 'Every product undergoes rigorous quality checks. We source only the finest ingredients from trusted farms worldwide.',
-    color: 'text-emerald-600',
-    bg: 'bg-emerald-50',
+    color: 'text-orange-400',
+    bg: 'bg-blue-50',
   },
   {
     icon: Heart,
@@ -112,8 +112,8 @@ const teamValues = [
     icon: Lightbulb,
     title: 'Innovation',
     desc: 'We constantly innovate — new flavors, healthier options, and better ways to bring premium snacking to your doorstep.',
-    color: 'text-amber-500',
-    bg: 'bg-amber-50',
+    color: 'text-orange-400',
+    bg: 'bg-orange-50',
   },
 ]
 
@@ -125,9 +125,9 @@ export default function AboutPage() {
   return (
     <div className="flex flex-col">
       {/* ──────── 1. Hero Section ──────── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-800">
-        <div className="absolute -top-32 -right-32 h-96 w-96 rounded-full bg-emerald-500/20 blur-3xl" />
-        <div className="absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-emerald-400/15 blur-3xl" />
+      <section className="relative overflow-hidden bg-gradient-to-br from-orange-400 via-orange-400 to-orange-400">
+        <div className="absolute -top-32 -right-32 h-96 w-96 rounded-full bg-orange-400/20 blur-3xl" />
+        <div className="absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-blue-400/15 blur-3xl" />
 
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
           <motion.div
@@ -139,7 +139,7 @@ export default function AboutPage() {
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight tracking-tight">
               About Mealicious Store
             </h1>
-            <p className="mt-4 sm:mt-6 text-base sm:text-lg text-emerald-100 max-w-2xl mx-auto">
+            <p className="mt-4 sm:mt-6 text-base sm:text-lg text-blue-100 max-w-2xl mx-auto">
               We&apos;re on a mission to make premium, healthy snacking accessible to everyone.
               Fresh, natural, and delicious — that&apos;s the Mealicious promise.
             </p>
@@ -156,7 +156,7 @@ export default function AboutPage() {
                 <h2 className="text-2xl sm:text-3xl font-bold text-foreground">
                   Our Story
                 </h2>
-                <Separator className="w-16 bg-emerald-500 h-1" />
+                <Separator className="w-16 bg-orange-400 h-1" />
                 <p className="text-muted-foreground leading-relaxed">
                   <strong className="text-foreground">MEALICIOUS VENTURES PRIVATE LIMITED</strong> was born from a simple
                   realization — finding truly premium, chemical-free dry fruits and healthy snacks in India
@@ -181,31 +181,31 @@ export default function AboutPage() {
 
             <FadeInWhenVisible delay={0.2}>
               <div className="relative">
-                <div className="rounded-2xl overflow-hidden bg-gradient-to-br from-emerald-100 to-emerald-50 p-8 sm:p-12 flex flex-col items-center justify-center min-h-[320px]">
-                  <Award className="h-20 w-20 text-emerald-600 mb-4" />
-                  <h3 className="text-2xl font-bold text-emerald-800 mb-2">FSSAI Certified</h3>
-                  <p className="text-emerald-600 text-center max-w-xs">
+                <div className="rounded-2xl overflow-hidden bg-gradient-to-br from-blue-100 to-blue-50 p-8 sm:p-12 flex flex-col items-center justify-center min-h-[320px]">
+                  <Award className="h-20 w-20 text-orange-400 mb-4" />
+                  <h3 className="text-2xl font-bold text-orange-400 mb-2">FSSAI Certified</h3>
+                  <p className="text-orange-400 text-center max-w-xs">
                     All our products are FSSAI certified and manufactured in licensed facilities
                     following strict quality standards.
                   </p>
                   <div className="mt-6 grid grid-cols-3 gap-4 text-center">
                     <div>
-                      <div className="text-2xl font-bold text-emerald-700">ISO</div>
-                      <div className="text-xs text-emerald-600">Certified</div>
+                      <div className="text-2xl font-bold text-orange-400">ISO</div>
+                      <div className="text-xs text-orange-400">Certified</div>
                     </div>
                     <div>
-                      <div className="text-2xl font-bold text-emerald-700">GMP</div>
-                      <div className="text-xs text-emerald-600">Compliant</div>
+                      <div className="text-2xl font-bold text-orange-400">GMP</div>
+                      <div className="text-xs text-orange-400">Compliant</div>
                     </div>
                     <div>
-                      <div className="text-2xl font-bold text-emerald-700">HACCP</div>
-                      <div className="text-xs text-emerald-600">Standards</div>
+                      <div className="text-2xl font-bold text-orange-400">HACCP</div>
+                      <div className="text-xs text-orange-400">Standards</div>
                     </div>
                   </div>
                 </div>
                 {/* Decorative elements */}
-                <div className="absolute -top-4 -right-4 h-24 w-24 rounded-full bg-emerald-200/50 blur-2xl" />
-                <div className="absolute -bottom-4 -left-4 h-20 w-20 rounded-full bg-emerald-300/30 blur-2xl" />
+                <div className="absolute -top-4 -right-4 h-24 w-24 rounded-full bg-blue-200/50 blur-2xl" />
+                <div className="absolute -bottom-4 -left-4 h-20 w-20 rounded-full bg-blue-300/30 blur-2xl" />
               </div>
             </FadeInWhenVisible>
           </div>
@@ -228,12 +228,12 @@ export default function AboutPage() {
 
           <div className="grid md:grid-cols-2 gap-6 sm:gap-8">
             <FadeInWhenVisible delay={0.1}>
-              <Card className="h-full border-emerald-200 bg-gradient-to-br from-emerald-50 to-white hover:shadow-lg transition-shadow">
+              <Card className="h-full border-blue-200 bg-gradient-to-br from-blue-50 to-white hover:shadow-lg transition-shadow">
                 <CardContent className="p-6 sm:p-8 space-y-4">
-                  <div className="rounded-full bg-emerald-100 p-3 w-fit">
-                    <Heart className="h-6 w-6 text-emerald-600" />
+                  <div className="rounded-full bg-blue-100 p-3 w-fit">
+                    <Heart className="h-6 w-6 text-orange-400" />
                   </div>
-                  <h3 className="text-xl font-bold text-emerald-800">Our Mission</h3>
+                  <h3 className="text-xl font-bold text-orange-400">Our Mission</h3>
                   <p className="text-muted-foreground leading-relaxed">
                     To make premium, chemical-free dry fruits and healthy snacks accessible to every
                     Indian household. We strive to bridge the gap between farm-fresh quality and
@@ -245,12 +245,12 @@ export default function AboutPage() {
             </FadeInWhenVisible>
 
             <FadeInWhenVisible delay={0.2}>
-              <Card className="h-full border-emerald-200 bg-gradient-to-br from-emerald-50 to-white hover:shadow-lg transition-shadow">
+              <Card className="h-full border-blue-200 bg-gradient-to-br from-blue-50 to-white hover:shadow-lg transition-shadow">
                 <CardContent className="p-6 sm:p-8 space-y-4">
-                  <div className="rounded-full bg-emerald-100 p-3 w-fit">
-                    <Lightbulb className="h-6 w-6 text-emerald-600" />
+                  <div className="rounded-full bg-blue-100 p-3 w-fit">
+                    <Lightbulb className="h-6 w-6 text-orange-400" />
                   </div>
-                  <h3 className="text-xl font-bold text-emerald-800">Our Vision</h3>
+                  <h3 className="text-xl font-bold text-orange-400">Our Vision</h3>
                   <p className="text-muted-foreground leading-relaxed">
                     To become India&apos;s most trusted and loved health snack brand, known for
                     uncompromising quality, innovative flavors, and a commitment to sustainability.
@@ -274,7 +274,7 @@ export default function AboutPage() {
                 <motion.div key={stat.label} variants={staggerChild}>
                   <Card className="text-center py-8 hover:shadow-md transition-shadow border-border/50 h-full">
                     <CardContent className="p-4 sm:p-6 space-y-3 flex flex-col items-center">
-                      <div className="rounded-full bg-emerald-50 p-3 sm:p-4">
+                      <div className="rounded-full bg-blue-50 p-3 sm:p-4">
                         <Icon className={`h-6 w-6 sm:h-7 sm:w-7 ${stat.color}`} />
                       </div>
                       <div className="text-2xl sm:text-3xl font-bold text-foreground">
@@ -328,9 +328,9 @@ export default function AboutPage() {
       </section>
 
       {/* ──────── 6. CTA Section ──────── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-800">
-        <div className="absolute -top-20 -right-20 h-60 w-60 rounded-full bg-emerald-400/20 blur-3xl" />
-        <div className="absolute -bottom-16 -left-16 h-48 w-48 rounded-full bg-emerald-500/15 blur-3xl" />
+      <section className="relative overflow-hidden bg-gradient-to-br from-orange-400 via-orange-400 to-orange-400">
+        <div className="absolute -top-20 -right-20 h-60 w-60 rounded-full bg-blue-400/20 blur-3xl" />
+        <div className="absolute -bottom-16 -left-16 h-48 w-48 rounded-full bg-orange-400/15 blur-3xl" />
 
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-14 sm:py-20">
           <FadeInWhenVisible>
@@ -338,12 +338,12 @@ export default function AboutPage() {
               <h2 className="text-2xl sm:text-3xl font-bold text-white">
                 Ready to taste the difference?
               </h2>
-              <p className="text-emerald-100">
+              <p className="text-blue-100">
                 Explore our collection of premium dry fruits &amp; healthy snacks today.
               </p>
               <Button
                 size="lg"
-                className="bg-white text-emerald-700 hover:bg-emerald-50 font-semibold mt-4"
+                className="bg-white text-orange-400 hover:bg-blue-50 font-semibold mt-4"
                 onClick={() => navigate('shop')}
               >
                 Shop Now

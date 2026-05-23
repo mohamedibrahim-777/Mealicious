@@ -25,6 +25,8 @@ import {
   ChevronRight,
   LogOut,
   UserCircle,
+  Sparkles,
+  Shield,
 } from 'lucide-react'
 
 const NAV_LINKS: { label: string; page: Page }[] = [
@@ -106,11 +108,11 @@ export default function Header() {
   return (
     <>
       {/* Announcement Bar */}
-      <div className="bg-emerald-700 text-white text-center py-2 px-4 text-xs sm:text-sm font-medium relative z-50">
+      <div className="bg-orange-400 text-white text-center py-2 px-4 text-xs sm:text-sm font-medium relative z-50">
         <div className="max-w-7xl mx-auto flex items-center justify-center gap-2">
-          <span className="hidden sm:inline">🎉</span>
+          <Sparkles className="hidden sm:inline-block h-4 w-4" />
           <span>Free Shipping on Orders Above ₹599 | Use Code WELCOME10 for 10% Off!</span>
-          <span className="hidden sm:inline">🎉</span>
+          <Sparkles className="hidden sm:inline-block h-4 w-4" />
         </div>
       </div>
 
@@ -131,7 +133,7 @@ export default function Header() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="mr-2 text-gray-700 hover:text-emerald-600 hover:bg-emerald-50"
+                    className="mr-2 text-gray-700 hover:text-orange-400 hover:bg-blue-50"
                     aria-label="Open menu"
                   >
                     <Menu className="h-5 w-5" />
@@ -140,9 +142,9 @@ export default function Header() {
                 <SheetContent side="left" className="w-[300px] sm:w-[350px] p-0">
                   <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
                   {/* Mobile Menu Header */}
-                  <div className="flex items-center gap-2 px-6 py-5 border-b border-gray-100 bg-emerald-50">
-                    <Leaf className="h-6 w-6 text-emerald-600" />
-                    <span className="text-xl font-bold text-emerald-800 tracking-tight">
+                  <div className="flex items-center gap-2 px-6 py-5 border-b border-gray-100 bg-blue-50">
+                    <Leaf className="h-6 w-6 text-orange-400" />
+                    <span className="text-xl font-bold text-orange-400 tracking-tight">
                       MEALICIOUS
                     </span>
                   </div>
@@ -155,8 +157,8 @@ export default function Header() {
                         onClick={() => handleNavClick(link.page)}
                         className={`flex items-center justify-between px-6 py-3.5 text-sm font-medium transition-colors ${
                           isActivePage(link.page)
-                            ? 'text-emerald-700 bg-emerald-50 border-r-3 border-emerald-600'
-                            : 'text-gray-700 hover:text-emerald-600 hover:bg-emerald-50/50'
+                            ? 'text-orange-400 bg-blue-50 border-r-3 border-orange-400'
+                            : 'text-gray-700 hover:text-orange-400 hover:bg-blue-50/50'
                         }`}
                       >
                         <span>{link.label}</span>
@@ -170,8 +172,8 @@ export default function Header() {
                     {isLoggedIn && user ? (
                       <div className="space-y-3">
                         <div className="flex items-center gap-3 py-2">
-                          <div className="h-9 w-9 rounded-full bg-emerald-100 flex items-center justify-center">
-                            <User className="h-4 w-4 text-emerald-700" />
+                          <div className="h-9 w-9 rounded-full bg-blue-100 flex items-center justify-center">
+                            <User className="h-4 w-4 text-orange-400" />
                           </div>
                           <div>
                             <p className="text-sm font-medium text-gray-900">{user.name}</p>
@@ -180,17 +182,25 @@ export default function Header() {
                         </div>
                         <button
                           onClick={() => handleNavClick('profile')}
-                          className="w-full text-left px-3 py-2.5 text-sm text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-md transition-colors"
+                          className="w-full text-left px-3 py-2.5 text-sm text-gray-700 hover:text-orange-400 hover:bg-blue-50 rounded-md transition-colors"
                         >
                           My Profile
                         </button>
+                        {user.role === 'admin' && (
+                          <button
+                            onClick={() => handleNavClick('admin')}
+                            className="w-full text-left px-3 py-2.5 text-sm font-semibold text-orange-500 hover:bg-orange-50 rounded-md transition-colors"
+                          >
+                            Admin Panel
+                          </button>
+                        )}
                         <button
                           onClick={() => handleNavClick('wishlist')}
-                          className="w-full text-left px-3 py-2.5 text-sm text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-md transition-colors flex items-center justify-between"
+                          className="w-full text-left px-3 py-2.5 text-sm text-gray-700 hover:text-orange-400 hover:bg-blue-50 rounded-md transition-colors flex items-center justify-between"
                         >
                           <span>Wishlist</span>
                           {wishlistCount > 0 && (
-                            <Badge className="bg-emerald-600 text-white text-[10px] h-5 min-w-[20px] px-1.5">
+                            <Badge className="bg-orange-400 text-white text-[10px] h-5 min-w-[20px] px-1.5">
                               {wishlistCount}
                             </Badge>
                           )}
@@ -210,14 +220,14 @@ export default function Header() {
                       <div className="space-y-2">
                         <Button
                           onClick={() => handleNavClick('login')}
-                          className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
+                          className="w-full bg-orange-400 hover:bg-orange-400 text-white"
                         >
                           Sign In
                         </Button>
                         <Button
                           onClick={() => handleNavClick('register')}
                           variant="outline"
-                          className="w-full border-emerald-600 text-emerald-600 hover:bg-emerald-50"
+                          className="w-full border-orange-400 text-orange-400 hover:bg-blue-50"
                         >
                           Create Account
                         </Button>
@@ -235,13 +245,13 @@ export default function Header() {
               aria-label="Go to homepage"
             >
               <div className="relative">
-                <Leaf className="h-7 w-7 text-emerald-600 group-hover:text-emerald-700 transition-colors" />
+                <Leaf className="h-7 w-7 text-orange-400 group-hover:text-orange-400 transition-colors" />
               </div>
               <div className="flex flex-col leading-none">
-                <span className="text-lg sm:text-xl font-extrabold tracking-tight text-gray-900 group-hover:text-emerald-700 transition-colors">
+                <span className="text-lg sm:text-xl font-extrabold tracking-tight text-gray-900 group-hover:text-orange-400 transition-colors">
                   MEALICIOUS
                 </span>
-                <span className="text-[9px] sm:text-[10px] font-medium text-emerald-600 tracking-[0.15em] uppercase">
+                <span className="text-[9px] sm:text-[10px] font-medium text-orange-400 tracking-[0.15em] uppercase">
                   Store
                 </span>
               </div>
@@ -255,13 +265,13 @@ export default function Header() {
                   onClick={() => handleNavClick(link.page)}
                   className={`relative px-3 py-2 text-sm font-medium transition-colors rounded-md ${
                     isActivePage(link.page)
-                      ? 'text-emerald-700 bg-emerald-50'
-                      : 'text-gray-600 hover:text-emerald-600 hover:bg-emerald-50/50'
+                      ? 'text-orange-400 bg-blue-50'
+                      : 'text-gray-600 hover:text-orange-400 hover:bg-blue-50/50'
                   }`}
                 >
                   {link.label}
                   {isActivePage(link.page) && (
-                    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-5 h-0.5 bg-emerald-600 rounded-full" />
+                    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-5 h-0.5 bg-orange-400 rounded-full" />
                   )}
                 </button>
               ))}
@@ -283,7 +293,7 @@ export default function Header() {
                         placeholder="Search products..."
                         value={localSearch}
                         onChange={(e) => setLocalSearch(e.target.value)}
-                        className="w-40 sm:w-56 h-9 pl-8 pr-3 text-sm border-emerald-200 focus:border-emerald-400 focus:ring-emerald-400/20"
+                        className="w-40 sm:w-56 h-9 pl-8 pr-3 text-sm border-blue-200 focus:border-blue-400 focus:ring-blue-400/20"
                         autoFocus
                       />
                     </div>
@@ -302,7 +312,7 @@ export default function Header() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 h-9 w-9 sm:h-10 sm:w-10"
+                    className="text-gray-600 hover:text-orange-400 hover:bg-blue-50 h-9 w-9 sm:h-10 sm:w-10"
                     onClick={() => setSearchOpen(true)}
                     aria-label="Open search"
                   >
@@ -315,13 +325,13 @@ export default function Header() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="relative text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 h-9 w-9 sm:h-10 sm:w-10"
+                className="relative text-gray-600 hover:text-orange-400 hover:bg-blue-50 h-9 w-9 sm:h-10 sm:w-10"
                 onClick={() => handleNavClick('wishlist')}
                 aria-label="Wishlist"
               >
                 <Heart className="h-[18px] w-[18px] sm:h-5 sm:w-5" />
                 {wishlistCount > 0 && (
-                  <Badge className="absolute -top-0.5 -right-0.5 bg-emerald-600 text-white text-[10px] h-4 min-w-[16px] px-1 flex items-center justify-center border-0">
+                  <Badge className="absolute -top-0.5 -right-0.5 bg-orange-400 text-white text-[10px] h-4 min-w-[16px] px-1 flex items-center justify-center border-0">
                     {wishlistCount}
                   </Badge>
                 )}
@@ -331,13 +341,13 @@ export default function Header() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="relative text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 h-9 w-9 sm:h-10 sm:w-10"
+                className="relative text-gray-600 hover:text-orange-400 hover:bg-blue-50 h-9 w-9 sm:h-10 sm:w-10"
                 onClick={() => setCartOpen(true)}
                 aria-label="Shopping cart"
               >
                 <ShoppingCart className="h-[18px] w-[18px] sm:h-5 sm:w-5" />
                 {cartCount > 0 && (
-                  <Badge className="absolute -top-0.5 -right-0.5 bg-emerald-600 text-white text-[10px] h-4 min-w-[16px] px-1 flex items-center justify-center border-0">
+                  <Badge className="absolute -top-0.5 -right-0.5 bg-orange-400 text-white text-[10px] h-4 min-w-[16px] px-1 flex items-center justify-center border-0">
                     {cartCount}
                   </Badge>
                 )}
@@ -350,11 +360,11 @@ export default function Header() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="relative text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 h-9 w-9 sm:h-10 sm:w-10"
+                      className="relative text-gray-600 hover:text-orange-400 hover:bg-blue-50 h-9 w-9 sm:h-10 sm:w-10"
                       aria-label="Account menu"
                     >
-                      <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-emerald-100 flex items-center justify-center">
-                        <span className="text-xs sm:text-sm font-semibold text-emerald-700">
+                      <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-blue-100 flex items-center justify-center">
+                        <span className="text-xs sm:text-sm font-semibold text-orange-400">
                           {user?.name?.charAt(0).toUpperCase() || 'U'}
                         </span>
                       </div>
@@ -375,6 +385,15 @@ export default function Header() {
                       <UserCircle className="mr-2 h-4 w-4" />
                       <span>My Profile</span>
                     </DropdownMenuItem>
+                    {user?.role === 'admin' && (
+                      <DropdownMenuItem
+                        onClick={() => handleNavClick('admin')}
+                        className="cursor-pointer font-semibold text-orange-500 focus:text-orange-500"
+                      >
+                        <Shield className="mr-2 h-4 w-4" />
+                        <span>Admin Panel</span>
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuItem
                       onClick={() => handleNavClick('wishlist')}
                       className="cursor-pointer"
@@ -382,7 +401,7 @@ export default function Header() {
                       <Heart className="mr-2 h-4 w-4" />
                       <span>Wishlist</span>
                       {wishlistCount > 0 && (
-                        <Badge className="ml-auto bg-emerald-600 text-white text-[10px] h-5 min-w-[20px] px-1.5 border-0">
+                        <Badge className="ml-auto bg-orange-400 text-white text-[10px] h-5 min-w-[20px] px-1.5 border-0">
                           {wishlistCount}
                         </Badge>
                       )}
@@ -401,7 +420,7 @@ export default function Header() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 h-9 w-9 sm:h-10 sm:w-10"
+                  className="text-gray-600 hover:text-orange-400 hover:bg-blue-50 h-9 w-9 sm:h-10 sm:w-10"
                   onClick={() => handleNavClick('login')}
                   aria-label="Sign in"
                 >

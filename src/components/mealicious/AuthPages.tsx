@@ -46,17 +46,17 @@ const strengthColors = [
   'bg-red-400',
   'bg-orange-400',
   'bg-yellow-400',
-  'bg-emerald-400',
-  'bg-emerald-600',
+  'bg-blue-400',
+  'bg-orange-400',
 ]
 
 function Logo() {
   return (
     <div className="flex items-center justify-center gap-2">
-      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-600 text-white">
+      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-400 text-white">
         <Leaf className="h-6 w-6" />
       </div>
-      <span className="text-2xl font-bold tracking-tight text-emerald-700">
+      <span className="text-2xl font-bold tracking-tight text-orange-400">
         MEALICIOUS
       </span>
     </div>
@@ -130,19 +130,19 @@ export function LoginPage() {
     const ok = login(email, password)
     setLoading(false)
     if (ok) {
-      toast.success('Welcome back! 🎉')
+      toast.success('Welcome back!')
     }
   }
 
   return (
-    <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center bg-gradient-to-br from-emerald-50 via-white to-emerald-50 px-4 py-12">
+    <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center bg-gradient-to-br from-blue-50 via-white to-blue-50 px-4 py-12">
       <motion.div
         variants={cardVariants}
         initial="hidden"
         animate="visible"
         className="w-full max-w-md"
       >
-        <Card className="border-emerald-100 shadow-xl shadow-emerald-100/40">
+        <Card className="border-blue-100 shadow-xl shadow-blue-100/40">
           <CardHeader className="items-center text-center">
             <Logo />
             <div className="mt-2 space-y-1 text-center">
@@ -211,7 +211,7 @@ export function LoginPage() {
                 </div>
                 <button
                   type="button"
-                  className="text-sm font-medium text-emerald-600 hover:text-emerald-700 hover:underline"
+                  className="text-sm font-medium text-orange-400 hover:text-orange-400 hover:underline"
                   onClick={() => toast.info('Password reset is not available in demo')}
                 >
                   Forgot Password?
@@ -221,7 +221,7 @@ export function LoginPage() {
               {/* Submit */}
               <Button
                 type="submit"
-                className="w-full bg-emerald-600 text-white hover:bg-emerald-700"
+                className="w-full bg-orange-400 text-white hover:bg-orange-400"
                 disabled={loading}
               >
                 {loading ? (
@@ -254,7 +254,7 @@ export function LoginPage() {
               Don&apos;t have an account?{' '}
               <button
                 type="button"
-                className="font-semibold text-emerald-600 hover:text-emerald-700 hover:underline"
+                className="font-semibold text-orange-400 hover:text-orange-400 hover:underline"
                 onClick={() => navigate('register')}
               >
                 Register
@@ -307,19 +307,19 @@ export function RegisterPage() {
     const ok = register(name, email, phone, password)
     setLoading(false)
     if (ok) {
-      toast.success('Account created successfully! 🎉')
+      toast.success('Account created successfully!')
     }
   }
 
   return (
-    <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center bg-gradient-to-br from-emerald-50 via-white to-emerald-50 px-4 py-12">
+    <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center bg-gradient-to-br from-blue-50 via-white to-blue-50 px-4 py-12">
       <motion.div
         variants={cardVariants}
         initial="hidden"
         animate="visible"
         className="w-full max-w-md"
       >
-        <Card className="border-emerald-100 shadow-xl shadow-emerald-100/40">
+        <Card className="border-blue-100 shadow-xl shadow-blue-100/40">
           <CardHeader className="items-center text-center">
             <Logo />
             <div className="mt-2 space-y-1 text-center">
@@ -424,11 +424,11 @@ export function RegisterPage() {
                       <span
                         className={
                           pwStrength >= 4
-                            ? 'font-semibold text-emerald-600'
+                            ? 'font-semibold text-orange-400'
                             : pwStrength >= 3
                               ? 'font-semibold text-yellow-600'
                               : pwStrength >= 2
-                                ? 'font-semibold text-orange-600'
+                                ? 'font-semibold text-orange-400'
                                 : 'font-semibold text-red-500'
                         }
                       >
@@ -478,7 +478,7 @@ export function RegisterPage() {
                   I agree to the{' '}
                   <button
                     type="button"
-                    className="text-emerald-600 hover:text-emerald-700 hover:underline"
+                    className="text-orange-400 hover:text-orange-400 hover:underline"
                     onClick={() => navigate('terms')}
                   >
                     Terms & Conditions
@@ -489,7 +489,7 @@ export function RegisterPage() {
               {/* Submit */}
               <Button
                 type="submit"
-                className="w-full bg-emerald-600 text-white hover:bg-emerald-700"
+                className="w-full bg-orange-400 text-white hover:bg-orange-400"
                 disabled={loading}
               >
                 {loading ? (
@@ -522,7 +522,7 @@ export function RegisterPage() {
               Already have an account?{' '}
               <button
                 type="button"
-                className="font-semibold text-emerald-600 hover:text-emerald-700 hover:underline"
+                className="font-semibold text-orange-400 hover:text-orange-400 hover:underline"
                 onClick={() => navigate('login')}
               >
                 Sign In

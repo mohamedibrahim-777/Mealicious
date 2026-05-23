@@ -4,7 +4,20 @@ import { useAppStore } from '@/lib/store'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
-import { ChevronRight, Home, Truck, Clock, Globe, AlertCircle } from 'lucide-react'
+import {
+  ChevronRight,
+  Home,
+  Truck,
+  Clock,
+  Globe,
+  AlertCircle,
+  Package,
+  PartyPopper,
+  Banknote,
+  Check,
+  Mail,
+  Phone,
+} from 'lucide-react'
 
 export default function ShippingPolicyPage() {
   const { navigate } = useAppStore()
@@ -23,9 +36,9 @@ export default function ShippingPolicyPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero */}
-      <div className="bg-gradient-to-r from-emerald-600 to-emerald-800 text-white py-12">
+      <div className="bg-gradient-to-r from-orange-400 to-orange-400 text-white py-12">
         <div className="container mx-auto px-4">
-          <div className="flex items-center gap-2 text-emerald-100 mb-4">
+          <div className="flex items-center gap-2 text-blue-100 mb-4">
             <button onClick={() => navigate('home')} className="hover:text-white transition-colors">
               <Home className="h-4 w-4" />
             </button>
@@ -33,7 +46,7 @@ export default function ShippingPolicyPage() {
             <span className="text-sm">Shipping Policy</span>
           </div>
           <h1 className="text-3xl md:text-4xl font-bold">Shipping Policy</h1>
-          <p className="text-emerald-100 mt-2">Last updated: January 2025</p>
+          <p className="text-blue-100 mt-2">Last updated: January 2025</p>
         </div>
       </div>
 
@@ -48,7 +61,7 @@ export default function ShippingPolicyPage() {
                   <a
                     key={s.id}
                     href={`#${s.id}`}
-                    className="block px-3 py-1.5 text-sm text-gray-600 rounded-md hover:bg-emerald-50 hover:text-emerald-700 transition-colors"
+                    className="block px-3 py-1.5 text-sm text-gray-600 rounded-md hover:bg-blue-50 hover:text-orange-400 transition-colors"
                   >
                     {s.title}
                   </a>
@@ -62,7 +75,7 @@ export default function ShippingPolicyPage() {
             <Card className="p-6 md:p-8 space-y-8">
               <section id="overview">
                 <div className="flex items-center gap-2 mb-4">
-                  <Truck className="h-5 w-5 text-emerald-600" />
+                  <Truck className="h-5 w-5 text-orange-400" />
                   <h2 className="text-xl font-bold">Shipping Overview</h2>
                 </div>
                 <p className="text-gray-600 leading-relaxed">
@@ -77,9 +90,9 @@ export default function ShippingPolicyPage() {
                 <p className="text-gray-600 leading-relaxed mb-4">
                   We currently deliver across all major cities and pin codes in India. Our products are carefully packed in food-grade, vacuum-sealed packaging to maintain freshness and quality during transit.
                 </p>
-                <div className="bg-emerald-50 rounded-lg p-4">
-                  <h4 className="font-semibold text-emerald-800 mb-2">📦 Packaging Standards</h4>
-                  <ul className="space-y-1 text-sm text-emerald-700">
+                <div className="bg-blue-50 rounded-lg p-4">
+                  <h4 className="font-semibold text-orange-400 mb-2 inline-flex items-center gap-2"><Package className="h-4 w-4" /> Packaging Standards</h4>
+                  <ul className="space-y-1 text-sm text-orange-400">
                     <li>• Food-grade, BPA-free packaging</li>
                     <li>• Vacuum-sealed for maximum freshness</li>
                     <li>• Protective cushioning for fragile items</li>
@@ -93,16 +106,16 @@ export default function ShippingPolicyPage() {
 
               <section id="delivery-time">
                 <div className="flex items-center gap-2 mb-4">
-                  <Clock className="h-5 w-5 text-emerald-600" />
+                  <Clock className="h-5 w-5 text-orange-400" />
                   <h2 className="text-xl font-bold">Delivery Timeframes</h2>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="bg-emerald-50">
-                        <th className="text-left p-3 font-semibold text-emerald-800">Zone</th>
-                        <th className="text-left p-3 font-semibold text-emerald-800">Estimated Delivery</th>
-                        <th className="text-left p-3 font-semibold text-emerald-800">Cities</th>
+                      <tr className="bg-blue-50">
+                        <th className="text-left p-3 font-semibold text-orange-400">Zone</th>
+                        <th className="text-left p-3 font-semibold text-orange-400">Estimated Delivery</th>
+                        <th className="text-left p-3 font-semibold text-orange-400">Cities</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y">
@@ -121,22 +134,22 @@ export default function ShippingPolicyPage() {
               <section id="charges">
                 <h2 className="text-xl font-bold mb-4">Shipping Charges</h2>
                 <div className="space-y-3">
-                  <div className="flex items-center gap-3 p-3 bg-emerald-50 rounded-lg">
-                    <span className="text-2xl">🎉</span>
+                  <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
+                    <PartyPopper className="h-6 w-6 text-orange-400 shrink-0" />
                     <div>
-                      <p className="font-semibold text-emerald-800">Free Shipping on Orders Above ₹599</p>
-                      <p className="text-sm text-emerald-600">No shipping fee on any order above ₹599</p>
+                      <p className="font-semibold text-orange-400">Free Shipping on Orders Above ₹599</p>
+                      <p className="text-sm text-orange-400">No shipping fee on any order above ₹599</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                    <span className="text-2xl">📦</span>
+                    <Package className="h-6 w-6 text-gray-600 shrink-0" />
                     <div>
                       <p className="font-semibold">Flat ₹49 for Orders Below ₹599</p>
                       <p className="text-sm text-gray-500">Nominal fee for smaller orders</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                    <span className="text-2xl">💵</span>
+                    <Banknote className="h-6 w-6 text-gray-600 shrink-0" />
                     <div>
                       <p className="font-semibold">COD Fee: ₹50</p>
                       <p className="text-sm text-gray-500">Additional fee for Cash on Delivery orders</p>
@@ -153,10 +166,10 @@ export default function ShippingPolicyPage() {
                   Once your order is shipped, you will receive:
                 </p>
                 <ul className="space-y-2 text-gray-600">
-                  <li className="flex items-start gap-2"><span className="text-emerald-600 mt-1">✓</span> Shipping confirmation email with tracking number</li>
-                  <li className="flex items-start gap-2"><span className="text-emerald-600 mt-1">✓</span> WhatsApp notification with tracking link</li>
-                  <li className="flex items-start gap-2"><span className="text-emerald-600 mt-1">✓</span> SMS update with delivery status</li>
-                  <li className="flex items-start gap-2"><span className="text-emerald-600 mt-1">✓</span> Real-time tracking on our Track Order page</li>
+                  <li className="flex items-start gap-2"><Check className="h-4 w-4 text-orange-400 mt-1 shrink-0" /> Shipping confirmation email with tracking number</li>
+                  <li className="flex items-start gap-2"><Check className="h-4 w-4 text-orange-400 mt-1 shrink-0" /> WhatsApp notification with tracking link</li>
+                  <li className="flex items-start gap-2"><Check className="h-4 w-4 text-orange-400 mt-1 shrink-0" /> SMS update with delivery status</li>
+                  <li className="flex items-start gap-2"><Check className="h-4 w-4 text-orange-400 mt-1 shrink-0" /> Real-time tracking on our Track Order page</li>
                 </ul>
               </section>
 
@@ -164,7 +177,7 @@ export default function ShippingPolicyPage() {
 
               <section id="restrictions">
                 <div className="flex items-center gap-2 mb-4">
-                  <AlertCircle className="h-5 w-5 text-amber-500" />
+                  <AlertCircle className="h-5 w-5 text-orange-400" />
                   <h2 className="text-xl font-bold">Shipping Restrictions</h2>
                 </div>
                 <ul className="space-y-2 text-gray-600">
@@ -180,7 +193,7 @@ export default function ShippingPolicyPage() {
               <section id="damaged">
                 <h2 className="text-xl font-bold mb-4">Damaged in Transit</h2>
                 <p className="text-gray-600 leading-relaxed">
-                  If your order arrives damaged, please contact us within 48 hours of delivery with photos of the damaged packaging and products. We will arrange a replacement or full refund. Email us at <span className="text-emerald-600 font-medium">support@mealicious.store</span> or call <span className="text-emerald-600 font-medium">+91-9876543210</span>.
+                  If your order arrives damaged, please contact us within 48 hours of delivery with photos of the damaged packaging and products. We will arrange a replacement or full refund. Email us at <span className="text-orange-400 font-medium">support@mealicious.store</span> or call <span className="text-orange-400 font-medium">+91-9876543210</span>.
                 </p>
               </section>
 
@@ -188,16 +201,16 @@ export default function ShippingPolicyPage() {
 
               <section id="contact">
                 <div className="flex items-center gap-2 mb-4">
-                  <Globe className="h-5 w-5 text-emerald-600" />
+                  <Globe className="h-5 w-5 text-orange-400" />
                   <h2 className="text-xl font-bold">Shipping Queries</h2>
                 </div>
                 <div className="bg-gray-50 rounded-lg p-4 space-y-2">
-                  <p className="text-gray-600">📧 Email: <span className="text-emerald-600">support@mealicious.store</span></p>
-                  <p className="text-gray-600">📞 Phone: <span className="text-emerald-600">+91-9876543210</span></p>
-                  <p className="text-gray-600">⏰ Support Hours: 10 AM - 8 PM IST, Monday to Saturday</p>
+                  <p className="text-gray-600 flex items-center gap-2"><Mail className="h-4 w-4" /> Email: <span className="text-orange-400">support@mealicious.store</span></p>
+                  <p className="text-gray-600 flex items-center gap-2"><Phone className="h-4 w-4" /> Phone: <span className="text-orange-400">+91-9876543210</span></p>
+                  <p className="text-gray-600 flex items-center gap-2"><Clock className="h-4 w-4" /> Support Hours: 10 AM - 8 PM IST, Monday to Saturday</p>
                 </div>
                 <div className="mt-4">
-                  <Button onClick={() => navigate('contact')} className="bg-emerald-600 hover:bg-emerald-700">
+                  <Button onClick={() => navigate('contact')} className="bg-orange-400 hover:bg-orange-400">
                     Contact Us
                   </Button>
                 </div>

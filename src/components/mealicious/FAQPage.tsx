@@ -2,7 +2,19 @@
 
 import { useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
-import { HelpCircle, MessageCircle, ArrowRight } from 'lucide-react'
+import {
+  HelpCircle,
+  MessageCircle,
+  ArrowRight,
+  Truck,
+  Sparkles,
+  CreditCard,
+  Handshake,
+  ClipboardList,
+  RefreshCw,
+  CheckCircle2,
+  type LucideIcon,
+} from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import {
@@ -45,11 +57,16 @@ function FadeInWhenVisible({
 
 /* ─────────────────────── category icons ─────────────────────── */
 
-const categoryIcons: Record<string, string> = {
-  'Orders & Shipping': '🚚',
-  'Products & Quality': '✨',
-  'Payments & Returns': '💳',
-  'Account & Support': '🤝',
+const categoryIcons: Record<string, LucideIcon> = {
+  'Orders & Shipping': Truck,
+  'Products & Quality': Sparkles,
+  'Payments & Returns': CreditCard,
+  'Account & Support': Handshake,
+}
+
+function CatIcon({ category, className }: { category: string; className?: string }) {
+  const Icon = categoryIcons[category] ?? ClipboardList
+  return <Icon className={className} />
 }
 
 /* ═══════════════════════ FAQ PAGE ═══════════════════════ */
@@ -61,9 +78,9 @@ export default function FAQPage() {
   return (
     <div className="flex flex-col">
       {/* ──────── 1. Hero Section ──────── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-800">
-        <div className="absolute -top-32 -right-32 h-96 w-96 rounded-full bg-emerald-500/20 blur-3xl" />
-        <div className="absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-emerald-400/15 blur-3xl" />
+      <section className="relative overflow-hidden bg-gradient-to-br from-orange-400 via-orange-400 to-orange-400">
+        <div className="absolute -top-32 -right-32 h-96 w-96 rounded-full bg-orange-400/20 blur-3xl" />
+        <div className="absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-blue-400/15 blur-3xl" />
 
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
           <motion.div
@@ -75,7 +92,7 @@ export default function FAQPage() {
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight tracking-tight">
               Frequently Asked Questions
             </h1>
-            <p className="mt-4 sm:mt-6 text-base sm:text-lg text-emerald-100 max-w-2xl mx-auto">
+            <p className="mt-4 sm:mt-6 text-base sm:text-lg text-blue-100 max-w-2xl mx-auto">
               Find quick answers to common questions about our products, shipping, returns, and more.
             </p>
           </motion.div>
@@ -96,7 +113,7 @@ export default function FAQPage() {
                       value={cat.category.replace(/\s+/g, '-').toLowerCase()}
                       className="text-xs sm:text-sm px-3 py-2"
                     >
-                      <span className="mr-1.5">{categoryIcons[cat.category] || '📋'}</span>
+                      <CatIcon category={cat.category} className="mr-1.5 h-4 w-4" />
                       <span className="hidden sm:inline">{cat.category}</span>
                       <span className="sm:hidden">{cat.category.split('&')[0].trim()}</span>
                     </TabsTrigger>
@@ -115,8 +132,8 @@ export default function FAQPage() {
                         <Card>
                           <CardContent className="p-6 sm:p-8">
                             <div className="flex items-center gap-3 mb-6">
-                              <div className="rounded-full bg-emerald-100 p-2.5">
-                                <HelpCircle className="h-5 w-5 text-emerald-600" />
+                              <div className="rounded-full bg-blue-100 p-2.5">
+                                <HelpCircle className="h-5 w-5 text-orange-400" />
                               </div>
                               <div>
                                 <h2 className="text-lg font-bold text-foreground">
@@ -131,7 +148,7 @@ export default function FAQPage() {
                             <Accordion type="single" collapsible className="w-full">
                               {cat.questions.map((item, idx) => (
                                 <AccordionItem key={idx} value={`q-${idx}`}>
-                                  <AccordionTrigger className="text-left text-sm sm:text-base font-medium hover:text-emerald-600 transition-colors">
+                                  <AccordionTrigger className="text-left text-sm sm:text-base font-medium hover:text-orange-400 transition-colors">
                                     {item.q}
                                   </AccordionTrigger>
                                   <AccordionContent className="text-sm text-muted-foreground leading-relaxed">
@@ -152,26 +169,26 @@ export default function FAQPage() {
                             <h3 className="font-semibold text-foreground">Quick Help</h3>
                             <div className="space-y-3">
                               <div className="flex items-center gap-3 text-sm">
-                                <Badge variant="secondary" className="bg-emerald-50 text-emerald-700 shrink-0">
-                                  🚚
+                                <Badge variant="secondary" className="bg-blue-50 text-orange-400 shrink-0">
+                                  <Truck className="h-3.5 w-3.5" />
                                 </Badge>
                                 <span className="text-muted-foreground">Free shipping above ₹599</span>
                               </div>
                               <div className="flex items-center gap-3 text-sm">
-                                <Badge variant="secondary" className="bg-emerald-50 text-emerald-700 shrink-0">
-                                  🔄
+                                <Badge variant="secondary" className="bg-blue-50 text-orange-400 shrink-0">
+                                  <RefreshCw className="h-3.5 w-3.5" />
                                 </Badge>
                                 <span className="text-muted-foreground">7-day easy returns</span>
                               </div>
                               <div className="flex items-center gap-3 text-sm">
-                                <Badge variant="secondary" className="bg-emerald-50 text-emerald-700 shrink-0">
-                                  ✅
+                                <Badge variant="secondary" className="bg-blue-50 text-orange-400 shrink-0">
+                                  <CheckCircle2 className="h-3.5 w-3.5" />
                                 </Badge>
                                 <span className="text-muted-foreground">FSSAI certified products</span>
                               </div>
                               <div className="flex items-center gap-3 text-sm">
-                                <Badge variant="secondary" className="bg-emerald-50 text-emerald-700 shrink-0">
-                                  💳
+                                <Badge variant="secondary" className="bg-blue-50 text-orange-400 shrink-0">
+                                  <CreditCard className="h-3.5 w-3.5" />
                                 </Badge>
                                 <span className="text-muted-foreground">COD available up to ₹5,000</span>
                               </div>
@@ -188,7 +205,7 @@ export default function FAQPage() {
                               .map((otherCat) => (
                                 <button
                                   key={otherCat.category}
-                                  className="flex items-center gap-3 text-sm text-muted-foreground hover:text-emerald-600 transition-colors w-full text-left py-1"
+                                  className="flex items-center gap-3 text-sm text-muted-foreground hover:text-orange-400 transition-colors w-full text-left py-1"
                                   onClick={() => {
                                     const tabEl = document.querySelector(
                                       `[data-state="inactive"][value="${otherCat.category.replace(/\s+/g, '-').toLowerCase()}"]`
@@ -196,7 +213,7 @@ export default function FAQPage() {
                                     tabEl?.click()
                                   }}
                                 >
-                                  <span>{categoryIcons[otherCat.category] || '📋'}</span>
+                                  <CatIcon category={otherCat.category} className="h-4 w-4" />
                                   <span>{otherCat.category}</span>
                                   <Badge variant="outline" className="ml-auto text-xs">
                                     {otherCat.questions.length}
@@ -216,26 +233,26 @@ export default function FAQPage() {
       </section>
 
       {/* ──────── 3. Still Have Questions CTA ──────── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-800">
-        <div className="absolute -top-20 -right-20 h-60 w-60 rounded-full bg-emerald-400/20 blur-3xl" />
-        <div className="absolute -bottom-16 -left-16 h-48 w-48 rounded-full bg-emerald-500/15 blur-3xl" />
+      <section className="relative overflow-hidden bg-gradient-to-br from-orange-400 via-orange-400 to-orange-400">
+        <div className="absolute -top-20 -right-20 h-60 w-60 rounded-full bg-blue-400/20 blur-3xl" />
+        <div className="absolute -bottom-16 -left-16 h-48 w-48 rounded-full bg-orange-400/15 blur-3xl" />
 
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-14 sm:py-20">
           <FadeInWhenVisible>
             <div className="text-center max-w-xl mx-auto space-y-4">
-              <div className="rounded-full bg-emerald-500/30 p-3 mx-auto w-fit">
+              <div className="rounded-full bg-orange-400/30 p-3 mx-auto w-fit">
                 <MessageCircle className="h-8 w-8 text-white" />
               </div>
               <h2 className="text-2xl sm:text-3xl font-bold text-white">
                 Still Have Questions?
               </h2>
-              <p className="text-emerald-100">
+              <p className="text-blue-100">
                 Our friendly support team is here to help. Reach out and we&apos;ll get back to you within 24 hours.
               </p>
               <div className="flex flex-wrap gap-3 justify-center mt-6">
                 <Button
                   size="lg"
-                  className="bg-white text-emerald-700 hover:bg-emerald-50 font-semibold"
+                  className="bg-white text-orange-400 hover:bg-blue-50 font-semibold"
                   onClick={() => navigate('contact')}
                 >
                   Contact Us

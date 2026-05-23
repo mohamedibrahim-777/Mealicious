@@ -15,17 +15,16 @@ import {
   ChevronRight,
   ZoomIn,
   CheckCircle2,
+  PackageSearch,
+  Check,
 } from 'lucide-react'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { useAppStore } from '@/lib/store'
-import {
-  getProductById,
-  getRelatedProducts,
-  reviews as allReviews,
-} from '@/lib/data'
+import { useCatalogStore } from '@/lib/catalog-store'
+import { reviews as allReviews } from '@/lib/data'
 import ProductCard from '@/components/mealicious/ProductCard'
 
 export default function ProductDetail() {
@@ -34,8 +33,12 @@ export default function ProductDetail() {
   const addToCart = useAppStore((s) => s.addToCart)
   const toggleWishlist = useAppStore((s) => s.toggleWishlist)
   const isInWishlist = useAppStore((s) => s.isInWishlist)
+  const allProducts = useCatalogStore((s) => s.products)
 
-  const product = useMemo(() => getProductById(pageParams.id || ''), [pageParams.id])
+  const product = useMemo(
+    () => allProducts.find((p) => p.id === (pageParams.id || '')),
+    [pageParams.id, allProducts],
+  )
 
   const [selectedImage, setSelectedImage] = useState(0)
   const [quantity, setQuantity] = useState(1)
@@ -97,8 +100,8 @@ export default function ProductDetail() {
   // Stock status
   const stockStatus = (() => {
     if (product.stock === 0) return { label: 'Out of Stock', color: 'text-red-600', bgColor: 'bg-red-50' }
-    if (product.stock <= 20) return { label: `Low Stock - Only ${product.stock} left!`, color: 'text-orange-600', bgColor: 'bg-orange-50' }
-    return { label: 'In Stock', color: 'text-emerald-600', bgColor: 'bg-emerald-50' }
+    if (product.stock <= 20) return { label: `Low Stock - Only ${product.stock} left!`, color: 'text-orange-400', bgColor: 'bg-orange-50' }
+    return { label: 'In Stock', color: 'text-orange-400', bgColor: 'bg-blue-50' }
   })()
 
   const variantString = Object.entries(effectiveVariants)
@@ -150,21 +153,21 @@ export default function ProductDetail() {
       >
         <button
           onClick={() => navigate('home')}
-          className="hover:text-emerald-600 transition-colors"
+          className="hover:text-orange-400 transition-colors"
         >
           Home
         </button>
         <ChevronRight className="h-3.5 w-3.5" />
         <button
           onClick={() => navigate('shop')}
-          className="hover:text-emerald-600 transition-colors"
+          className="hover:text-orange-400 transition-colors"
         >
           Shop
         </button>
         <ChevronRight className="h-3.5 w-3.5" />
         <button
           onClick={() => navigate('shop', { category: product.categorySlug })}
-          className="hover:text-emerald-600 transition-colors"
+          className="hover:text-orange-400 transition-colors"
         >
           {product.category}
         </button>
@@ -212,8 +215,8 @@ export default function ProductDetail() {
                 </div>
               </>
             ) : (
-              <div className="flex h-full w-full items-center justify-center text-6xl text-muted-foreground bg-emerald-50">
-                🥜
+              <div className="flex h-full w-full items-center justify-center text-muted-foreground bg-blue-50">
+                <PackageSearch className="h-20 w-20" />
               </div>
             )}
 
@@ -226,7 +229,7 @@ export default function ProductDetail() {
 
             {/* Bestseller badge */}
             {product.bestSeller && (
-              <Badge className="absolute top-3 left-3 mt-9 bg-amber-500 text-white hover:bg-amber-600 border-0 text-xs font-bold px-2.5 py-1">
+              <Badge className="absolute top-3 left-3 mt-9 bg-orange-400 text-white hover:bg-orange-400 border-0 text-xs font-bold px-2.5 py-1">
                 Bestseller
               </Badge>
             )}
@@ -244,8 +247,8 @@ export default function ProductDetail() {
                   }}
                   className={`relative w-20 h-20 rounded-lg overflow-hidden border-2 transition-all duration-200 ${
                     selectedImage === idx
-                      ? 'border-emerald-600 shadow-md'
-                      : 'border-border/50 hover:border-emerald-300'
+                      ? 'border-orange-400 shadow-md'
+                      : 'border-border/50 hover:border-blue-300'
                   }`}
                 >
                   {!imgError[idx] ? (
@@ -258,8 +261,8 @@ export default function ProductDetail() {
                       onError={() => setImgError((prev) => ({ ...prev, [idx]: true }))}
                     />
                   ) : (
-                    <div className="flex h-full w-full items-center justify-center text-2xl bg-emerald-50">
-                      🥜
+                    <div className="flex h-full w-full items-center justify-center bg-blue-50">
+                      <PackageSearch className="h-6 w-6 text-muted-foreground" />
                     </div>
                   )}
                 </button>
@@ -294,7 +297,7 @@ export default function ProductDetail() {
                   key={star}
                   className={`h-4 w-4 ${
                     star <= Math.round(product.rating)
-                      ? 'fill-amber-400 text-amber-400'
+                      ? 'fill-orange-400 text-orange-400'
                       : 'fill-muted text-muted'
                   }`}
                 />
@@ -306,14 +309,14 @@ export default function ProductDetail() {
             <span className="text-sm text-muted-foreground">
               ({product.reviewCount} reviews)
             </span>
-            <button className="text-sm text-emerald-600 hover:text-emerald-700 font-medium transition-colors">
+            <button className="text-sm text-orange-400 hover:text-orange-400 font-medium transition-colors">
               Write a Review
             </button>
           </div>
 
           {/* Price Display */}
           <div className="flex items-baseline gap-3 mb-4 flex-wrap">
-            <span className="text-3xl font-bold text-emerald-700">
+            <span className="text-3xl font-bold text-orange-400">
               ₹{displayPrice}
             </span>
             {product.salePrice && (
@@ -321,7 +324,7 @@ export default function ProductDetail() {
                 <span className="text-lg text-muted-foreground line-through">
                   ₹{product.price}
                 </span>
-                <Badge className="bg-emerald-100 text-emerald-800 hover:bg-emerald-100 border-0 text-xs font-bold px-2 py-0.5">
+                <Badge className="bg-blue-100 text-orange-400 hover:bg-blue-100 border-0 text-xs font-bold px-2 py-0.5">
                   Save {discountPercent}%
                 </Badge>
               </>
@@ -340,7 +343,7 @@ export default function ProductDetail() {
             <div key={variant.type} className="mb-4">
               <label className="text-sm font-semibold text-foreground mb-2 block">
                 {variant.type}:{' '}
-                <span className="font-normal text-emerald-700">
+                <span className="font-normal text-orange-400">
                   {effectiveVariants[variant.type]}
                 </span>
               </label>
@@ -355,8 +358,8 @@ export default function ProductDetail() {
                       }
                       className={`px-4 py-2 rounded-full text-sm font-medium border transition-all duration-200 ${
                         isSelected
-                          ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
-                          : 'bg-white text-foreground border-border hover:border-emerald-400 hover:text-emerald-700'
+                          ? 'bg-orange-400 text-white border-orange-400 shadow-sm'
+                          : 'bg-white text-foreground border-border hover:border-blue-400 hover:text-orange-400'
                       }`}
                     >
                       {option}
@@ -406,7 +409,7 @@ export default function ProductDetail() {
             <Button
               size="lg"
               disabled={product.stock === 0}
-              className="flex-1 min-w-[160px] bg-emerald-600 hover:bg-emerald-700 text-white h-12 text-base font-semibold"
+              className="flex-1 min-w-[160px] bg-orange-400 hover:bg-orange-400 text-white h-12 text-base font-semibold"
               onClick={handleAddToCart}
             >
               <ShoppingCart className="h-5 w-5 mr-2" />
@@ -416,7 +419,7 @@ export default function ProductDetail() {
               size="lg"
               variant="outline"
               disabled={product.stock === 0}
-              className="flex-1 min-w-[140px] border-emerald-600 text-emerald-700 hover:bg-emerald-50 h-12 text-base font-semibold"
+              className="flex-1 min-w-[140px] border-orange-400 text-orange-400 hover:bg-blue-50 h-12 text-base font-semibold"
               onClick={handleBuyNow}
             >
               Buy Now
@@ -441,21 +444,21 @@ export default function ProductDetail() {
           {/* Delivery Info */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
             <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-              <Truck className="h-5 w-5 text-emerald-600 shrink-0" />
+              <Truck className="h-5 w-5 text-orange-400 shrink-0" />
               <div>
                 <p className="text-xs font-semibold text-foreground">Free Delivery</p>
                 <p className="text-[11px] text-muted-foreground">On orders ₹599+</p>
               </div>
             </div>
             <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-              <RotateCcw className="h-5 w-5 text-emerald-600 shrink-0" />
+              <RotateCcw className="h-5 w-5 text-orange-400 shrink-0" />
               <div>
                 <p className="text-xs font-semibold text-foreground">3-7 Days Delivery</p>
                 <p className="text-[11px] text-muted-foreground">Across India</p>
               </div>
             </div>
             <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-              <Shield className="h-5 w-5 text-emerald-600 shrink-0" />
+              <Shield className="h-5 w-5 text-orange-400 shrink-0" />
               <div>
                 <p className="text-xs font-semibold text-foreground">7-Day Returns</p>
                 <p className="text-[11px] text-muted-foreground">Easy returns</p>
@@ -494,9 +497,9 @@ export default function ProductDetail() {
                 {product.description}
               </p>
               <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="p-4 rounded-lg bg-emerald-50 border border-emerald-100">
-                  <h4 className="font-semibold text-emerald-800 text-sm mb-2">Why Choose This Product?</h4>
-                  <ul className="space-y-1.5 text-sm text-emerald-700">
+                <div className="p-4 rounded-lg bg-blue-50 border border-blue-100">
+                  <h4 className="font-semibold text-orange-400 text-sm mb-2">Why Choose This Product?</h4>
+                  <ul className="space-y-1.5 text-sm text-orange-400">
                     <li className="flex items-start gap-2">
                       <CheckCircle2 className="h-4 w-4 mt-0.5 shrink-0" />
                       Premium quality, handpicked selection
@@ -515,9 +518,9 @@ export default function ProductDetail() {
                     </li>
                   </ul>
                 </div>
-                <div className="p-4 rounded-lg bg-amber-50 border border-amber-100">
-                  <h4 className="font-semibold text-amber-800 text-sm mb-2">Storage Instructions</h4>
-                  <ul className="space-y-1.5 text-sm text-amber-700">
+                <div className="p-4 rounded-lg bg-orange-50 border border-orange-100">
+                  <h4 className="font-semibold text-orange-400 text-sm mb-2">Storage Instructions</h4>
+                  <ul className="space-y-1.5 text-sm text-orange-400">
                     <li className="flex items-start gap-2">
                       <CheckCircle2 className="h-4 w-4 mt-0.5 shrink-0" />
                       Store in a cool, dry place
@@ -552,11 +555,11 @@ export default function ProductDetail() {
               <div className="border border-border rounded-xl overflow-hidden">
                 <table className="w-full">
                   <thead>
-                    <tr className="bg-emerald-50">
-                      <th className="text-left px-4 py-3 text-sm font-semibold text-emerald-800">
+                    <tr className="bg-blue-50">
+                      <th className="text-left px-4 py-3 text-sm font-semibold text-orange-400">
                         Nutrient
                       </th>
-                      <th className="text-right px-4 py-3 text-sm font-semibold text-emerald-800">
+                      <th className="text-right px-4 py-3 text-sm font-semibold text-orange-400">
                         Value
                       </th>
                     </tr>
@@ -601,7 +604,7 @@ export default function ProductDetail() {
                           key={star}
                           className={`h-5 w-5 ${
                             star <= Math.round(product.rating)
-                              ? 'fill-amber-400 text-amber-400'
+                              ? 'fill-orange-400 text-orange-400'
                               : 'fill-muted text-muted'
                           }`}
                         />
@@ -617,10 +620,10 @@ export default function ProductDetail() {
                     {ratingDistribution.map(({ star, count, percentage }) => (
                       <div key={star} className="flex items-center gap-2 text-sm">
                         <span className="w-3 text-muted-foreground font-medium">{star}</span>
-                        <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+                        <Star className="h-3 w-3 fill-orange-400 text-orange-400" />
                         <div className="flex-1 h-2.5 bg-muted rounded-full overflow-hidden">
                           <div
-                            className="h-full bg-amber-400 rounded-full transition-all duration-500"
+                            className="h-full bg-orange-400 rounded-full transition-all duration-500"
                             style={{ width: `${percentage}%` }}
                           />
                         </div>
@@ -638,7 +641,7 @@ export default function ProductDetail() {
                 {productReviews.map((review) => (
                   <div
                     key={review.id}
-                    className="p-4 rounded-xl border border-border hover:border-emerald-200 transition-colors"
+                    className="p-4 rounded-xl border border-border hover:border-blue-200 transition-colors"
                   >
                     <div className="flex items-start justify-between mb-2">
                       <div>
@@ -647,8 +650,8 @@ export default function ProductDetail() {
                             {review.userName}
                           </span>
                           {review.verified && (
-                            <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-0 text-[10px] px-1.5 py-0">
-                              ✓ Verified
+                            <Badge className="bg-blue-100 text-orange-400 hover:bg-blue-100 border-0 text-[10px] px-1.5 py-0 inline-flex items-center gap-0.5">
+                              <Check className="h-3 w-3" /> Verified
                             </Badge>
                           )}
                         </div>
@@ -658,7 +661,7 @@ export default function ProductDetail() {
                               key={star}
                               className={`h-3.5 w-3.5 ${
                                 star <= review.rating
-                                  ? 'fill-amber-400 text-amber-400'
+                                  ? 'fill-orange-400 text-orange-400'
                                   : 'fill-muted text-muted'
                               }`}
                             />
@@ -689,7 +692,9 @@ export default function ProductDetail() {
 
       {/* Related Products */}
       {(() => {
-        const related = getRelatedProducts(product)
+        const related = allProducts
+          .filter((p) => p.id !== product.id && p.categorySlug === product.categorySlug)
+          .slice(0, 4)
         if (related.length === 0) return null
         return (
           <motion.section

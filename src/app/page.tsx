@@ -1,5 +1,7 @@
 'use client'
 
+import { useEffect } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import { useAppStore, Page } from '@/lib/store'
 import Header from '@/components/mealicious/Header'
 import Footer from '@/components/mealicious/Footer'
@@ -17,6 +19,8 @@ import { PrivacyPolicyPage, TermsPage, RefundPolicyPage } from '@/components/mea
 import ShippingPolicyPage from '@/components/mealicious/ShippingPolicyPage'
 import TrackOrderPage from '@/components/mealicious/TrackOrderPage'
 import WishlistPage from '@/components/mealicious/WishlistPage'
+import ProfilePage from '@/components/mealicious/ProfilePage'
+import AdminPanel from '@/components/mealicious/AdminPanel'
 import AIChatWidget from '@/components/mealicious/AIChatWidget'
 
 function PageRenderer({ page }: { page: Page }) {
@@ -58,7 +62,9 @@ function PageRenderer({ page }: { page: Page }) {
     case 'cart':
       return <CheckoutPage />
     case 'profile':
-      return <WishlistPage />
+      return <ProfilePage />
+    case 'admin':
+      return <AdminPanel />
     default:
       return <HomePage />
   }
@@ -67,11 +73,49 @@ function PageRenderer({ page }: { page: Page }) {
 export default function MealiciousStore() {
   const { currentPage } = useAppStore()
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [currentPage])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    // Seed initial history entry
+    if (!window.history.state?.page) {
+      window.history.replaceState(
+        { page: useAppStore.getState().currentPage, params: useAppStore.getState().pageParams },
+        '',
+        '#' + useAppStore.getState().currentPage,
+      )
+    }
+    const onPopState = (e: PopStateEvent) => {
+      const state = e.state as { page?: Page; params?: Record<string, string> } | null
+      if (state?.page) {
+        useAppStore.setState({
+          currentPage: state.page,
+          pageParams: state.params ?? {},
+          mobileMenuOpen: false,
+        })
+      }
+    }
+    window.addEventListener('popstate', onPopState)
+    return () => window.removeEventListener('popstate', onPopState)
+  }, [])
+
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Header />
       <main className="flex-1">
-        <PageRenderer page={currentPage} />
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentPage}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <PageRenderer page={currentPage} />
+          </motion.div>
+        </AnimatePresence>
       </main>
       <Footer />
       <CartSidebar />

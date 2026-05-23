@@ -212,8 +212,8 @@ export default function CheckoutPage() {
   if (isEmpty && !orderDialogOpen) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center px-4 text-center">
-        <div className="w-20 h-20 rounded-full bg-emerald-50 flex items-center justify-center mb-6">
-          <ShoppingBag className="w-10 h-10 text-emerald-600" />
+        <div className="w-20 h-20 rounded-full bg-blue-50 flex items-center justify-center mb-6">
+          <ShoppingBag className="w-10 h-10 text-orange-400" />
         </div>
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Your cart is empty</h2>
         <p className="text-gray-500 mb-6 max-w-md">
@@ -221,7 +221,7 @@ export default function CheckoutPage() {
         </p>
         <Button
           onClick={() => navigate('shop')}
-          className="bg-emerald-600 hover:bg-emerald-700 text-white px-8"
+          className="bg-orange-400 hover:bg-orange-400 text-white px-8"
           size="lg"
         >
           <ShoppingBag className="w-4 h-4 mr-2" />
@@ -239,7 +239,7 @@ export default function CheckoutPage() {
           <BreadcrumbList>
             <BreadcrumbItem>
               <BreadcrumbLink
-                className="cursor-pointer text-gray-500 hover:text-emerald-600"
+                className="cursor-pointer text-gray-500 hover:text-orange-400"
                 onClick={() => navigate('home')}
               >
                 Home
@@ -250,7 +250,7 @@ export default function CheckoutPage() {
             </BreadcrumbSeparator>
             <BreadcrumbItem>
               <BreadcrumbLink
-                className="cursor-pointer text-gray-500 hover:text-emerald-600"
+                className="cursor-pointer text-gray-500 hover:text-orange-400"
                 onClick={() => navigate('cart')}
               >
                 Cart
@@ -260,7 +260,7 @@ export default function CheckoutPage() {
               <ChevronRight className="h-3.5 w-3.5" />
             </BreadcrumbSeparator>
             <BreadcrumbItem>
-              <BreadcrumbPage className="text-emerald-700 font-medium">Checkout</BreadcrumbPage>
+              <BreadcrumbPage className="text-orange-400 font-medium">Checkout</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
@@ -279,7 +279,7 @@ export default function CheckoutPage() {
             <Card className="border-0 shadow-sm">
               <CardHeader className="pb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-sm font-bold">
+                  <div className="w-8 h-8 rounded-full bg-blue-100 text-orange-400 flex items-center justify-center text-sm font-bold">
                     1
                   </div>
                   <div>
@@ -341,12 +341,12 @@ export default function CheckoutPage() {
             <Card className="border-0 shadow-sm">
               <CardHeader className="pb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-sm font-bold">
+                  <div className="w-8 h-8 rounded-full bg-blue-100 text-orange-400 flex items-center justify-center text-sm font-bold">
                     2
                   </div>
                   <div>
                     <CardTitle className="text-lg flex items-center gap-2">
-                      <MapPin className="w-5 h-5 text-emerald-600" />
+                      <MapPin className="w-5 h-5 text-orange-400" />
                       Shipping Address
                     </CardTitle>
                     <p className="text-sm text-gray-500 mt-0.5">Where should we deliver your order?</p>
@@ -476,7 +476,7 @@ export default function CheckoutPage() {
                     id="saveDefault"
                     checked={saveAsDefault}
                     onCheckedChange={(checked) => setSaveAsDefault(checked === true)}
-                    className="data-[state=checked]:bg-emerald-600 data-[state=checked]:border-emerald-600"
+                    className="data-[state=checked]:bg-orange-400 data-[state=checked]:border-orange-400"
                   />
                   <Label htmlFor="saveDefault" className="cursor-pointer text-sm font-normal text-gray-600">
                     Save as default address for future orders
@@ -489,12 +489,12 @@ export default function CheckoutPage() {
             <Card className="border-0 shadow-sm">
               <CardHeader className="pb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-sm font-bold">
+                  <div className="w-8 h-8 rounded-full bg-blue-100 text-orange-400 flex items-center justify-center text-sm font-bold">
                     3
                   </div>
                   <div>
                     <CardTitle className="text-lg flex items-center gap-2">
-                      <CreditCard className="w-5 h-5 text-emerald-600" />
+                      <CreditCard className="w-5 h-5 text-orange-400" />
                       Payment Method
                     </CardTitle>
                     <p className="text-sm text-gray-500 mt-0.5">Choose how you want to pay</p>
@@ -511,17 +511,17 @@ export default function CheckoutPage() {
                   <label
                     className={`flex items-start gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${
                       paymentMethod === 'cod'
-                        ? 'border-emerald-500 bg-emerald-50/50 shadow-sm'
+                        ? 'border-orange-400 bg-blue-50/50 shadow-sm'
                         : 'border-gray-200 hover:border-gray-300 bg-white'
                     }`}
                   >
                     <RadioGroupItem
                       value="cod"
-                      className="mt-0.5 data-[state=checked]:border-emerald-600 [&>span>svg]:fill-emerald-600"
+                      className="mt-0.5 data-[state=checked]:border-orange-400 [&>span>svg]:fill-orange-400"
                     />
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
-                        <Banknote className="w-5 h-5 text-emerald-600" />
+                        <Banknote className="w-5 h-5 text-orange-400" />
                         <span className="font-semibold text-gray-900">Cash on Delivery (COD)</span>
                       </div>
                       <p className="text-sm text-gray-500 mt-1">
@@ -530,14 +530,14 @@ export default function CheckoutPage() {
                       <div className="mt-2 flex items-center gap-1.5">
                         <Badge
                           variant="secondary"
-                          className="bg-amber-100 text-amber-700 border-0 text-xs"
+                          className="bg-orange-100 text-orange-400 border-0 text-xs"
                         >
                           +₹50 COD fee
                         </Badge>
                       </div>
                     </div>
                     {paymentMethod === 'cod' && (
-                      <Check className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+                      <Check className="w-5 h-5 text-orange-400 shrink-0 mt-0.5" />
                     )}
                   </label>
 
@@ -545,17 +545,17 @@ export default function CheckoutPage() {
                   <label
                     className={`flex items-start gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${
                       paymentMethod === 'online'
-                        ? 'border-emerald-500 bg-emerald-50/50 shadow-sm'
+                        ? 'border-orange-400 bg-blue-50/50 shadow-sm'
                         : 'border-gray-200 hover:border-gray-300 bg-white'
                     }`}
                   >
                     <RadioGroupItem
                       value="online"
-                      className="mt-0.5 data-[state=checked]:border-emerald-600 [&>span>svg]:fill-emerald-600"
+                      className="mt-0.5 data-[state=checked]:border-orange-400 [&>span>svg]:fill-orange-400"
                     />
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
-                        <CreditCard className="w-5 h-5 text-emerald-600" />
+                        <CreditCard className="w-5 h-5 text-orange-400" />
                         <span className="font-semibold text-gray-900">
                           Pay Online (UPI/Card/Net Banking)
                         </span>
@@ -565,10 +565,10 @@ export default function CheckoutPage() {
                       </p>
                       <div className="mt-2 flex items-center gap-2">
                         <div className="flex items-center gap-1.5 bg-white px-2.5 py-1 rounded-md border border-gray-200">
-                          <span className="text-xs font-bold text-blue-600">UPI</span>
+                          <span className="text-xs font-bold text-orange-400">UPI</span>
                         </div>
                         <div className="flex items-center gap-1.5 bg-white px-2.5 py-1 rounded-md border border-gray-200">
-                          <span className="text-xs font-bold text-orange-600">Visa</span>
+                          <span className="text-xs font-bold text-orange-400">Visa</span>
                         </div>
                         <div className="flex items-center gap-1.5 bg-white px-2.5 py-1 rounded-md border border-gray-200">
                           <span className="text-xs font-bold text-red-600">MC</span>
@@ -579,7 +579,7 @@ export default function CheckoutPage() {
                       </div>
                     </div>
                     {paymentMethod === 'online' && (
-                      <Check className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+                      <Check className="w-5 h-5 text-orange-400 shrink-0 mt-0.5" />
                     )}
                   </label>
                 </RadioGroup>
@@ -597,7 +597,7 @@ export default function CheckoutPage() {
               <Button
                 onClick={handlePlaceOrder}
                 disabled={orderPlacing}
-                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white h-14 text-lg font-semibold rounded-xl shadow-lg shadow-emerald-200 transition-all"
+                className="w-full bg-orange-400 hover:bg-orange-400 text-white h-14 text-lg font-semibold rounded-xl shadow-lg shadow-blue-200 transition-all"
                 size="lg"
               >
                 {orderPlacing ? (
@@ -621,9 +621,9 @@ export default function CheckoutPage() {
               <Card className="border-0 shadow-sm">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-lg flex items-center gap-2">
-                    <Package className="w-5 h-5 text-emerald-600" />
+                    <Package className="w-5 h-5 text-orange-400" />
                     Order Summary
-                    <Badge variant="secondary" className="ml-auto bg-emerald-100 text-emerald-700 border-0">
+                    <Badge variant="secondary" className="ml-auto bg-blue-100 text-orange-400 border-0">
                       {cartItems.length} {cartItems.length === 1 ? 'item' : 'items'}
                     </Badge>
                   </CardTitle>
@@ -642,7 +642,7 @@ export default function CheckoutPage() {
                             alt={item.name}
                             className="w-full h-full object-cover"
                           />
-                          <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-emerald-600 text-white text-[10px] font-bold flex items-center justify-center">
+                          <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-orange-400 text-white text-[10px] font-bold flex items-center justify-center">
                             {item.quantity}
                           </div>
                         </div>
@@ -653,7 +653,7 @@ export default function CheckoutPage() {
                           {item.variant && (
                             <p className="text-xs text-gray-400">{item.variant}</p>
                           )}
-                          <p className="text-sm font-semibold text-emerald-700 mt-0.5">
+                          <p className="text-sm font-semibold text-orange-400 mt-0.5">
                             {formatPrice((item.salePrice ?? item.price) * item.quantity)}
                           </p>
                         </div>
@@ -666,12 +666,12 @@ export default function CheckoutPage() {
                   {/* Coupon Code */}
                   <div className="space-y-2">
                     {appliedCoupon ? (
-                      <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2">
-                        <Tag className="w-4 h-4 text-emerald-600" />
-                        <span className="text-sm font-medium text-emerald-700 flex-1">
+                      <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2">
+                        <Tag className="w-4 h-4 text-orange-400" />
+                        <span className="text-sm font-medium text-orange-400 flex-1">
                           {appliedCoupon}
                         </span>
-                        <span className="text-xs text-emerald-600">
+                        <span className="text-xs text-orange-400">
                           -{formatPrice(discount)}
                         </span>
                         <button
@@ -703,7 +703,7 @@ export default function CheckoutPage() {
                             variant="outline"
                             size="sm"
                             onClick={handleApplyCoupon}
-                            className="border-emerald-200 text-emerald-700 hover:bg-emerald-50 h-9 px-4"
+                            className="border-blue-200 text-orange-400 hover:bg-blue-50 h-9 px-4"
                           >
                             Apply
                           </Button>
@@ -728,7 +728,7 @@ export default function CheckoutPage() {
                       <span className="text-gray-500">Shipping</span>
                       <span className="font-medium">
                         {shippingBase === 0 ? (
-                          <span className="text-emerald-600">FREE</span>
+                          <span className="text-orange-400">FREE</span>
                         ) : (
                           formatPrice(shippingBase)
                         )}
@@ -745,7 +745,7 @@ export default function CheckoutPage() {
                     {discount > 0 && (
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-500">Discount</span>
-                        <span className="font-medium text-emerald-600">-{formatPrice(discount)}</span>
+                        <span className="font-medium text-orange-400">-{formatPrice(discount)}</span>
                       </div>
                     )}
 
@@ -759,26 +759,26 @@ export default function CheckoutPage() {
 
                   <div className="flex justify-between items-center">
                     <span className="font-semibold text-gray-900">Total</span>
-                    <span className="text-xl font-bold text-emerald-700">
+                    <span className="text-xl font-bold text-orange-400">
                       {formatPrice(total)}
                     </span>
                   </div>
 
                   {/* Free shipping message */}
                   {subtotal < 599 && (
-                    <div className="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 flex items-start gap-2">
-                      <Truck className="w-4 h-4 text-amber-600 mt-0.5 shrink-0" />
-                      <p className="text-xs text-amber-700">
+                    <div className="bg-orange-50 border border-orange-200 rounded-lg px-3 py-2 flex items-start gap-2">
+                      <Truck className="w-4 h-4 text-orange-400 mt-0.5 shrink-0" />
+                      <p className="text-xs text-orange-400">
                         Add {formatPrice(599 - subtotal)} more for <strong>FREE shipping</strong>!
                       </p>
                     </div>
                   )}
 
                   {subtotal >= 599 && (
-                    <div className="bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2 flex items-center gap-2">
-                      <Truck className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <p className="text-xs text-emerald-700 font-medium">
-                        You qualify for FREE shipping! 🎉
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg px-3 py-2 flex items-center gap-2">
+                      <Truck className="w-4 h-4 text-orange-400 shrink-0" />
+                      <p className="text-xs text-orange-400 font-medium">
+                        You qualify for FREE shipping!
                       </p>
                     </div>
                   )}
@@ -789,7 +789,7 @@ export default function CheckoutPage() {
               <Button
                 onClick={handlePlaceOrder}
                 disabled={orderPlacing}
-                className="hidden lg:flex w-full bg-emerald-600 hover:bg-emerald-700 text-white h-14 text-lg font-semibold rounded-xl shadow-lg shadow-emerald-200 transition-all"
+                className="hidden lg:flex w-full bg-orange-400 hover:bg-orange-400 text-white h-14 text-lg font-semibold rounded-xl shadow-lg shadow-blue-200 transition-all"
                 size="lg"
               >
                 {orderPlacing ? (
@@ -808,15 +808,15 @@ export default function CheckoutPage() {
               {/* Trust badges */}
               <div className="grid grid-cols-3 gap-2">
                 <div className="text-center p-3 bg-white rounded-xl border border-gray-100">
-                  <Shield className="w-5 h-5 text-emerald-600 mx-auto mb-1" />
+                  <Shield className="w-5 h-5 text-orange-400 mx-auto mb-1" />
                   <p className="text-[10px] text-gray-500 leading-tight">Secure<br />Payment</p>
                 </div>
                 <div className="text-center p-3 bg-white rounded-xl border border-gray-100">
-                  <Truck className="w-5 h-5 text-emerald-600 mx-auto mb-1" />
+                  <Truck className="w-5 h-5 text-orange-400 mx-auto mb-1" />
                   <p className="text-[10px] text-gray-500 leading-tight">Free Shipping<br />₹599+</p>
                 </div>
                 <div className="text-center p-3 bg-white rounded-xl border border-gray-100">
-                  <Check className="w-5 h-5 text-emerald-600 mx-auto mb-1" />
+                  <Check className="w-5 h-5 text-orange-400 mx-auto mb-1" />
                   <p className="text-[10px] text-gray-500 leading-tight">100%<br />Genuine</p>
                 </div>
               </div>
@@ -830,8 +830,8 @@ export default function CheckoutPage() {
         <DialogContent className="sm:max-w-md" showCloseButton={false}>
           <div className="flex flex-col items-center text-center py-4">
             {/* Success Animation */}
-            <div className="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center mb-5">
-              <div className="w-14 h-14 rounded-full bg-emerald-600 flex items-center justify-center">
+            <div className="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center mb-5">
+              <div className="w-14 h-14 rounded-full bg-orange-400 flex items-center justify-center">
                 <Check className="w-8 h-8 text-white" strokeWidth={3} />
               </div>
             </div>
@@ -844,23 +844,23 @@ export default function CheckoutPage() {
             </DialogDescription>
 
             {/* Order ID */}
-            <div className="mt-5 bg-emerald-50 border border-emerald-200 rounded-xl px-5 py-3">
-              <p className="text-xs text-emerald-600 font-medium mb-0.5">Order Number</p>
-              <p className="text-lg font-bold text-emerald-800 tracking-wider">{orderId}</p>
+            <div className="mt-5 bg-blue-50 border border-blue-200 rounded-xl px-5 py-3">
+              <p className="text-xs text-orange-400 font-medium mb-0.5">Order Number</p>
+              <p className="text-lg font-bold text-orange-400 tracking-wider">{orderId}</p>
             </div>
 
             {/* Estimated Delivery */}
             <div className="mt-4 flex items-center gap-2 text-sm text-gray-600">
-              <Truck className="w-4 h-4 text-emerald-600" />
+              <Truck className="w-4 h-4 text-orange-400" />
               <span>Estimated delivery: <strong>{estimatedDelivery}</strong></span>
             </div>
 
             {/* Payment Method */}
             <div className="mt-2 flex items-center gap-2 text-sm text-gray-600">
               {paymentMethod === 'cod' ? (
-                <Banknote className="w-4 h-4 text-emerald-600" />
+                <Banknote className="w-4 h-4 text-orange-400" />
               ) : (
-                <CreditCard className="w-4 h-4 text-emerald-600" />
+                <CreditCard className="w-4 h-4 text-orange-400" />
               )}
               <span>
                 Payment:{' '}
@@ -872,7 +872,7 @@ export default function CheckoutPage() {
 
             {/* Total */}
             <div className="mt-4 text-sm text-gray-500">
-              Total Paid: <span className="font-bold text-emerald-700 text-lg">{formatPrice(total)}</span>
+              Total Paid: <span className="font-bold text-orange-400 text-lg">{formatPrice(total)}</span>
             </div>
           </div>
 
@@ -885,7 +885,7 @@ export default function CheckoutPage() {
                 handleOrderComplete()
                 navigate('track-order')
               }}
-              className="flex-1 border-emerald-200 text-emerald-700 hover:bg-emerald-50"
+              className="flex-1 border-blue-200 text-orange-400 hover:bg-blue-50"
             >
               <MapPin className="w-4 h-4 mr-2" />
               Track Order
@@ -895,7 +895,7 @@ export default function CheckoutPage() {
                 handleOrderComplete()
                 navigate('shop')
               }}
-              className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white"
+              className="flex-1 bg-orange-400 hover:bg-orange-400 text-white"
             >
               <ShoppingBag className="w-4 h-4 mr-2" />
               Continue Shopping
