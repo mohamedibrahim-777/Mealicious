@@ -825,7 +825,7 @@ export const faqData = [
     questions: [
       { q: 'How do I create an account?', a: 'Click on the "Login/Register" button in the top navigation bar. You can sign up with your email address or phone number. It takes less than 30 seconds!' },
       { q: 'I forgot my password. What do I do?', a: 'Click on "Forgot Password" on the login page. Enter your registered email, and we will send you a password reset link.' },
-      { q: 'How can I contact customer support?', a: 'You can reach us through: Email: support@mealicious.store, Phone: +91-9876543210, WhatsApp: +91-9876543210, or use the live chat on our website. We are available 10 AM - 8 PM IST, Monday to Saturday.' },
+      { q: 'How can I contact customer support?', a: 'You can reach us through: Email: support@mealicious.store, Phone: +91-9876543210, WhatsApp: +91-7397075166, or use the live chat on our website. We are available 10 AM - 8 PM IST, Monday to Saturday.' },
     ],
   },
 ]
