@@ -99,7 +99,7 @@ const contactInfo = [
   {
     icon: Phone,
     title: 'Call Us',
-    detail: '+91-9876543210',
+    detail: '+91-7397075166',
     subDetail: 'Mon-Sat, 10 AM - 8 PM IST',
     color: 'text-orange-400',
     bg: 'bg-blue-50',
