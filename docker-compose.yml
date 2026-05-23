@@ -1,0 +1,23 @@
+services:
+  mealicious:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: mealicious:latest
+    container_name: mealicious
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3010:3000"
+    volumes:
+      - ./db:/app/db
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      HOSTNAME: 0.0.0.0
+      DATABASE_URL: file:/app/db/custom.db
+    networks:
+      - mealicious-net
+
+networks:
+  mealicious-net:
+    driver: bridge
