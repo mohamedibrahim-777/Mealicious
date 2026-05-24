@@ -77,6 +77,34 @@ export default function MealiciousStore() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }, [currentPage])
 
+  // Cashfree return-URL handler: after the user pays, Cashfree redirects to
+  // `/?cashfree_order_id=...#payment-return`. Verify the order server-side and notify the user.
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const url = new URL(window.location.href)
+    const cfOrderId = url.searchParams.get('cashfree_order_id')
+    if (!cfOrderId) return
+    ;(async () => {
+      try {
+        const res = await fetch(`/api/payments/cashfree/verify?orderId=${encodeURIComponent(cfOrderId)}`)
+        const data = await res.json()
+        if (data.paid) {
+          const { clearCart, navigate } = useAppStore.getState()
+          clearCart()
+          alert(`Payment successful! Order ${cfOrderId} confirmed.`)
+          navigate('track-order', { orderId: cfOrderId })
+        } else {
+          alert(`Payment status: ${data.status ?? 'unknown'}. If you were charged, please contact support.`)
+        }
+      } catch {
+        alert('Could not verify payment. Please contact support if you were charged.')
+      } finally {
+        url.searchParams.delete('cashfree_order_id')
+        window.history.replaceState(window.history.state, '', url.pathname + url.search + url.hash)
+      }
+    })()
+  }, [])
+
   useEffect(() => {
     if (typeof window === 'undefined') return
     // Seed initial history entry

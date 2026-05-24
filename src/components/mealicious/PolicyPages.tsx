@@ -226,7 +226,7 @@ export function PrivacyPolicyPage() {
                       We do not sell your personal information. We may share your information with:
                     </p>
                     <ul className="list-disc pl-5 space-y-2 text-muted-foreground">
-                      <li><strong className="text-foreground">Service Providers:</strong> Logistics partners for delivery, payment processors (Razorpay), and analytics providers</li>
+                      <li><strong className="text-foreground">Service Providers:</strong> Logistics partners for delivery, payment processors (Cashfree), and analytics providers</li>
                       <li><strong className="text-foreground">Legal Requirements:</strong> When required by law, court order, or government regulation</li>
                       <li><strong className="text-foreground">Business Transfers:</strong> In connection with a merger, acquisition, or sale of assets</li>
                       <li><strong className="text-foreground">With Your Consent:</strong> When you have given us explicit permission to share your information</li>

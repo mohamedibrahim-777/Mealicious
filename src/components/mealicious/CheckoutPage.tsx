@@ -186,18 +186,84 @@ export default function CheckoutPage() {
     setCouponError('')
   }
 
+  const loadCashfreeSdk = (): Promise<any> => {
+    return new Promise((resolve, reject) => {
+      const w = window as any
+      if (w.Cashfree) {
+        resolve(w.Cashfree)
+        return
+      }
+      const existing = document.getElementById('cashfree-sdk') as HTMLScriptElement | null
+      if (existing) {
+        existing.addEventListener('load', () => resolve((window as any).Cashfree))
+        existing.addEventListener('error', () => reject(new Error('Failed to load Cashfree SDK')))
+        return
+      }
+      const script = document.createElement('script')
+      script.id = 'cashfree-sdk'
+      script.src = 'https://sdk.cashfree.com/js/v3/cashfree.js'
+      script.async = true
+      script.onload = () => resolve((window as any).Cashfree)
+      script.onerror = () => reject(new Error('Failed to load Cashfree SDK'))
+      document.body.appendChild(script)
+    })
+  }
+
   const handlePlaceOrder = async () => {
     if (!validateForm()) {
-      // Scroll to first error
       const firstError = document.querySelector('[data-error="true"]')
       if (firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' })
       return
     }
 
     setOrderPlacing(true)
-    // Simulate order processing
-    await new Promise((resolve) => setTimeout(resolve, 2000))
-    setOrderId(generateOrderId())
+    const newOrderId = generateOrderId()
+
+    if (paymentMethod === 'online') {
+      try {
+        const res = await fetch('/api/payments/cashfree/create-order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            orderId: newOrderId,
+            amount: total,
+            customerName: fullName,
+            customerEmail: email,
+            customerPhone: phone,
+            orderNote: `Mealicious order ${newOrderId}`,
+          }),
+        })
+        const data = await res.json()
+        if (!res.ok || !data.paymentSessionId) {
+          if (data.code === 'PAYMENT_NOT_CONFIGURED') {
+            alert(
+              'Online payments are not configured yet.\n\nPlease select "Cash on Delivery" to complete your order, or contact support.'
+            )
+            setPaymentMethod('cod')
+            setOrderPlacing(false)
+            return
+          }
+          throw new Error(data.error || 'Failed to create payment order')
+        }
+        const Cashfree = await loadCashfreeSdk()
+        const cashfree = Cashfree({ mode: data.mode === 'production' ? 'production' : 'sandbox' })
+        await cashfree.checkout({
+          paymentSessionId: data.paymentSessionId,
+          redirectTarget: '_self',
+        })
+        // Browser will redirect; nothing else to do.
+        return
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Payment failed'
+        alert(`Payment could not be started: ${message}`)
+        setOrderPlacing(false)
+        return
+      }
+    }
+
+    // COD flow
+    await new Promise((resolve) => setTimeout(resolve, 1200))
+    setOrderId(newOrderId)
     setEstimatedDelivery(getEstimatedDelivery())
     setOrderPlacing(false)
     setOrderDialogOpen(true)
@@ -561,7 +627,7 @@ export default function CheckoutPage() {
                         </span>
                       </div>
                       <p className="text-sm text-gray-500 mt-1">
-                        Secure payment via Razorpay — UPI, Cards & Net Banking
+                        Secure payment via Cashfree — UPI, Cards & Net Banking
                       </p>
                       <div className="mt-2 flex items-center gap-2">
                         <div className="flex items-center gap-1.5 bg-white px-2.5 py-1 rounded-md border border-gray-200">

@@ -178,6 +178,12 @@ export const useAppStore = create<AppStore>()(
       },
       logout: () => {
         set({ isLoggedIn: false, user: null, currentPage: 'home' })
+        if (typeof window !== 'undefined') {
+          // Also clear any NextAuth (Google) session
+          import('next-auth/react')
+            .then(({ signOut }) => signOut({ redirect: false }))
+            .catch(() => {})
+        }
       },
       updateProfile: (data) => {
         const { user } = get()

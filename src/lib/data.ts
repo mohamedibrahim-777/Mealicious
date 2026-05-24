@@ -814,7 +814,7 @@ export const faqData = [
   {
     category: 'Payments & Returns',
     questions: [
-      { q: 'What payment methods do you accept?', a: 'We accept all major payment methods including UPI (Google Pay, PhonePe, Paytm), Credit/Debit Cards, Net Banking, and Cash on Delivery (COD). All online payments are secured by Razorpay.' },
+      { q: 'What payment methods do you accept?', a: 'We accept all major payment methods including UPI (Google Pay, PhonePe, Paytm), Credit/Debit Cards, Net Banking, and Cash on Delivery (COD). All online payments are secured by Cashfree.' },
       { q: 'Is COD available?', a: 'Yes, Cash on Delivery is available for orders up to ₹5,000. A nominal COD fee of ₹50 applies.' },
       { q: 'What is your return policy?', a: 'We offer a 7-day return policy for all products. If you receive a damaged or defective product, we will replace it or provide a full refund. Please contact our support team within 7 days of delivery.' },
       { q: 'How do I get a refund?', a: 'Refunds are processed within 5-7 business days. For prepaid orders, the refund is credited to your original payment method. For COD orders, we will transfer the refund to your bank account.' },
