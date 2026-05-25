@@ -651,8 +651,6 @@ export function RefundPolicyPage() {
                         <div className="space-y-2 text-sm">
                           <p><strong className="text-foreground">MEALICIOUS VENTURES PRIVATE LIMITED</strong></p>
                           <p className="text-muted-foreground">Email: <span className="text-orange-400">support@mealicious.store</span></p>
-                          <p className="text-muted-foreground">Phone: <span className="text-orange-400">+91-9876543210</span></p>
-                          <p className="text-muted-foreground">WhatsApp: <span className="text-orange-400">+91-7397075166</span></p>
                           <p className="text-muted-foreground">Hours: Monday - Saturday, 10 AM - 8 PM IST</p>
                           <p className="text-muted-foreground">Address: 123 Health Street, Mumbai, Maharashtra 400001, India</p>
                         </div>

@@ -21,7 +21,6 @@ import TrackOrderPage from '@/components/mealicious/TrackOrderPage'
 import WishlistPage from '@/components/mealicious/WishlistPage'
 import ProfilePage from '@/components/mealicious/ProfilePage'
 import AdminPanel from '@/components/mealicious/AdminPanel'
-import AIChatWidget from '@/components/mealicious/AIChatWidget'
 
 function PageRenderer({ page }: { page: Page }) {
   switch (page) {
@@ -147,7 +146,6 @@ export default function MealiciousStore() {
       </main>
       <Footer />
       <CartSidebar />
-      <AIChatWidget />
     </div>
   )
 }

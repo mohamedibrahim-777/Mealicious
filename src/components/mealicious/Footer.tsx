@@ -5,7 +5,7 @@ import { toast } from 'sonner'
 import { useAppStore } from '@/lib/store'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Leaf, Mail, Phone, MapPin, Facebook, Instagram, Twitter, Youtube } from 'lucide-react'
+import { Leaf, Mail, MapPin, Facebook, Instagram, Twitter, Youtube } from 'lucide-react'
 
 export default function Footer() {
   const navigate = useAppStore((s) => s.navigate)
@@ -176,10 +176,6 @@ export default function Footer() {
               <li className="flex items-start gap-3">
                 <Mail className="mt-0.5 h-4 w-4 shrink-0 text-orange-400" />
                 <span className="text-sm text-gray-400">support@mealicious.store</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <Phone className="mt-0.5 h-4 w-4 shrink-0 text-orange-400" />
-                <span className="text-sm text-gray-400">+91-7397075166</span>
               </li>
               <li className="flex items-start gap-3">
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-orange-400" />

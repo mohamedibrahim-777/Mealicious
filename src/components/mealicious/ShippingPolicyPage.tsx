@@ -16,7 +16,6 @@ import {
   Banknote,
   Check,
   Mail,
-  Phone,
 } from 'lucide-react'
 
 export default function ShippingPolicyPage() {
@@ -193,7 +192,7 @@ export default function ShippingPolicyPage() {
               <section id="damaged">
                 <h2 className="text-xl font-bold mb-4">Damaged in Transit</h2>
                 <p className="text-gray-600 leading-relaxed">
-                  If your order arrives damaged, please contact us within 48 hours of delivery with photos of the damaged packaging and products. We will arrange a replacement or full refund. Email us at <span className="text-orange-400 font-medium">support@mealicious.store</span> or call <span className="text-orange-400 font-medium">+91-7397075166</span>.
+                  If your order arrives damaged, please contact us within 48 hours of delivery with photos of the damaged packaging and products. We will arrange a replacement or full refund. Email us at <span className="text-orange-400 font-medium">support@mealicious.store</span>.
                 </p>
               </section>
 
@@ -206,7 +205,6 @@ export default function ShippingPolicyPage() {
                 </div>
                 <div className="bg-gray-50 rounded-lg p-4 space-y-2">
                   <p className="text-gray-600 flex items-center gap-2"><Mail className="h-4 w-4" /> Email: <span className="text-orange-400">support@mealicious.store</span></p>
-                  <p className="text-gray-600 flex items-center gap-2"><Phone className="h-4 w-4" /> Phone: <span className="text-orange-400">+91-7397075166</span></p>
                   <p className="text-gray-600 flex items-center gap-2"><Clock className="h-4 w-4" /> Support Hours: 10 AM - 8 PM IST, Monday to Saturday</p>
                 </div>
                 <div className="mt-4">
