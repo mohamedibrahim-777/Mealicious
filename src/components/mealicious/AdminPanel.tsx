@@ -84,19 +84,6 @@ export default function AdminPanel() {
   const [creating, setCreating] = useState(false)
   const [viewingOrder, setViewingOrder] = useState<AdminOrder | null>(null)
 
-  if (!user || user.role !== 'admin') {
-    return (
-      <div className="container mx-auto px-4 py-20 text-center">
-        <Shield className="h-10 w-10 text-orange-400 mx-auto mb-4" />
-        <h2 className="text-2xl font-bold mb-2">Admin access required</h2>
-        <p className="text-gray-500 mb-4">Sign in with the admin account to view this panel.</p>
-        <Button onClick={() => navigate('login')} className="bg-orange-400 hover:bg-orange-500">
-          Sign in as admin
-        </Button>
-      </div>
-    )
-  }
-
   const stats = useMemo(() => {
     const totalStock = products.reduce((s, p) => s + p.stock, 0)
     const inventoryValue = products.reduce((s, p) => s + (p.salePrice ?? p.price) * p.stock, 0)
@@ -115,6 +102,19 @@ export default function AdminPanel() {
       revenue,
     }
   }, [products, categories, orders, users])
+
+  if (!user || user.role !== 'admin') {
+    return (
+      <div className="container mx-auto px-4 py-20 text-center">
+        <Shield className="h-10 w-10 text-orange-400 mx-auto mb-4" />
+        <h2 className="text-2xl font-bold mb-2">Admin access required</h2>
+        <p className="text-gray-500 mb-4">Sign in with the admin account to view this panel.</p>
+        <Button onClick={() => navigate('login')} className="bg-orange-400 hover:bg-orange-500">
+          Sign in as admin
+        </Button>
+      </div>
+    )
+  }
 
   const filteredProducts = products.filter(
     (p) =>
