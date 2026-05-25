@@ -179,9 +179,11 @@ export const useAppStore = create<AppStore>()(
       logout: () => {
         set({ isLoggedIn: false, user: null, currentPage: 'home' })
         if (typeof window !== 'undefined') {
-          // Also clear any NextAuth (Google) session
-          import('next-auth/react')
-            .then(({ signOut }) => signOut({ redirect: false }))
+          import('@/lib/firebase')
+            .then(({ getFirebaseAuth }) => {
+              const auth = getFirebaseAuth()
+              if (auth) return import('firebase/auth').then(({ signOut }) => signOut(auth))
+            })
             .catch(() => {})
         }
       },

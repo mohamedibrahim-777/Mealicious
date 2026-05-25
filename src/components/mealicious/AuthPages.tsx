@@ -4,7 +4,8 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Leaf, Eye, EyeOff, Mail, Lock, User, Phone } from 'lucide-react'
 import { toast } from 'sonner'
-import { signIn } from 'next-auth/react'
+import { signInWithPopup, sendPasswordResetEmail } from 'firebase/auth'
+import { getFirebaseAuth, googleProvider, isFirebaseConfigured } from '@/lib/firebase'
 import { useAppStore } from '@/lib/store'
 import {
   Card,
@@ -65,21 +66,22 @@ function Logo() {
 }
 
 async function handleGoogleSignIn() {
+  if (!isFirebaseConfigured) {
+    toast.error('Google sign-in is not configured. Add NEXT_PUBLIC_FIREBASE_* keys to .env')
+    return
+  }
+  const auth = getFirebaseAuth()
+  if (!auth) {
+    toast.error('Firebase auth unavailable')
+    return
+  }
   try {
-    const res = await signIn('google', { callbackUrl: '/', redirect: false })
-    if (res?.error === 'OAuthSignin' || res?.error?.includes('client_id')) {
-      toast.error('Google sign-in is not configured. Add GOOGLE_CLIENT_ID/SECRET to .env')
-      return
-    }
-    if (res?.error) {
-      toast.error(`Google sign-in failed: ${res.error}`)
-      return
-    }
-    if (res?.url) {
-      window.location.href = res.url
-    }
-  } catch {
-    toast.error('Google sign-in is not available. Check server configuration.')
+    await signInWithPopup(auth, googleProvider)
+    toast.success('Signed in with Google')
+  } catch (err) {
+    const code = (err as { code?: string })?.code ?? ''
+    if (code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request') return
+    toast.error(`Google sign-in failed: ${code || 'unknown error'}`)
   }
 }
 
@@ -221,7 +223,25 @@ export function LoginPage() {
                 <button
                   type="button"
                   className="text-sm font-medium text-orange-400 hover:text-orange-400 hover:underline"
-                  onClick={() => toast.info('Password reset is not available in demo')}
+                  onClick={async () => {
+                    if (!email) {
+                      toast.error('Enter your email above first')
+                      return
+                    }
+                    if (!isFirebaseConfigured) {
+                      toast.error('Password reset unavailable: Firebase not configured')
+                      return
+                    }
+                    const auth = getFirebaseAuth()
+                    if (!auth) return
+                    try {
+                      await sendPasswordResetEmail(auth, email)
+                      toast.success('Password reset email sent. Check your inbox.')
+                    } catch (err) {
+                      const code = (err as { code?: string })?.code ?? 'unknown'
+                      toast.error(`Reset failed: ${code}`)
+                    }
+                  }}
                 >
                   Forgot Password?
                 </button>

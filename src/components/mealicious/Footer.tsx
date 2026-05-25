@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { toast } from 'sonner'
 import { useAppStore } from '@/lib/store'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -10,13 +11,32 @@ export default function Footer() {
   const navigate = useAppStore((s) => s.navigate)
   const [email, setEmail] = useState('')
   const [subscribed, setSubscribed] = useState(false)
+  const [loading, setLoading] = useState(false)
 
-  const handleSubscribe = (e: React.FormEvent) => {
+  const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (email.trim()) {
+    const value = email.trim()
+    if (!value) return
+    setLoading(true)
+    try {
+      const res = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: value }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        toast.error(data.error ?? 'Subscription failed')
+        return
+      }
       setSubscribed(true)
       setEmail('')
+      toast.success(data.message ?? 'Subscribed!')
       setTimeout(() => setSubscribed(false), 3000)
+    } catch {
+      toast.error('Network error. Try again.')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -38,10 +58,10 @@ export default function Footer() {
   ]
 
   const socialLinks = [
-    { icon: Facebook, label: 'Facebook', href: '#' },
-    { icon: Instagram, label: 'Instagram', href: '#' },
-    { icon: Twitter, label: 'Twitter', href: '#' },
-    { icon: Youtube, label: 'YouTube', href: '#' },
+    { icon: Facebook, label: 'Facebook', href: 'https://www.facebook.com/' },
+    { icon: Instagram, label: 'Instagram', href: 'https://www.instagram.com/' },
+    { icon: Twitter, label: 'Twitter', href: 'https://twitter.com/' },
+    { icon: Youtube, label: 'YouTube', href: 'https://www.youtube.com/' },
   ]
 
   return (
@@ -67,9 +87,10 @@ export default function Footer() {
               />
               <Button
                 type="submit"
+                disabled={loading}
                 className="shrink-0 bg-orange-400 hover:bg-orange-400 text-white"
               >
-                {subscribed ? 'Subscribed!' : 'Subscribe'}
+                {loading ? 'Subscribing…' : subscribed ? 'Subscribed!' : 'Subscribe'}
               </Button>
             </form>
           </div>
@@ -97,6 +118,8 @@ export default function Footer() {
                 <a
                   key={label}
                   href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   aria-label={label}
                   className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-800 text-gray-400 transition-colors hover:bg-orange-400 hover:text-white"
                 >

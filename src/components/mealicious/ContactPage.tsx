@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react'
 import { motion, useInView } from 'framer-motion'
+import { toast } from 'sonner'
 import {
   Mail,
   Phone,
@@ -123,11 +124,11 @@ const contactInfo = [
 ]
 
 const socialLinks = [
-  { icon: Instagram, label: 'Instagram', href: '#' },
-  { icon: Twitter, label: 'Twitter', href: '#' },
-  { icon: Facebook, label: 'Facebook', href: '#' },
-  { icon: Youtube, label: 'YouTube', href: '#' },
-  { icon: WhatsAppIcon, label: 'WhatsApp', href: '#', brand: true },
+  { icon: Instagram, label: 'Instagram', href: 'https://www.instagram.com/' },
+  { icon: Twitter, label: 'Twitter', href: 'https://twitter.com/' },
+  { icon: Facebook, label: 'Facebook', href: 'https://www.facebook.com/' },
+  { icon: Youtube, label: 'YouTube', href: 'https://www.youtube.com/' },
+  { icon: WhatsAppIcon, label: 'WhatsApp', href: 'https://wa.me/917397075166', brand: true },
 ]
 
 /* ═══════════════════════ CONTACT PAGE ═══════════════════════ */
@@ -142,14 +143,33 @@ export default function ContactPage() {
     message: '',
   })
   const [submitted, setSubmitted] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setSubmitted(true)
-    setTimeout(() => {
-      setSubmitted(false)
-      setFormState({ name: '', email: '', phone: '', subject: '', message: '' })
-    }, 3000)
+    setSubmitting(true)
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formState),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        toast.error(data.error ?? 'Failed to send message')
+        return
+      }
+      setSubmitted(true)
+      toast.success(data.message ?? 'Message sent!')
+      setTimeout(() => {
+        setSubmitted(false)
+        setFormState({ name: '', email: '', phone: '', subject: '', message: '' })
+      }, 3000)
+    } catch {
+      toast.error('Network error. Try again.')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -282,10 +302,11 @@ export default function ContactPage() {
                       <Button
                         type="submit"
                         size="lg"
+                        disabled={submitting}
                         className="bg-orange-400 hover:bg-orange-400 text-white font-semibold"
                       >
                         <Send className="h-4 w-4 mr-2" />
-                        Send Message
+                        {submitting ? 'Sending…' : 'Send Message'}
                       </Button>
                     </form>
                   )}
@@ -370,22 +391,26 @@ export default function ContactPage() {
               {socialLinks.map((social) => {
                 const Icon = social.icon
                 return (
-                  <Card
+                  <a
                     key={social.label}
-                    className="cursor-pointer hover:shadow-md transition-all hover:-translate-y-1"
-                    onClick={() => navigate('home')}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={social.label}
                   >
-                    <CardContent className="p-4 flex items-center gap-3">
-                      {social.brand ? (
-                        <Icon className="h-10 w-10" />
-                      ) : (
-                        <div className="rounded-full bg-blue-50 p-2.5">
-                          <Icon className="h-5 w-5 text-orange-400" />
-                        </div>
-                      )}
-                      <span className="text-sm font-medium">{social.label}</span>
-                    </CardContent>
-                  </Card>
+                    <Card className="cursor-pointer hover:shadow-md transition-all hover:-translate-y-1">
+                      <CardContent className="p-4 flex items-center gap-3">
+                        {social.brand ? (
+                          <Icon className="h-10 w-10" />
+                        ) : (
+                          <div className="rounded-full bg-blue-50 p-2.5">
+                            <Icon className="h-5 w-5 text-orange-400" />
+                          </div>
+                        )}
+                        <span className="text-sm font-medium">{social.label}</span>
+                      </CardContent>
+                    </Card>
+                  </a>
                 )
               })}
             </div>

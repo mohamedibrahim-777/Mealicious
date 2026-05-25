@@ -3,6 +3,7 @@
 import { useRef, useState, useMemo } from 'react'
 import Image from 'next/image'
 import { motion, useInView } from 'framer-motion'
+import { toast } from 'sonner'
 import {
   Search,
   Clock,
@@ -89,6 +90,35 @@ export default function BlogPage() {
   const navigate = useAppStore((s) => s.navigate)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+  const [newsletterEmail, setNewsletterEmail] = useState('')
+  const [newsletterLoading, setNewsletterLoading] = useState(false)
+
+  const handleNewsletter = async () => {
+    const value = newsletterEmail.trim()
+    if (!value || !value.includes('@')) {
+      toast.error('Enter a valid email')
+      return
+    }
+    setNewsletterLoading(true)
+    try {
+      const res = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: value }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        toast.error(data.error ?? 'Subscription failed')
+        return
+      }
+      toast.success(data.message ?? 'Subscribed!')
+      setNewsletterEmail('')
+    } catch {
+      toast.error('Network error')
+    } finally {
+      setNewsletterLoading(false)
+    }
+  }
 
   const filteredPosts = useMemo(() => {
     return blogPosts.filter((post) => {
@@ -400,13 +430,21 @@ export default function BlogPage() {
                     Get the latest articles, recipes, and exclusive offers delivered to your inbox.
                   </p>
                   <div className="space-y-2">
-                    <Input placeholder="Enter your email" className="h-9" />
+                    <Input
+                      type="email"
+                      placeholder="Enter your email"
+                      className="h-9"
+                      value={newsletterEmail}
+                      onChange={(e) => setNewsletterEmail(e.target.value)}
+                    />
                     <Button
                       size="sm"
+                      onClick={handleNewsletter}
+                      disabled={newsletterLoading}
                       className="w-full bg-orange-400 hover:bg-orange-400 text-white"
                     >
                       <Send className="h-3 w-3 mr-1" />
-                      Subscribe
+                      {newsletterLoading ? 'Subscribing…' : 'Subscribe'}
                     </Button>
                   </div>
                   <p className="text-xs text-muted-foreground">
