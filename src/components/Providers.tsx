@@ -4,6 +4,15 @@ import { useEffect } from 'react'
 import { onAuthStateChanged } from 'firebase/auth'
 import { getFirebaseAuth } from '@/lib/firebase'
 import { useAppStore } from '@/lib/store'
+import { useCatalogStore } from '@/lib/catalog-store'
+
+function PublicDataBridge() {
+  const loadPublicProducts = useCatalogStore((s) => s.loadPublicProducts)
+  useEffect(() => {
+    loadPublicProducts()
+  }, [loadPublicProducts])
+  return null
+}
 
 function AuthBridge() {
   useEffect(() => {
@@ -48,6 +57,7 @@ function AuthBridge() {
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <>
+      <PublicDataBridge />
       <AuthBridge />
       {children}
     </>

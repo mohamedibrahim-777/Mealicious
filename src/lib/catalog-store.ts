@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { adminFetch } from './admin-fetch'
-import { type Product, type Category } from './data'
+import { products as seedProducts, categories as seedCategories, type Product, type Category } from './data'
 
 export interface AdminOrder {
   id: string
@@ -58,6 +58,7 @@ interface CatalogStore {
   loading: boolean
   error: string | null
 
+  loadPublicProducts: () => Promise<void>
   loadAll: () => Promise<void>
   loadProducts: () => Promise<void>
   loadOrders: () => Promise<void>
@@ -82,11 +83,9 @@ interface CatalogStore {
   resetCatalog: () => Promise<void>
 }
 
-import { categories as seedCategories } from './data'
-
 export const useCatalogStore = create<CatalogStore>()((set, get) => ({
-  products: [],
-  categories: seedCategories, // categories rarely change; keep static for selectors
+  products: seedProducts,
+  categories: seedCategories,
   orders: [],
   users: [],
   subscribers: [],
@@ -94,6 +93,18 @@ export const useCatalogStore = create<CatalogStore>()((set, get) => ({
   dashboard: null,
   loading: false,
   error: null,
+
+  loadPublicProducts: async () => {
+    try {
+      const res = await fetch('/api/products')
+      const data = (await res.json()) as { products?: Product[] }
+      if (Array.isArray(data.products) && data.products.length > 0) {
+        set({ products: data.products })
+      }
+    } catch {
+      // Keep seed fallback
+    }
+  },
 
   loadAll: async () => {
     set({ loading: true, error: null })

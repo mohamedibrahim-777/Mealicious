@@ -1,41 +1,52 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { products, categories } from '@/lib/data'
+import { db } from '@/lib/db'
+import { serializeProduct } from '@/lib/admin-helpers'
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
-  const category = searchParams.get('category')
+  const categorySlug = searchParams.get('category')
   const search = searchParams.get('search')
   const featured = searchParams.get('featured')
   const bestSeller = searchParams.get('bestSeller')
   const isNew = searchParams.get('new')
 
-  let filtered = [...products]
-
-  if (category) {
-    filtered = filtered.filter(p => p.categorySlug === category)
-  }
+  const where: Record<string, unknown> = { isActive: true }
+  if (categorySlug) where.category = { slug: categorySlug }
+  if (featured === 'true') where.featured = true
+  if (bestSeller === 'true') where.bestSeller = true
+  if (isNew === 'true') where.isNew = true
   if (search) {
-    const q = search.toLowerCase()
-    filtered = filtered.filter(p =>
-      p.name.toLowerCase().includes(q) ||
-      p.description.toLowerCase().includes(q) ||
-      p.tags.some(t => t.toLowerCase().includes(q))
-    )
+    where.OR = [
+      { name: { contains: search, mode: 'insensitive' } },
+      { description: { contains: search, mode: 'insensitive' } },
+    ]
   }
-  if (featured === 'true') {
-    filtered = filtered.filter(p => p.featured)
-  }
-  if (bestSeller === 'true') {
-    filtered = filtered.filter(p => p.bestSeller)
-  }
-  if (isNew === 'true') {
-    filtered = filtered.filter(p => p.isNew)
-  }
+
+  const [rows, cats] = await Promise.all([
+    db.product.findMany({
+      where,
+      include: { category: true },
+      orderBy: { createdAt: 'desc' },
+    }),
+    db.category.findMany({ orderBy: { sortOrder: 'asc' } }),
+  ])
+
+  const products = rows.map((p) => ({
+    ...serializeProduct(p as unknown as Record<string, unknown>),
+    category: p.category?.name,
+    categorySlug: p.category?.slug,
+  }))
 
   return NextResponse.json({
     success: true,
-    products: filtered,
-    categories,
-    total: filtered.length,
+    products,
+    categories: cats.map((c) => ({
+      id: c.id,
+      name: c.name,
+      slug: c.slug,
+      image: c.image,
+      icon: c.icon,
+    })),
+    total: products.length,
   })
 }
