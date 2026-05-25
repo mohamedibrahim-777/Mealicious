@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useAppStore } from '@/lib/store'
 import { useCatalogStore, type AdminOrder, type AdminUser } from '@/lib/catalog-store'
 import type { Product } from '@/lib/data'
@@ -69,7 +69,14 @@ export default function AdminPanel() {
     updateUserRole,
     deleteUser,
     resetCatalog,
+    loadAll,
   } = useCatalogStore()
+
+  useEffect(() => {
+    if (user?.role === 'admin') {
+      loadAll().catch((e) => toast.error(`Failed to load admin data: ${e.message}`))
+    }
+  }, [user?.role, loadAll])
 
   const [tab, setTab] = useState<Tab>('overview')
   const [search, setSearch] = useState('')
@@ -131,7 +138,8 @@ export default function AdminPanel() {
             size="sm"
             onClick={() => {
               resetCatalog()
-              toast.success('Catalog reset to defaults')
+                .then(() => toast.success('Data refreshed'))
+                .catch((e) => toast.error(e.message))
             }}
             className="bg-white text-orange-500 hover:bg-orange-50"
           >
@@ -276,7 +284,8 @@ export default function AdminPanel() {
                             onClick={() => {
                               if (confirm(`Delete "${p.name}"?`)) {
                                 deleteProduct(p.id)
-                                toast.success('Product deleted')
+                                  .then(() => toast.success('Product deleted'))
+                                  .catch((e) => toast.error(e.message))
                               }
                             }}
                             title="Delete"
@@ -333,7 +342,8 @@ export default function AdminPanel() {
                             value={o.status}
                             onValueChange={(v) => {
                               updateOrderStatus(o.id, v as AdminOrder['status'])
-                              toast.success(`Order ${o.id} → ${v}`)
+                                .then(() => toast.success(`Order ${o.id} → ${v}`))
+                                .catch((e) => toast.error(e.message))
                             }}
                           >
                             <SelectTrigger className="h-8 w-[130px]">
@@ -363,7 +373,8 @@ export default function AdminPanel() {
                             onClick={() => {
                               if (confirm(`Delete order ${o.id}?`)) {
                                 deleteOrder(o.id)
-                                toast.success('Order deleted')
+                                  .then(() => toast.success('Order deleted'))
+                                  .catch((e) => toast.error(e.message))
                               }
                             }}
                             title="Delete"
@@ -408,7 +419,8 @@ export default function AdminPanel() {
                           value={u.role}
                           onValueChange={(v) => {
                             updateUserRole(u.id, v as AdminUser['role'])
-                            toast.success(`${u.name} → ${v}`)
+                              .then(() => toast.success(`${u.name} → ${v}`))
+                              .catch((e) => toast.error(e.message))
                           }}
                         >
                           <SelectTrigger className="h-8 w-[110px]">
@@ -431,7 +443,8 @@ export default function AdminPanel() {
                             }
                             if (confirm(`Delete user ${u.name}?`)) {
                               deleteUser(u.id)
-                              toast.success('User deleted')
+                                .then(() => toast.success('User deleted'))
+                                .catch((e) => toast.error(e.message))
                             }
                           }}
                           title="Delete"
@@ -472,16 +485,17 @@ export default function AdminPanel() {
         onSubmit={(data) => {
           if (editing) {
             updateProduct(editing.id, data)
-            toast.success('Product updated')
+              .then(() => toast.success('Product updated'))
+              .catch((e) => toast.error(e.message))
           } else {
-            const newP: Product = {
+            const newP = {
               ...emptyProduct(),
               ...data,
-              id: `p-${Date.now()}`,
               slug: (data.name ?? 'new-product').toLowerCase().replace(/\s+/g, '-'),
-            } as Product
+            }
             addProduct(newP)
-            toast.success('Product created')
+              .then(() => toast.success('Product created'))
+              .catch((e) => toast.error(e.message))
           }
           setCreating(false)
           setEditing(null)

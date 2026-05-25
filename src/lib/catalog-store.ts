@@ -1,11 +1,6 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
-import {
-  products as seedProducts,
-  categories as seedCategories,
-  type Product,
-  type Category,
-} from './data'
+import { adminFetch } from './admin-fetch'
+import { type Product, type Category } from './data'
 
 export interface AdminOrder {
   id: string
@@ -13,8 +8,17 @@ export interface AdminOrder {
   email: string
   items: number
   total: number
-  status: 'Pending' | 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled'
+  status: 'Pending' | 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled' | 'Confirmed'
   date: string
+  dbId?: string
+  paymentStatus?: string
+  paymentMethod?: string | null
+  shippingAddr?: Record<string, unknown>
+  itemDetails?: unknown[]
+  subtotal?: number
+  shipping?: number
+  tax?: number
+  discount?: number
 }
 
 export interface AdminUser {
@@ -23,6 +27,24 @@ export interface AdminUser {
   email: string
   role: 'admin' | 'user'
   joined: string
+  orderCount?: number
+  phone?: string | null
+}
+
+export interface AdminSubscriber { id: string; email: string; createdAt: string }
+export interface AdminMessage {
+  id: string; name: string; email: string; phone: string | null;
+  subject: string; message: string; isRead: boolean; createdAt: string
+}
+
+export interface DashboardSummary {
+  counts: {
+    products: number; orders: number; users: number;
+    subscribers: number; messages: number; unreadMessages: number;
+    lowStockProducts: number
+  }
+  revenue: number
+  recentOrders: { id: string; customer: string; total: number; status: string; date: string }[]
 }
 
 interface CatalogStore {
@@ -30,76 +52,136 @@ interface CatalogStore {
   categories: Category[]
   orders: AdminOrder[]
   users: AdminUser[]
+  subscribers: AdminSubscriber[]
+  messages: AdminMessage[]
+  dashboard: DashboardSummary | null
+  loading: boolean
+  error: string | null
 
-  addProduct: (p: Product) => void
-  updateProduct: (id: string, patch: Partial<Product>) => void
-  deleteProduct: (id: string) => void
+  loadAll: () => Promise<void>
+  loadProducts: () => Promise<void>
+  loadOrders: () => Promise<void>
+  loadUsers: () => Promise<void>
+  loadSubscribers: () => Promise<void>
+  loadMessages: () => Promise<void>
+  loadDashboard: () => Promise<void>
 
-  addOrder: (o: AdminOrder) => void
-  updateOrderStatus: (id: string, status: AdminOrder['status']) => void
-  deleteOrder: (id: string) => void
+  addProduct: (p: Partial<Product>) => Promise<void>
+  updateProduct: (id: string, patch: Partial<Product>) => Promise<void>
+  deleteProduct: (id: string) => Promise<void>
 
-  addUser: (u: AdminUser) => void
-  updateUserRole: (id: string, role: AdminUser['role']) => void
-  deleteUser: (id: string) => void
+  updateOrderStatus: (orderNumber: string, status: AdminOrder['status']) => Promise<void>
+  deleteOrder: (orderNumber: string) => Promise<void>
 
-  resetCatalog: () => void
+  updateUserRole: (id: string, role: AdminUser['role']) => Promise<void>
+  deleteUser: (id: string) => Promise<void>
+
+  markMessageRead: (id: string, isRead?: boolean) => Promise<void>
+  deleteMessage: (id: string) => Promise<void>
+
+  resetCatalog: () => Promise<void>
 }
 
-const seedOrders: AdminOrder[] = [
-  { id: 'MEA-1042', customer: 'Aarav Sharma', email: 'aarav@example.com', items: 3, total: 1499, status: 'Shipped', date: '2026-05-19' },
-  { id: 'MEA-1041', customer: 'Priya Singh', email: 'priya@example.com', items: 1, total: 799, status: 'Processing', date: '2026-05-20' },
-  { id: 'MEA-1040', customer: 'Rahul Verma', email: 'rahul@example.com', items: 5, total: 2399, status: 'Delivered', date: '2026-05-14' },
-  { id: 'MEA-1039', customer: 'Neha Patel', email: 'neha@example.com', items: 2, total: 549, status: 'Pending', date: '2026-05-21' },
-  { id: 'MEA-1038', customer: 'Karthik Iyer', email: 'karthik@example.com', items: 4, total: 1899, status: 'Delivered', date: '2026-05-10' },
-]
+import { categories as seedCategories } from './data'
 
-const seedUsers: AdminUser[] = [
-  { id: 'u-1', name: 'Admin', email: 'admin@mealicious.com', role: 'admin', joined: '2026-01-01' },
-  { id: 'u-2', name: 'Aarav Sharma', email: 'aarav@example.com', role: 'user', joined: '2026-02-12' },
-  { id: 'u-3', name: 'Priya Singh', email: 'priya@example.com', role: 'user', joined: '2026-03-04' },
-  { id: 'u-4', name: 'Rahul Verma', email: 'rahul@example.com', role: 'user', joined: '2026-03-21' },
-  { id: 'u-5', name: 'Neha Patel', email: 'neha@example.com', role: 'user', joined: '2026-04-08' },
-]
+export const useCatalogStore = create<CatalogStore>()((set, get) => ({
+  products: [],
+  categories: seedCategories, // categories rarely change; keep static for selectors
+  orders: [],
+  users: [],
+  subscribers: [],
+  messages: [],
+  dashboard: null,
+  loading: false,
+  error: null,
 
-export const useCatalogStore = create<CatalogStore>()(
-  persist(
-    (set, get) => ({
-      products: seedProducts,
-      categories: seedCategories,
-      orders: seedOrders,
-      users: seedUsers,
+  loadAll: async () => {
+    set({ loading: true, error: null })
+    try {
+      await Promise.all([
+        get().loadProducts(),
+        get().loadOrders(),
+        get().loadUsers(),
+        get().loadSubscribers(),
+        get().loadMessages(),
+        get().loadDashboard(),
+      ])
+    } catch (e) {
+      set({ error: (e as Error).message })
+    } finally {
+      set({ loading: false })
+    }
+  },
 
-      addProduct: (p) => set({ products: [p, ...get().products] }),
-      updateProduct: (id, patch) =>
-        set({ products: get().products.map((p) => (p.id === id ? { ...p, ...patch } : p)) }),
-      deleteProduct: (id) => set({ products: get().products.filter((p) => p.id !== id) }),
+  loadProducts: async () => {
+    const data = await adminFetch<{ products: Product[] }>('/api/admin/products')
+    set({ products: data.products })
+  },
+  loadOrders: async () => {
+    const data = await adminFetch<{ orders: AdminOrder[] }>('/api/admin/orders')
+    set({ orders: data.orders })
+  },
+  loadUsers: async () => {
+    const data = await adminFetch<{ users: AdminUser[] }>('/api/admin/users')
+    set({ users: data.users })
+  },
+  loadSubscribers: async () => {
+    const data = await adminFetch<{ subscribers: AdminSubscriber[] }>('/api/admin/subscribers')
+    set({ subscribers: data.subscribers })
+  },
+  loadMessages: async () => {
+    const data = await adminFetch<{ messages: AdminMessage[] }>('/api/admin/messages')
+    set({ messages: data.messages })
+  },
+  loadDashboard: async () => {
+    const data = await adminFetch<DashboardSummary>('/api/admin/dashboard')
+    set({ dashboard: data })
+  },
 
-      addOrder: (o) => set({ orders: [o, ...get().orders] }),
-      updateOrderStatus: (id, status) =>
-        set({ orders: get().orders.map((o) => (o.id === id ? { ...o, status } : o)) }),
-      deleteOrder: (id) => set({ orders: get().orders.filter((o) => o.id !== id) }),
+  addProduct: async (p) => {
+    await adminFetch('/api/admin/products', { method: 'POST', body: JSON.stringify(p) })
+    await get().loadProducts()
+  },
+  updateProduct: async (id, patch) => {
+    await adminFetch(`/api/admin/products/${id}`, { method: 'PATCH', body: JSON.stringify(patch) })
+    await get().loadProducts()
+  },
+  deleteProduct: async (id) => {
+    await adminFetch(`/api/admin/products/${id}`, { method: 'DELETE' })
+    await get().loadProducts()
+  },
 
-      addUser: (u) => set({ users: [u, ...get().users] }),
-      updateUserRole: (id, role) =>
-        set({ users: get().users.map((u) => (u.id === id ? { ...u, role } : u)) }),
-      deleteUser: (id) => set({ users: get().users.filter((u) => u.id !== id) }),
+  updateOrderStatus: async (orderNumber, status) => {
+    await adminFetch(`/api/admin/orders/${orderNumber}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status: status.toLowerCase() }),
+    })
+    await get().loadOrders()
+  },
+  deleteOrder: async (orderNumber) => {
+    await adminFetch(`/api/admin/orders/${orderNumber}`, { method: 'DELETE' })
+    await get().loadOrders()
+  },
 
-      resetCatalog: () =>
-        set({
-          products: seedProducts,
-          categories: seedCategories,
-          orders: seedOrders,
-          users: seedUsers,
-        }),
-    }),
-    {
-      name: 'mealicious-catalog',
-      partialize: (state) => ({
-        products: state.products,
-        orders: state.orders,
-        users: state.users,
-      }),
-    },
-  ),
-)
+  updateUserRole: async (id, role) => {
+    await adminFetch(`/api/admin/users/${id}`, { method: 'PATCH', body: JSON.stringify({ role }) })
+    await get().loadUsers()
+  },
+  deleteUser: async (id) => {
+    await adminFetch(`/api/admin/users/${id}`, { method: 'DELETE' })
+    await get().loadUsers()
+  },
+
+  markMessageRead: async (id, isRead = true) => {
+    await adminFetch(`/api/admin/messages/${id}`, { method: 'PATCH', body: JSON.stringify({ isRead }) })
+    await get().loadMessages()
+  },
+  deleteMessage: async (id) => {
+    await adminFetch(`/api/admin/messages/${id}`, { method: 'DELETE' })
+    await get().loadMessages()
+  },
+
+  resetCatalog: async () => {
+    await get().loadAll()
+  },
+}))

@@ -208,6 +208,7 @@ export const useAppStore = create<AppStore>()(
         wishlistItems: state.wishlistItems,
         isLoggedIn: state.isLoggedIn,
         user: state.user,
+        currentPage: state.currentPage,
       }),
     }
   )
