@@ -16,3 +16,16 @@ worklog.md
 db
 prisma/db
 .next/standalone
+.next/cache
+coverage
+.vscode
+.idea
+*.md
+!CLAUDE.md
+test
+tests
+__tests__
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx

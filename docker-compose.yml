@@ -1,4 +1,24 @@
 services:
+  mealicious-db:
+    image: postgres:16-alpine
+    container_name: mealicious-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: mealicious
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: mealicious
+    ports:
+      - "127.0.0.1:5434:5432"
+    volumes:
+      - mealicious-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mealicious -d mealicious"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - mealicious-net
+
   mealicious:
     build:
       context: .
@@ -10,15 +30,19 @@ services:
       - .env
     ports:
       - "127.0.0.1:3010:3000"
-    volumes:
-      - ./db:/app/db
     environment:
       NODE_ENV: production
       PORT: 3000
       HOSTNAME: 0.0.0.0
-      DATABASE_URL: file:/app/db/custom.db
+      DATABASE_URL: postgresql://mealicious:${POSTGRES_PASSWORD}@mealicious-db:5432/mealicious?schema=public
+    depends_on:
+      mealicious-db:
+        condition: service_healthy
     networks:
       - mealicious-net
+
+volumes:
+  mealicious-pgdata:
 
 networks:
   mealicious-net:
