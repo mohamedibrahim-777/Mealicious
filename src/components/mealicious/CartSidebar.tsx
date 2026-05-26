@@ -43,7 +43,11 @@ export default function CartSidebar() {
   )
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0)
   const shipping = subtotal >= 599 ? 0 : 49
-  const discount = appliedCoupon ? Math.round(subtotal * 0.1) : 0
+  const discount = (() => {
+    if (!appliedCoupon) return 0
+    if (appliedCoupon === 'IBUU50') return Math.min(Math.round(subtotal * 0.5), 500)
+    return Math.round(subtotal * 0.1)
+  })()
   const total = subtotal + shipping - discount
 
   const handleApplyCoupon = () => {
@@ -58,7 +62,7 @@ export default function CartSidebar() {
     }
     // Simulate coupon validation
     const code = couponCode.trim().toUpperCase()
-    if (code === 'WELCOME10' || code === 'SAVE10') {
+    if (code === 'WELCOME10' || code === 'SAVE10' || code === 'IBUU50') {
       setAppliedCoupon(code)
       setCouponCode('')
     } else {

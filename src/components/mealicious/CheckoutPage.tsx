@@ -54,11 +54,12 @@ const INDIAN_STATES = [
   'Delhi', 'Jammu and Kashmir', 'Ladakh', 'Lakshadweep', 'Puducherry',
 ]
 
-const COUPON_CODES: Record<string, { discount: number; type: 'percent' | 'flat'; minOrder: number }> = {
+const COUPON_CODES: Record<string, { discount: number; type: 'percent' | 'flat'; minOrder: number; maxDiscount?: number }> = {
   'MEAL10': { discount: 10, type: 'percent', minOrder: 499 },
   'SNACK20': { discount: 20, type: 'percent', minOrder: 999 },
   'FLAT50': { discount: 50, type: 'flat', minOrder: 599 },
   'WELCOME': { discount: 15, type: 'percent', minOrder: 399 },
+  'IBUU50': { discount: 50, type: 'percent', minOrder: 0, maxDiscount: 500 },
 }
 
 function generateOrderId(): string {
@@ -131,6 +132,7 @@ export default function CheckoutPage() {
         coupon.type === 'percent'
           ? Math.round((subtotal * coupon.discount) / 100)
           : coupon.discount
+      if (coupon.maxDiscount != null) discount = Math.min(discount, coupon.maxDiscount)
     }
   }
 
