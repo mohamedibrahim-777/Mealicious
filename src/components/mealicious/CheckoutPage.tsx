@@ -137,7 +137,15 @@ export default function CheckoutPage() {
   }
 
   const afterDiscount = subtotal - discount
-  const gst = Math.round(afterDiscount * 0.18)
+  const GST_EXEMPT_NAMES = new Set(['Dates Medjool Premium'])
+  const taxableSubtotal = cartItems.reduce(
+    (sum, item) => GST_EXEMPT_NAMES.has(item.name)
+      ? sum
+      : sum + (item.salePrice ?? item.price) * item.quantity,
+    0
+  )
+  const taxableAfterDiscount = subtotal > 0 ? (taxableSubtotal / subtotal) * afterDiscount : 0
+  const gst = Math.round(taxableAfterDiscount * 0.18)
   const total = afterDiscount + shippingTotal + gst
 
   // Empty cart redirect - derived state
