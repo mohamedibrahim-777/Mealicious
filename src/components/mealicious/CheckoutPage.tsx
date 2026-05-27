@@ -227,12 +227,18 @@ export default function CheckoutPage() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            orderId: newOrderId,
-            amount: total,
+            items: cartItems.map((it) => ({
+              productId: it.productId,
+              quantity: it.quantity,
+              variant: it.variant ?? null,
+            })),
+            couponCode: appliedCoupon,
+            paymentMethod: 'online',
+            clientAmount: total,
             customerName: fullName,
             customerEmail: email,
             customerPhone: phone,
-            orderNote: `Mealicious order ${newOrderId}`,
+            orderNote: `Mealicious order`,
           }),
         })
         const data = await res.json()
@@ -263,12 +269,44 @@ export default function CheckoutPage() {
       }
     }
 
-    // COD flow
-    await new Promise((resolve) => setTimeout(resolve, 1200))
-    setOrderId(newOrderId)
-    setEstimatedDelivery(getEstimatedDelivery())
-    setOrderPlacing(false)
-    setOrderDialogOpen(true)
+    // COD flow — persist to server
+    try {
+      const res = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: cartItems.map((it) => ({
+            productId: it.productId,
+            quantity: it.quantity,
+            variant: it.variant ?? null,
+          })),
+          couponCode: appliedCoupon,
+          paymentMethod: 'cod',
+          clientTotal: total,
+          customerName: fullName,
+          customerEmail: email,
+          customerPhone: phone,
+          shippingAddr: {
+            fullName, email, phone,
+            address1, address2, city, state, pincode,
+          },
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        alert(`Order failed: ${data.error || 'unknown'}`)
+        setOrderPlacing(false)
+        return
+      }
+      setOrderId(data.order?.orderNumber ?? newOrderId)
+      setEstimatedDelivery(getEstimatedDelivery())
+      setOrderPlacing(false)
+      setOrderDialogOpen(true)
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Unknown error'
+      alert(`Order failed: ${message}`)
+      setOrderPlacing(false)
+    }
   }
 
   const handleOrderComplete = () => {

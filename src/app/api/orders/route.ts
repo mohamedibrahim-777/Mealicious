@@ -1,39 +1,55 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
+import { priceCartFromDb, computeTotals, type PricingItemInput } from '@/lib/pricing'
 
-interface OrderItemInput {
-  productId?: string
-  name: string
-  image?: string
-  price: number
-  quantity: number
-  variant?: string
-}
+const ALLOWED_AMOUNT_DRIFT = 1
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
     const {
       items,
-      subtotal,
-      shipping,
-      discount,
-      tax,
-      total,
+      couponCode,
       paymentMethod,
       shippingAddr,
       billingAddr,
       customerEmail,
       customerName,
       customerPhone,
-      couponCode,
-    } = body
+      clientTotal,
+      cashfreeOrderId,
+    } = body as {
+      items: PricingItemInput[]
+      couponCode?: string
+      paymentMethod?: 'cod' | 'online'
+      shippingAddr: Record<string, unknown>
+      billingAddr?: Record<string, unknown>
+      customerEmail: string
+      customerName?: string
+      customerPhone?: string
+      clientTotal?: number
+      cashfreeOrderId?: string
+    }
 
-    if (!items || !Array.isArray(items) || items.length === 0) {
-      return NextResponse.json({ error: 'No items in order' }, { status: 400 })
+    if (!Array.isArray(items) || items.length === 0) {
+      return NextResponse.json({ error: 'items[] required' }, { status: 400 })
     }
     if (!customerEmail) {
       return NextResponse.json({ error: 'customerEmail required' }, { status: 400 })
+    }
+
+    const priced = await priceCartFromDb(items)
+    const totals = computeTotals(priced, { couponCode, paymentMethod: paymentMethod ?? 'cod' })
+
+    if (typeof clientTotal === 'number' && Math.abs(clientTotal - totals.total) > ALLOWED_AMOUNT_DRIFT) {
+      return NextResponse.json(
+        {
+          error: 'Amount mismatch. Cart prices have changed — refresh and try again.',
+          serverTotal: totals.total,
+          clientTotal,
+        },
+        { status: 409 },
+      )
     }
 
     const user = await db.user.upsert({
@@ -49,47 +65,36 @@ export async function POST(req: NextRequest) {
       },
     })
 
-    const orderNumber = `ML-${Date.now().toString(36).toUpperCase()}${Math.random().toString(36).substring(2, 6).toUpperCase()}`
-
-    const itemsToCreate = await Promise.all(
-      (items as OrderItemInput[]).map(async (it) => {
-        let productId = it.productId
-        if (!productId && it.name) {
-          const slug = it.name.toLowerCase().replace(/\s+/g, '-')
-          const p = await db.product.findUnique({ where: { slug } })
-          productId = p?.id
-        }
-        if (!productId) {
-          throw new Error(`productId missing for item "${it.name}"`)
-        }
-        return {
-          productId,
-          name: it.name,
-          image: it.image ?? '',
-          price: Number(it.price) || 0,
-          quantity: Number(it.quantity) || 1,
-          variant: it.variant ?? null,
-          subtotal: (Number(it.price) || 0) * (Number(it.quantity) || 1),
-        }
-      }),
-    )
+    const orderNumber =
+      cashfreeOrderId ||
+      `ML-${Date.now().toString(36).toUpperCase()}${Math.random().toString(36).slice(2, 6).toUpperCase()}`
 
     const order = await db.order.create({
       data: {
         orderNumber,
         userId: user.id,
         status: 'confirmed',
-        subtotal: Number(subtotal) || 0,
-        shipping: Number(shipping) || 0,
-        discount: Number(discount) || 0,
-        tax: Number(tax) || 0,
-        total: Number(total) || 0,
+        subtotal: totals.subtotal,
+        shipping: totals.shipping + totals.codFee,
+        discount: totals.discount,
+        tax: totals.gst,
+        total: totals.total,
         paymentMethod: paymentMethod ?? null,
         paymentStatus: 'pending',
         shippingAddr: JSON.stringify(shippingAddr ?? {}),
         billingAddr: billingAddr ? JSON.stringify(billingAddr) : null,
-        couponCode: couponCode ?? null,
-        items: { create: itemsToCreate },
+        couponCode: totals.appliedCoupon,
+        items: {
+          create: priced.map((p) => ({
+            productId: p.productId,
+            name: p.name,
+            image: p.image,
+            price: p.unitPrice,
+            quantity: p.quantity,
+            variant: p.variant,
+            subtotal: p.lineSubtotal,
+          })),
+        },
       },
       include: { items: true },
     })
@@ -115,6 +120,7 @@ export async function POST(req: NextRequest) {
     })
   } catch (error) {
     console.error('Order API error:', error)
-    return NextResponse.json({ error: 'Failed to create order' }, { status: 500 })
+    const message = error instanceof Error ? error.message : 'Failed to create order'
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }
