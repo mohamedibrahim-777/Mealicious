@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createCashfreeOrder, getCashfreeMode, CashfreeNotConfiguredError } from '@/lib/cashfree'
 import { priceCartFromDb, computeTotals, type PricingItemInput } from '@/lib/pricing'
+import { db } from '@/lib/db'
 
-const ALLOWED_AMOUNT_DRIFT = 1 // rupee — accept ±₹1 rounding skew vs client
+const ALLOWED_AMOUNT_DRIFT = 1
 
 function generateOrderId() {
   return `ML-${Date.now().toString(36).toUpperCase()}${Math.random().toString(36).slice(2, 6).toUpperCase()}`
@@ -14,21 +15,23 @@ export async function POST(req: NextRequest) {
     const {
       items,
       couponCode,
-      paymentMethod,
       customerName,
       customerEmail,
       customerPhone,
       orderNote,
       clientAmount,
+      shippingAddr,
+      billingAddr,
     } = body as {
       items: PricingItemInput[]
       couponCode?: string
-      paymentMethod?: 'cod' | 'online'
       customerName: string
       customerEmail: string
       customerPhone: string
       orderNote?: string
       clientAmount?: number
+      shippingAddr?: Record<string, unknown>
+      billingAddr?: Record<string, unknown>
     }
 
     if (!Array.isArray(items) || items.length === 0) {
@@ -42,7 +45,7 @@ export async function POST(req: NextRequest) {
     }
 
     const priced = await priceCartFromDb(items)
-    const totals = computeTotals(priced, { couponCode, paymentMethod: paymentMethod ?? 'online' })
+    const totals = computeTotals(priced, { couponCode, paymentMethod: 'online' })
 
     if (typeof clientAmount === 'number') {
       if (Math.abs(clientAmount - totals.total) > ALLOWED_AMOUNT_DRIFT) {
@@ -56,12 +59,56 @@ export async function POST(req: NextRequest) {
         )
       }
     }
-
     if (totals.total <= 0) {
       return NextResponse.json({ error: 'Order total must be positive' }, { status: 400 })
     }
 
     const orderId = generateOrderId()
+
+    // Upsert user + create pending Order row BEFORE calling Cashfree so verify/webhook
+    // can find it later.
+    const user = await db.user.upsert({
+      where: { email: String(customerEmail).toLowerCase() },
+      update: {
+        ...(customerName ? { name: customerName } : {}),
+        ...(customerPhone ? { phone: customerPhone } : {}),
+      },
+      create: {
+        email: String(customerEmail).toLowerCase(),
+        name: customerName || String(customerEmail).split('@')[0],
+        phone: customerPhone || null,
+      },
+    })
+
+    await db.order.create({
+      data: {
+        orderNumber: orderId,
+        userId: user.id,
+        status: 'pending',
+        subtotal: totals.subtotal,
+        shipping: totals.shipping + totals.codFee,
+        discount: totals.discount,
+        tax: totals.gst,
+        total: totals.total,
+        paymentMethod: 'online',
+        paymentStatus: 'pending',
+        shippingAddr: JSON.stringify(shippingAddr ?? {}),
+        billingAddr: billingAddr ? JSON.stringify(billingAddr) : null,
+        couponCode: totals.appliedCoupon,
+        items: {
+          create: priced.map((p) => ({
+            productId: p.productId,
+            name: p.name,
+            image: p.image,
+            price: p.unitPrice,
+            quantity: p.quantity,
+            variant: p.variant,
+            subtotal: p.lineSubtotal,
+          })),
+        },
+      },
+    })
+
     const fwdHost = req.headers.get('x-forwarded-host') || req.headers.get('host')
     const fwdProto = req.headers.get('x-forwarded-proto') || 'https'
     const publicBase =

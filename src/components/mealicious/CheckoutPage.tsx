@@ -239,6 +239,10 @@ export default function CheckoutPage() {
             customerEmail: email,
             customerPhone: phone,
             orderNote: `Mealicious order`,
+            shippingAddr: {
+              fullName, email, phone,
+              address1, address2, city, state, pincode,
+            },
           }),
         })
         const data = await res.json()
