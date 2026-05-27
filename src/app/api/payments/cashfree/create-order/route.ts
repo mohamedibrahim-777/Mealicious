@@ -27,8 +27,12 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const origin = req.nextUrl.origin
-    const returnUrl = `${origin}/?cashfree_order_id={order_id}#payment-return`
+    const fwdHost = req.headers.get('x-forwarded-host') || req.headers.get('host')
+    const fwdProto = req.headers.get('x-forwarded-proto') || 'https'
+    const publicBase =
+      process.env.PUBLIC_BASE_URL ||
+      (fwdHost ? `${fwdProto}://${fwdHost}` : req.nextUrl.origin)
+    const returnUrl = `${publicBase}/?cashfree_order_id={order_id}#payment-return`
 
     const order = await createCashfreeOrder({
       orderId,
