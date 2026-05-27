@@ -65,20 +65,20 @@ export async function POST(req: NextRequest) {
 
     const orderId = generateOrderId()
 
-    // Upsert user + create pending Order row BEFORE calling Cashfree so verify/webhook
-    // can find it later.
-    const user = await db.user.upsert({
-      where: { email: String(customerEmail).toLowerCase() },
-      update: {
-        ...(customerName ? { name: customerName } : {}),
-        ...(customerPhone ? { phone: customerPhone } : {}),
-      },
-      create: {
-        email: String(customerEmail).toLowerCase(),
-        name: customerName || String(customerEmail).split('@')[0],
-        phone: customerPhone || null,
-      },
-    })
+    // Find-or-create user. Never overwrite an existing User's name/phone from an
+    // unauthenticated checkout — that would let anyone rewrite a victim's profile
+    // by submitting a checkout with their email. Shipping contact info lives on
+    // the Order row (shippingAddr JSON) instead.
+    const emailLc = String(customerEmail).toLowerCase()
+    const user =
+      (await db.user.findUnique({ where: { email: emailLc } })) ??
+      (await db.user.create({
+        data: {
+          email: emailLc,
+          name: customerName || emailLc.split('@')[0],
+          phone: customerPhone || null,
+        },
+      }))
 
     await db.order.create({
       data: {

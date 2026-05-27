@@ -52,18 +52,18 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const user = await db.user.upsert({
-      where: { email: String(customerEmail).toLowerCase() },
-      update: {
-        ...(customerName ? { name: customerName } : {}),
-        ...(customerPhone ? { phone: customerPhone } : {}),
-      },
-      create: {
-        email: String(customerEmail).toLowerCase(),
-        name: customerName || String(customerEmail).split('@')[0],
-        phone: customerPhone || null,
-      },
-    })
+    // Find-or-create only — never overwrite an existing User's profile from an
+    // unauthenticated checkout. Shipping contact lives on the Order row.
+    const emailLc = String(customerEmail).toLowerCase()
+    const user =
+      (await db.user.findUnique({ where: { email: emailLc } })) ??
+      (await db.user.create({
+        data: {
+          email: emailLc,
+          name: customerName || emailLc.split('@')[0],
+          phone: customerPhone || null,
+        },
+      }))
 
     const orderNumber =
       cashfreeOrderId ||
