@@ -59,7 +59,7 @@ const COUPON_CODES: Record<string, { discount: number; type: 'percent' | 'flat';
   'SNACK20': { discount: 20, type: 'percent', minOrder: 999 },
   'FLAT50': { discount: 50, type: 'flat', minOrder: 599 },
   'WELCOME': { discount: 15, type: 'percent', minOrder: 399 },
-  'IBUU50': { discount: 50, type: 'flat', minOrder: 0 },
+  'IBUU50': { discount: 49, type: 'flat', minOrder: 0 },
 }
 
 function generateOrderId(): string {

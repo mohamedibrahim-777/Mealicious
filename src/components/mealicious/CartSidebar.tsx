@@ -45,7 +45,7 @@ export default function CartSidebar() {
   const shipping = subtotal >= 599 ? 0 : 49
   const discount = (() => {
     if (!appliedCoupon) return 0
-    if (appliedCoupon === 'IBUU50') return Math.min(50, subtotal)
+    if (appliedCoupon === 'IBUU50') return Math.min(49, subtotal)
     return Math.round(subtotal * 0.1)
   })()
   const total = subtotal + shipping - discount
