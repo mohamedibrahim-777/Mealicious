@@ -3,9 +3,11 @@ import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
 
 const COOKIE_NAME = 'admin-session'
-const SECRET = new TextEncoder().encode(
-  process.env.ADMIN_SESSION_SECRET || 'fallback-secret-change-me-in-production'
-)
+const rawSecret = process.env.ADMIN_SESSION_SECRET
+if (!rawSecret || rawSecret.length < 32) {
+  throw new Error('ADMIN_SESSION_SECRET must be set to a strong random value (min 32 chars)')
+}
+const SECRET = new TextEncoder().encode(rawSecret)
 const EXPIRY = '7d'
 
 export interface AdminSession {
