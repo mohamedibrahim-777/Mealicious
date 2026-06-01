@@ -1,5 +1,6 @@
 import { jwtVerify, createRemoteJWKSet } from 'jose'
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
+import { getSessionFromRequest } from './admin-session'
 
 const PROJECT_ID = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || ''
 const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || 'admin@mealicious.com')
@@ -57,4 +58,15 @@ export async function requireAdmin(req: Request) {
   if (!user) return { user: null, error: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) }
   if (!user.isAdmin) return { user, error: NextResponse.json({ error: 'Forbidden' }, { status: 403 }) }
   return { user, error: null }
+}
+
+export async function requireAdminSession(req: NextRequest) {
+  const session = await getSessionFromRequest(req)
+  if (!session) {
+    return {
+      session: null,
+      error: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }),
+    }
+  }
+  return { session, error: null }
 }
