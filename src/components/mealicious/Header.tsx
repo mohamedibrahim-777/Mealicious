@@ -52,21 +52,9 @@ export default function Header() {
     setSearchQuery,
     mobileMenuOpen,
     setMobileMenuOpen,
-    adminSessionReady,
   } = useAppStore()
 
-  async function openAdminPanel() {
-    if (!adminSessionReady) {
-      // session cookie still being set — wait up to 3s
-      await new Promise<void>(resolve => {
-        const start = Date.now()
-        const check = () => {
-          if (useAppStore.getState().adminSessionReady || Date.now() - start > 3000) resolve()
-          else setTimeout(check, 100)
-        }
-        check()
-      })
-    }
+  function openAdminPanel() {
     window.location.href = '/admin/dashboard'
   }
 
