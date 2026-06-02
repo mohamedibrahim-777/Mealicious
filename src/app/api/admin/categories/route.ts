@@ -1,0 +1,27 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { db } from '@/lib/db'
+
+export async function GET() {
+  const categories = await db.category.findMany({
+    include: { children: true, parent: true },
+    orderBy: [{ parentId: 'asc' }, { sortOrder: 'asc' }, { name: 'asc' }],
+  })
+  return NextResponse.json({ categories })
+}
+
+export async function POST(req: NextRequest) {
+  const body = await req.json()
+  const slug = (body.slug || String(body.name || '').toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')).slice(0, 80)
+  const category = await db.category.create({
+    data: {
+      name: body.name,
+      slug,
+      image: body.image ?? null,
+      icon: body.icon ?? null,
+      featured: body.featured ?? false,
+      sortOrder: Number(body.sortOrder) || 0,
+      parentId: body.parentId || null,
+    },
+  })
+  return NextResponse.json({ category }, { status: 201 })
+}

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect, useCallback } from 'react'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import {
@@ -24,8 +24,11 @@ import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { useAppStore } from '@/lib/store'
 import { useCatalogStore } from '@/lib/catalog-store'
-import { reviews as allReviews } from '@/lib/data'
 import ProductCard from '@/components/mealicious/ProductCard'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Label } from '@/components/ui/label'
+import { toast } from 'sonner'
 
 export default function ProductDetail() {
   const navigate = useAppStore((s) => s.navigate)
@@ -88,7 +91,52 @@ export default function ProductDetail() {
     : 0
   const displayPrice = product.salePrice ?? product.price
 
-  const productReviews = allReviews.slice(0, 6)
+  // Real reviews from DB
+  const [productReviews, setProductReviews] = useState<{ id: string; name: string; rating: number; title: string; comment: string; date: string; verified: boolean }[]>([])
+  const [reviewsLoaded, setReviewsLoaded] = useState(false)
+
+  const loadReviews = useCallback(async () => {
+    if (!product?.id) return
+    try {
+      const res = await fetch(`/api/products/${product.id}/reviews`)
+      if (res.ok) {
+        const data = await res.json()
+        setProductReviews(data.reviews)
+      }
+    } catch {}
+    setReviewsLoaded(true)
+  }, [product?.id])
+
+  useEffect(() => { loadReviews() }, [loadReviews])
+
+  // Review form state
+  const [reviewForm, setReviewForm] = useState({ name: '', email: '', rating: 0, title: '', comment: '' })
+  const [hoverRating, setHoverRating] = useState(0)
+  const [submitting, setSubmitting] = useState(false)
+  const [submitted, setSubmitted] = useState(false)
+
+  async function submitReview() {
+    if (!reviewForm.name || !reviewForm.comment || !reviewForm.rating) {
+      toast.error('Name, rating and comment are required')
+      return
+    }
+    setSubmitting(true)
+    try {
+      const res = await fetch(`/api/products/${product!.id}/reviews`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(reviewForm),
+      })
+      if (!res.ok) throw new Error((await res.json()).error || 'Failed')
+      toast.success('Review submitted! It will appear after moderation.')
+      setSubmitted(true)
+      setReviewForm({ name: '', email: '', rating: 0, title: '', comment: '' })
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : 'Error')
+    } finally {
+      setSubmitting(false)
+    }
+  }
 
   // Rating distribution
   const ratingDistribution = [5, 4, 3, 2, 1].map((star) => {
@@ -636,54 +684,78 @@ export default function ProductDetail() {
                 </div>
               </div>
 
-              {/* Reviews List */}
-              <div className="lg:col-span-2 space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
-                {productReviews.map((review) => (
-                  <div
-                    key={review.id}
-                    className="p-4 rounded-xl border border-border hover:border-blue-200 transition-colors"
-                  >
-                    <div className="flex items-start justify-between mb-2">
+              {/* Reviews List + Write Review */}
+              <div className="lg:col-span-2 space-y-4">
+                {/* Write Review Form */}
+                <div className="p-4 rounded-xl border border-orange-200 bg-orange-50/30">
+                  <h4 className="font-semibold text-sm mb-3">Write a Review</h4>
+                  {submitted ? (
+                    <p className="text-sm text-green-600 font-medium">✓ Review submitted! It will appear after moderation.</p>
+                  ) : (
+                    <div className="space-y-3">
+                      {/* Star picker */}
                       <div>
-                        <div className="flex items-center gap-2">
-                          <span className="font-semibold text-sm text-foreground">
-                            {review.userName}
-                          </span>
-                          {review.verified && (
-                            <Badge className="bg-blue-100 text-orange-400 hover:bg-blue-100 border-0 text-[10px] px-1.5 py-0 inline-flex items-center gap-0.5">
-                              <Check className="h-3 w-3" /> Verified
-                            </Badge>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-1 mt-1">
-                          {[1, 2, 3, 4, 5].map((star) => (
-                            <Star
-                              key={star}
-                              className={`h-3.5 w-3.5 ${
-                                star <= review.rating
-                                  ? 'fill-orange-400 text-orange-400'
-                                  : 'fill-muted text-muted'
-                              }`}
-                            />
+                        <Label className="text-xs mb-1 block">Your Rating *</Label>
+                        <div className="flex gap-1">
+                          {[1,2,3,4,5].map(s => (
+                            <button
+                              key={s}
+                              type="button"
+                              onMouseEnter={() => setHoverRating(s)}
+                              onMouseLeave={() => setHoverRating(0)}
+                              onClick={() => setReviewForm(p => ({ ...p, rating: s }))}
+                            >
+                              <Star className={`h-6 w-6 transition-colors ${s <= (hoverRating || reviewForm.rating) ? 'fill-orange-400 text-orange-400' : 'text-neutral-300'}`} />
+                            </button>
                           ))}
                         </div>
                       </div>
-                      <span className="text-xs text-muted-foreground">
-                        {new Date(review.date).toLocaleDateString('en-IN', {
-                          year: 'numeric',
-                          month: 'short',
-                          day: 'numeric',
-                        })}
-                      </span>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div><Label className="text-xs">Name *</Label><Input className="mt-1 h-8 text-sm" value={reviewForm.name} onChange={e => setReviewForm(p => ({ ...p, name: e.target.value }))} placeholder="Your name" /></div>
+                        <div><Label className="text-xs">Email</Label><Input className="mt-1 h-8 text-sm" type="email" value={reviewForm.email} onChange={e => setReviewForm(p => ({ ...p, email: e.target.value }))} placeholder="Optional" /></div>
+                      </div>
+                      <div><Label className="text-xs">Title</Label><Input className="mt-1 h-8 text-sm" value={reviewForm.title} onChange={e => setReviewForm(p => ({ ...p, title: e.target.value }))} placeholder="Summary of your review" /></div>
+                      <div><Label className="text-xs">Review *</Label><Textarea className="mt-1 text-sm" rows={3} value={reviewForm.comment} onChange={e => setReviewForm(p => ({ ...p, comment: e.target.value }))} placeholder="Share your experience…" /></div>
+                      <Button size="sm" onClick={submitReview} disabled={submitting} className="bg-orange-500 hover:bg-orange-600">
+                        {submitting ? 'Submitting…' : 'Submit Review'}
+                      </Button>
                     </div>
-                    <h4 className="font-semibold text-sm text-foreground mb-1">
-                      {review.title}
-                    </h4>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      {review.comment}
-                    </p>
-                  </div>
-                ))}
+                  )}
+                </div>
+
+                {/* Reviews List */}
+                <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1 custom-scrollbar">
+                  {!reviewsLoaded && <p className="text-sm text-muted-foreground">Loading reviews…</p>}
+                  {reviewsLoaded && productReviews.length === 0 && (
+                    <p className="text-sm text-muted-foreground py-4 text-center">No reviews yet. Be the first!</p>
+                  )}
+                  {productReviews.map((review) => (
+                    <div key={review.id} className="p-4 rounded-xl border border-border hover:border-blue-200 transition-colors">
+                      <div className="flex items-start justify-between mb-2">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-semibold text-sm text-foreground">{review.name}</span>
+                            {review.verified && (
+                              <Badge className="bg-blue-100 text-orange-400 hover:bg-blue-100 border-0 text-[10px] px-1.5 py-0 inline-flex items-center gap-0.5">
+                                <Check className="h-3 w-3" /> Verified
+                              </Badge>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-1 mt-1">
+                            {[1,2,3,4,5].map(star => (
+                              <Star key={star} className={`h-3.5 w-3.5 ${star <= review.rating ? 'fill-orange-400 text-orange-400' : 'fill-muted text-muted'}`} />
+                            ))}
+                          </div>
+                        </div>
+                        <span className="text-xs text-muted-foreground">
+                          {new Date(review.date).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' })}
+                        </span>
+                      </div>
+                      {review.title && <h4 className="font-semibold text-sm text-foreground mb-1">{review.title}</h4>}
+                      <p className="text-sm text-muted-foreground leading-relaxed">{review.comment}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </TabsContent>
