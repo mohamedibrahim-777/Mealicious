@@ -63,7 +63,8 @@ function PageRenderer({ page }: { page: Page }) {
     case 'profile':
       return <ProfilePage />
     case 'admin':
-      return <AdminPanel />
+      if (typeof window !== 'undefined') window.location.href = '/admin'
+      return null
     default:
       return <HomePage />
   }
