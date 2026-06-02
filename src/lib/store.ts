@@ -69,6 +69,7 @@ interface AppStore {
   // Auth
   isLoggedIn: boolean
   user: { name: string; email: string; phone: string; role: 'admin' | 'user' } | null
+  adminSessionReady: boolean
   login: (email: string, password: string) => boolean
   register: (name: string, email: string, phone: string, password: string) => boolean
   logout: () => void
@@ -153,25 +154,29 @@ export const useAppStore = create<AppStore>()(
       // Auth
       isLoggedIn: false,
       user: null,
+      adminSessionReady: false,
       login: (email, password) => {
         const isAdmin =
           email.toLowerCase() === 'admin@mealicious.com' && password === 'admin123'
         set({
           isLoggedIn: true,
+          adminSessionReady: false,
           user: {
             name: isAdmin ? 'Admin' : email.split('@')[0],
             email,
             phone: '',
             role: isAdmin ? 'admin' : 'user',
           },
-          currentPage: isAdmin ? 'home' : 'home',
+          currentPage: 'home',
         })
         if (isAdmin && typeof window !== 'undefined') {
           fetch('/api/admin/auth/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password }),
-          }).catch(() => {})
+          })
+            .then(() => set({ adminSessionReady: true }))
+            .catch(() => set({ adminSessionReady: true }))
         }
         return true
       },

@@ -52,7 +52,23 @@ export default function Header() {
     setSearchQuery,
     mobileMenuOpen,
     setMobileMenuOpen,
+    adminSessionReady,
   } = useAppStore()
+
+  async function openAdminPanel() {
+    if (!adminSessionReady) {
+      // session cookie still being set — wait up to 3s
+      await new Promise<void>(resolve => {
+        const start = Date.now()
+        const check = () => {
+          if (useAppStore.getState().adminSessionReady || Date.now() - start > 3000) resolve()
+          else setTimeout(check, 100)
+        }
+        check()
+      })
+    }
+    window.location.href = '/admin/dashboard'
+  }
 
   const [scrolled, setScrolled] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
@@ -188,14 +204,7 @@ export default function Header() {
                         </button>
                         {user.role === 'admin' && (
                           <button
-                            onClick={async () => {
-                            await fetch('/api/admin/auth/login', {
-                              method: 'POST',
-                              headers: { 'Content-Type': 'application/json' },
-                              body: JSON.stringify({ email: user.email, password: 'admin123' }),
-                            }).catch(() => {})
-                            window.location.href = '/admin/dashboard'
-                          }}
+                            onClick={openAdminPanel}
                             className="w-full text-left px-3 py-2.5 text-sm font-semibold text-orange-500 hover:bg-orange-50 rounded-md transition-colors"
                           >
                             Admin Panel
@@ -394,14 +403,7 @@ export default function Header() {
                     </DropdownMenuItem>
                     {user?.role === 'admin' && (
                       <DropdownMenuItem
-                        onClick={async () => {
-                            await fetch('/api/admin/auth/login', {
-                              method: 'POST',
-                              headers: { 'Content-Type': 'application/json' },
-                              body: JSON.stringify({ email: user.email, password: 'admin123' }),
-                            }).catch(() => {})
-                            window.location.href = '/admin/dashboard'
-                          }}
+                        onClick={openAdminPanel}
                         className="cursor-pointer font-semibold text-orange-500 focus:text-orange-500"
                       >
                         <Shield className="mr-2 h-4 w-4" />

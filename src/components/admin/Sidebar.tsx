@@ -50,7 +50,10 @@ export function Sidebar() {
       </nav>
       <div className="px-3 py-4 border-t border-neutral-800">
         <button
-          onClick={() => { window.location.href = '/' }}
+          onClick={async () => {
+            await fetch('/api/admin/auth/logout', { method: 'POST' }).catch(() => {})
+            window.location.href = '/'
+          }}
           className="flex items-center gap-3 px-3 py-2 w-full rounded-md text-sm text-neutral-400 hover:bg-neutral-800 hover:text-white transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
