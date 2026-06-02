@@ -69,8 +69,8 @@ interface AppStore {
   isLoggedIn: boolean
   user: { name: string; email: string; phone: string; role: 'admin' | 'user' } | null
   adminSessionReady: boolean
-  login: (email: string, password: string) => boolean
-  register: (name: string, email: string, phone: string, password: string) => boolean
+  login: (email: string, password: string) => Promise<string | null>
+  register: (name: string, email: string, phone: string, password: string) => Promise<string | null>
   logout: () => void
   updateProfile: (data: Partial<{ name: string; email: string; phone: string }>) => void
 
@@ -160,41 +160,49 @@ export const useAppStore = create<AppStore>()(
       isLoggedIn: false,
       user: null,
       adminSessionReady: false,
-      login: (email, password) => {
-        const isAdmin =
-          email.toLowerCase() === 'admin@mealicious.com' && password === 'admin123'
-        set({
-          isLoggedIn: true,
-          adminSessionReady: false,
-          user: {
-            name: isAdmin ? 'Admin' : email.split('@')[0],
-            email,
-            phone: '',
-            role: isAdmin ? 'admin' : 'user',
-          },
-          currentPage: 'home',
-        })
-        if (isAdmin && typeof window !== 'undefined') {
-          fetch('/api/admin/auth/login', {
+      login: async (email, password) => {
+        try {
+          const res = await fetch('/api/auth/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password }),
           })
-            .then(() => set({ adminSessionReady: true }))
-            .catch(() => set({ adminSessionReady: true }))
+          const data = await res.json()
+          if (!res.ok) return data.error || 'Login failed'
+          const u = data.user
+          set({ isLoggedIn: true, adminSessionReady: false, user: { name: u.name, email: u.email, phone: u.phone, role: u.role }, currentPage: 'home' })
+          if (u.role === 'admin' && typeof window !== 'undefined') {
+            fetch('/api/admin/auth/login', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email, password }),
+            })
+              .then(() => set({ adminSessionReady: true }))
+              .catch(() => set({ adminSessionReady: true }))
+          }
+          return null
+        } catch {
+          return 'Network error. Try again.'
         }
-        return true
       },
-      register: (name, email, phone, _password) => {
-        set({
-          isLoggedIn: true,
-          user: { name, email, phone, role: 'user' },
-          currentPage: 'home',
-        })
-        return true
+      register: async (name, email, phone, password) => {
+        try {
+          const res = await fetch('/api/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email, phone, password }),
+          })
+          const data = await res.json()
+          if (!res.ok) return data.error || 'Registration failed'
+          const u = data.user
+          set({ isLoggedIn: true, user: { name: u.name, email: u.email, phone: u.phone, role: 'user' }, currentPage: 'home' })
+          return null
+        } catch {
+          return 'Network error. Try again.'
+        }
       },
       logout: () => {
-        set({ isLoggedIn: false, user: null, currentPage: 'home' })
+        set({ isLoggedIn: false, user: null, currentPage: 'home', addresses: [], cartItems: [], wishlistItems: [] })
         if (typeof window !== 'undefined') {
           import('@/lib/firebase')
             .then(({ getFirebaseAuth }) => {

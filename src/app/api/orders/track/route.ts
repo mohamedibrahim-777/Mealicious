@@ -34,6 +34,13 @@ export async function GET(req: NextRequest) {
     status: i < currentStatusIdx ? 'completed' : i === currentStatusIdx ? 'current' : 'upcoming',
   }))
 
+  // Mask PII — public tracking shows only city+state, not full address or personal details
+  const maskedAddr = {
+    city: shippingAddr.city ?? '',
+    state: shippingAddr.state ?? '',
+    pincode: shippingAddr.pincode ? shippingAddr.pincode.slice(0, 3) + '***' : '',
+  }
+
   return NextResponse.json({
     order: {
       orderNumber: order.orderNumber,
@@ -43,7 +50,7 @@ export async function GET(req: NextRequest) {
       createdAt: format(new Date(order.createdAt), 'dd MMM yyyy, h:mm a'),
       total: order.total,
       items: order.items.map(i => ({ name: i.name, quantity: i.quantity, variant: i.variant })),
-      shippingAddr,
+      shippingAddr: maskedAddr,
       trackingId: order.trackingId,
       trackingUrl: order.trackingUrl,
       shippingProvider: order.shippingProvider,

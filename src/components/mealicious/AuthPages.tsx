@@ -131,16 +131,13 @@ export function LoginPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!email || !password) {
-      toast.error('Please fill in all fields')
-      return
-    }
+    if (!email || !password) { toast.error('Please fill in all fields'); return }
     setLoading(true)
-    // simulate network delay
-    await new Promise((r) => setTimeout(r, 600))
-    const ok = login(email, password)
+    const err = await login(email, password)
     setLoading(false)
-    if (ok) {
+    if (err) {
+      toast.error(err)
+    } else {
       toast.success('Welcome back!')
     }
   }
@@ -332,10 +329,11 @@ export function RegisterPage() {
       return
     }
     setLoading(true)
-    await new Promise((r) => setTimeout(r, 600))
-    const ok = register(name, email, phone, password)
+    const err = await register(name, email, phone, password)
     setLoading(false)
-    if (ok) {
+    if (err) {
+      toast.error(err)
+    } else {
       toast.success('Account created successfully!')
     }
   }
