@@ -28,15 +28,12 @@ export async function POST(req: NextRequest) {
     if (existing.passwordHash) {
       return NextResponse.json({ error: 'Account already exists. Please login.' }, { status: 409 })
     }
-    // Guest account from checkout — set password now
+    // Guest account from checkout — allow setting password without email verification
+    // since the email was already used to place a real order (implicit ownership proof)
     const passwordHash = await hashPassword(String(password))
     const updated = await db.user.update({
       where: { email: emailLc },
-      data: {
-        name: String(name).trim(),
-        phone: phone ? String(phone).trim() : undefined,
-        passwordHash,
-      },
+      data: { passwordHash },
     })
     return NextResponse.json({
       user: { name: updated.name, email: updated.email, phone: updated.phone ?? '', role: 'user' },
