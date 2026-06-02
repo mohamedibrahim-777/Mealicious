@@ -1,8 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
+import { timingSafeEqual } from 'crypto'
 
 // Shiprocket webhook — configure at: Shiprocket > Settings > API > Webhooks
 // URL: https://mealicious.store/api/shipping/webhook
+// Set SHIPROCKET_WEBHOOK_TOKEN env var and configure same token in Shiprocket dashboard
+
+const WEBHOOK_TOKEN = process.env.SHIPROCKET_WEBHOOK_TOKEN || ''
+
+function verifyToken(req: NextRequest): boolean {
+  if (!WEBHOOK_TOKEN) return true // not configured — pass through (warn in production)
+  const header = req.headers.get('x-shiprocket-token') || req.headers.get('authorization') || ''
+  const token = header.replace(/^Bearer\s+/i, '')
+  if (!token) return false
+  try {
+    const a = Buffer.from(token); const b = Buffer.from(WEBHOOK_TOKEN)
+    if (a.length !== b.length) { timingSafeEqual(a, a); return false }
+    return timingSafeEqual(a, b)
+  } catch { return false }
+}
 
 const STATUS_MAP: Record<string, string> = {
   'PICKUP COMPLETE': 'processing',
@@ -17,6 +33,9 @@ const STATUS_MAP: Record<string, string> = {
 }
 
 export async function POST(req: NextRequest) {
+  if (!verifyToken(req)) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
   try {
     const body = await req.json()
 
@@ -68,6 +87,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true, orderNumber: order.orderNumber, status: updateData.status || order.status })
   } catch (e: unknown) {
     console.error('Shiprocket webhook error:', e)
-    return NextResponse.json({ ok: false, error: e instanceof Error ? e.message : 'unknown' }, { status: 500 })
+    return NextResponse.json({ ok: false, error: 'Internal error' }, { status: 500 })
   }
 }
