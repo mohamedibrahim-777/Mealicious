@@ -627,9 +627,8 @@ function ProductDialog({
   const [form, setForm] = useState<Partial<Product>>(product ?? emptyProduct())
 
   // Reset form whenever the dialog target changes
-  useMemo(() => {
-    setForm(product ?? emptyProduct())
-  }, [product, open])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { setForm(product ?? emptyProduct()) }, [product?.id, open])
 
   const handle = (key: keyof Product, value: unknown) =>
     setForm((f) => ({ ...f, [key]: value }))

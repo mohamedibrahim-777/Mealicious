@@ -510,6 +510,7 @@ export default function ShopPage() {
   }, [pageParams.category, selectedCategories])
 
   // Filtered & sorted products
+  // eslint-disable-next-line react-hooks/preserve-manual-memoization
   const filteredProducts = useMemo(() => {
     let result = [...products]
 
@@ -615,6 +616,7 @@ export default function ShopPage() {
   const clearAllFilters = useCallback(() => dispatch({ type: 'CLEAR_ALL' }), [])
 
   // Active filter tags for display
+  // eslint-disable-next-line react-hooks/preserve-manual-memoization
   const activeFilterTags = useMemo(() => {
     const tags: { key: string; label: string; onRemove: () => void }[] = []
 

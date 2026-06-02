@@ -70,6 +70,28 @@ export default function ProductDetail() {
     return result
   }, [product, selectedVariants])
 
+  // Real reviews from DB — hooks MUST be before any early return
+  const [productReviews, setProductReviews] = useState<{ id: string; name: string; rating: number; title: string; comment: string; date: string; verified: boolean }[]>([])
+  const [reviewsLoaded, setReviewsLoaded] = useState(false)
+  const [reviewForm, setReviewForm] = useState({ name: '', email: '', rating: 0, title: '', comment: '' })
+  const [hoverRating, setHoverRating] = useState(0)
+  const [submitting, setSubmitting] = useState(false)
+  const [submitted, setSubmitted] = useState(false)
+
+  const loadReviews = useCallback(async () => {
+    if (!product?.id) return
+    try {
+      const res = await fetch(`/api/products/${product.id}/reviews`)
+      if (res.ok) {
+        const data = await res.json()
+        setProductReviews(data.reviews)
+      }
+    } catch {}
+    setReviewsLoaded(true)
+  }, [product?.id])
+
+  useEffect(() => { loadReviews() }, [loadReviews])
+
   if (!product) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
@@ -90,30 +112,6 @@ export default function ProductDetail() {
     ? Math.round(((product.price - product.salePrice) / product.price) * 100)
     : 0
   const displayPrice = product.salePrice ?? product.price
-
-  // Real reviews from DB
-  const [productReviews, setProductReviews] = useState<{ id: string; name: string; rating: number; title: string; comment: string; date: string; verified: boolean }[]>([])
-  const [reviewsLoaded, setReviewsLoaded] = useState(false)
-
-  const loadReviews = useCallback(async () => {
-    if (!product?.id) return
-    try {
-      const res = await fetch(`/api/products/${product.id}/reviews`)
-      if (res.ok) {
-        const data = await res.json()
-        setProductReviews(data.reviews)
-      }
-    } catch {}
-    setReviewsLoaded(true)
-  }, [product?.id])
-
-  useEffect(() => { loadReviews() }, [loadReviews])
-
-  // Review form state
-  const [reviewForm, setReviewForm] = useState({ name: '', email: '', rating: 0, title: '', comment: '' })
-  const [hoverRating, setHoverRating] = useState(0)
-  const [submitting, setSubmitting] = useState(false)
-  const [submitted, setSubmitted] = useState(false)
 
   async function submitReview() {
     if (!reviewForm.name || !reviewForm.comment || !reviewForm.rating) {
