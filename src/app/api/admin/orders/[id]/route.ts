@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { requireAdmin } from '@/lib/auth-server'
+import { notifyOrderShipped, notifyOrderDelivered, notifyOrderCancelled } from '@/lib/whatsapp'
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { error } = await requireAdmin(req)
@@ -13,7 +14,34 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (body.trackingId !== undefined) data.trackingId = body.trackingId
   if (body.trackingUrl !== undefined) data.trackingUrl = body.trackingUrl
   if (body.shippingProvider !== undefined) data.shippingProvider = body.shippingProvider
+
+  const existing = await db.order.findUnique({ where: { orderNumber: id }, include: { user: true } })
   const updated = await db.order.update({ where: { orderNumber: id }, data })
+
+  // WhatsApp delivery alerts (fire-and-forget)
+  if (existing && body.status && body.status !== existing.status) {
+    let addr: Record<string, string> = {}
+    try { addr = JSON.parse(existing.shippingAddr) } catch {}
+    const phone = existing.user?.phone || addr.phone
+    const name = existing.user?.name || addr.fullName || 'Customer'
+    if (phone) {
+      const newStatus = String(body.status).toLowerCase()
+      if (newStatus === 'shipped') {
+        notifyOrderShipped(phone, {
+          customerName: name,
+          orderNumber: existing.orderNumber,
+          courierName: String(data.shippingProvider || existing.shippingProvider || 'Courier'),
+          awb: String(data.trackingId || existing.trackingId || ''),
+          trackingUrl: String(data.trackingUrl || existing.trackingUrl || 'https://mealicious.store'),
+        }).catch(() => {})
+      } else if (newStatus === 'delivered') {
+        notifyOrderDelivered(phone, { customerName: name, orderNumber: existing.orderNumber }).catch(() => {})
+      } else if (newStatus === 'cancelled') {
+        notifyOrderCancelled(phone, { customerName: name, orderNumber: existing.orderNumber, total: existing.total }).catch(() => {})
+      }
+    }
+  }
+
   return NextResponse.json({ order: updated })
 }
 

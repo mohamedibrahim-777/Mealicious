@@ -192,3 +192,24 @@ model Banner {
   sortOrder Int      @default(0)
   createdAt DateTime @default(now())
 }
+
+model AbandonedCart {
+  id         String   @id @default(cuid())
+  phone      String
+  name       String?
+  email      String?
+  items      String   // JSON: [{name, quantity, price}]
+  cartValue  Float
+  recovered  Boolean  @default(false)
+  reminderSent Boolean @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([phone])
+}
+
+model WhatsAppOptOut {
+  id        String   @id @default(cuid())
+  phone     String   @unique
+  createdAt DateTime @default(now())
+}

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { requireAdminSession } from '@/lib/auth-server'
 import { createShiprocketOrder, assignAWB, generateLabel } from '@/lib/shiprocket'
+import { notifyOrderShipped } from '@/lib/whatsapp'
 import { format } from 'date-fns'
 
 export async function POST(req: NextRequest) {
@@ -74,9 +75,21 @@ export async function POST(req: NextRequest) {
       trackingId: awb || null,
       trackingUrl: awb ? `https://shiprocket.co/tracking/${awb}` : null,
       shippingProvider: courierName || 'Shiprocket',
-      status: 'processing',
+      status: 'shipped',
     },
   })
+
+  // WhatsApp shipping update (fire-and-forget)
+  const waPhone = addr.phone || order.user?.phone
+  if (waPhone && awb) {
+    notifyOrderShipped(waPhone, {
+      customerName: addr.fullName || order.user?.name || 'Customer',
+      orderNumber: order.orderNumber,
+      courierName: courierName || 'Shiprocket',
+      awb,
+      trackingUrl: updated.trackingUrl || 'https://mealicious.store',
+    }).catch(() => {})
+  }
 
   return NextResponse.json({
     ok: true,

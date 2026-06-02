@@ -143,6 +143,27 @@ export default function CheckoutPage() {
   // Empty cart redirect - derived state
   const isEmpty = cartItems.length === 0 && !orderDialogOpen
 
+  // Record abandoned cart for WhatsApp recovery once phone is valid (debounced)
+  useEffect(() => {
+    const cleanPhone = phone.replace(/\D/g, '')
+    if (cleanPhone.length !== 10 || cartItems.length === 0 || orderDialogOpen) return
+    const t = setTimeout(() => {
+      fetch('/api/whatsapp/abandon', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          phone: cleanPhone,
+          name: fullName || undefined,
+          email: email || undefined,
+          items: cartItems.map(i => ({ name: i.name, quantity: i.quantity, price: i.salePrice ?? i.price })),
+          cartValue: subtotal,
+        }),
+      }).catch(() => {})
+    }, 2500)
+    return () => clearTimeout(t)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phone, fullName, email, cartItems.length])
+
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {}
 

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { priceCartFromDb, computeTotals, type PricingItemInput } from '@/lib/pricing'
+import { notifyOrderConfirmed } from '@/lib/whatsapp'
 
 const ALLOWED_AMOUNT_DRIFT = 1
 
@@ -98,6 +99,25 @@ export async function POST(req: NextRequest) {
       },
       include: { items: true },
     })
+
+    // Mark abandoned cart recovered (fire-and-forget)
+    const waPhone = customerPhone || (JSON.parse(order.shippingAddr) as Record<string, string>).phone
+    if (waPhone) {
+      const cleanPhone = String(waPhone).replace(/\D/g, '').slice(-10)
+      db.abandonedCart.updateMany({ where: { phone: cleanPhone, recovered: false }, data: { recovered: true } }).catch(() => {})
+    }
+
+    // WhatsApp order confirmation (fire-and-forget)
+    if (waPhone) {
+      const itemsSummary = order.items.map(i => `${i.quantity}× ${i.name}`).join(', ')
+      notifyOrderConfirmed(waPhone, {
+        customerName: user.name,
+        orderNumber: order.orderNumber,
+        items: itemsSummary,
+        total: order.total,
+        paymentMethod: order.paymentMethod || 'COD',
+      }).catch(() => {})
+    }
 
     return NextResponse.json({
       success: true,
