@@ -1,10 +1,10 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard, Package, ShoppingCart, Users, Boxes,
-  Tag, ImageIcon, FileText, Star, MessageSquare, Mail, LogOut
+  Tag, ImageIcon, FileText, Star, MessageSquare, Mail, ArrowLeft
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -24,12 +24,6 @@ const NAV = [
 
 export function Sidebar() {
   const pathname = usePathname()
-  const router = useRouter()
-
-  async function handleLogout() {
-    await fetch('/api/admin/auth/logout', { method: 'POST' })
-    router.push('/admin/login')
-  }
 
   return (
     <aside className="w-64 min-h-screen bg-neutral-900 text-neutral-100 flex flex-col shrink-0">
@@ -56,11 +50,11 @@ export function Sidebar() {
       </nav>
       <div className="px-3 py-4 border-t border-neutral-800">
         <button
-          onClick={handleLogout}
+          onClick={() => { window.location.href = '/' }}
           className="flex items-center gap-3 px-3 py-2 w-full rounded-md text-sm text-neutral-400 hover:bg-neutral-800 hover:text-white transition-colors"
         >
-          <LogOut className="h-4 w-4" />
-          Logout
+          <ArrowLeft className="h-4 w-4" />
+          Back to Home
         </button>
       </div>
     </aside>
