@@ -21,7 +21,6 @@ export type Page =
   | 'register' 
   | 'profile'
   | 'wishlist'
-  | 'admin'
 
 export interface CartItem {
   productId: string

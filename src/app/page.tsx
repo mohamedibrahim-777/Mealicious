@@ -20,7 +20,6 @@ import ShippingPolicyPage from '@/components/mealicious/ShippingPolicyPage'
 import TrackOrderPage from '@/components/mealicious/TrackOrderPage'
 import WishlistPage from '@/components/mealicious/WishlistPage'
 import ProfilePage from '@/components/mealicious/ProfilePage'
-import AdminPanel from '@/components/mealicious/AdminPanel'
 
 function PageRenderer({ page }: { page: Page }) {
   switch (page) {
@@ -62,9 +61,6 @@ function PageRenderer({ page }: { page: Page }) {
       return <CheckoutPage />
     case 'profile':
       return <ProfilePage />
-    case 'admin':
-      if (typeof window !== 'undefined') window.location.href = '/admin'
-      return null
     default:
       return <HomePage />
   }
