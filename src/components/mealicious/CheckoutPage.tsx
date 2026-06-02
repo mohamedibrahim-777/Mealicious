@@ -155,7 +155,7 @@ export default function CheckoutPage() {
           phone: cleanPhone,
           name: fullName || undefined,
           email: email || undefined,
-          items: cartItems.map(i => ({ name: i.name, quantity: i.quantity, price: i.salePrice ?? i.price })),
+          items: cartItems.map(i => ({ productId: i.productId, quantity: i.quantity })),
           cartValue: subtotal,
         }),
       }).catch(() => {})

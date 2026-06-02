@@ -1,8 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { normalizePhone } from '@/lib/whatsapp'
+import { createHmac, timingSafeEqual } from 'crypto'
 
 const VERIFY_TOKEN = process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN || ''
+const APP_SECRET = process.env.WHATSAPP_APP_SECRET || ''
+
+function verifySignature(raw: string, signature: string): boolean {
+  if (!APP_SECRET) return true // not configured — allow (set WHATSAPP_APP_SECRET in production)
+  if (!signature) return false
+  try {
+    const expected = 'sha256=' + createHmac('sha256', APP_SECRET).update(raw).digest('hex')
+    const a = Buffer.from(expected); const b = Buffer.from(signature)
+    if (a.length !== b.length) { timingSafeEqual(a, a); return false }
+    return timingSafeEqual(a, b)
+  } catch { return false }
+}
 
 // GET — Meta webhook verification handshake
 export async function GET(req: NextRequest) {
@@ -20,7 +33,11 @@ export async function GET(req: NextRequest) {
 // POST — inbound messages (handle STOP for opt-out)
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json()
+    const raw = await req.text()
+    if (!verifySignature(raw, req.headers.get('x-hub-signature-256') || '')) {
+      return NextResponse.json({ error: 'bad signature' }, { status: 401 })
+    }
+    const body = JSON.parse(raw)
 
     const entries = body.entry ?? []
     for (const entry of entries) {
