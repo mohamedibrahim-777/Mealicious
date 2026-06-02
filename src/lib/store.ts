@@ -164,8 +164,15 @@ export const useAppStore = create<AppStore>()(
             phone: '',
             role: isAdmin ? 'admin' : 'user',
           },
-          currentPage: isAdmin ? 'admin' : 'home',
+          currentPage: isAdmin ? 'home' : 'home',
         })
+        if (isAdmin && typeof window !== 'undefined') {
+          fetch('/api/admin/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password }),
+          }).catch(() => {})
+        }
         return true
       },
       register: (name, email, phone, _password) => {

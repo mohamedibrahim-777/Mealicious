@@ -188,7 +188,7 @@ export default function Header() {
                         </button>
                         {user.role === 'admin' && (
                           <button
-                            onClick={() => window.location.href = '/admin'}
+                            onClick={() => window.location.href = '/admin/dashboard'}
                             className="w-full text-left px-3 py-2.5 text-sm font-semibold text-orange-500 hover:bg-orange-50 rounded-md transition-colors"
                           >
                             Admin Panel
@@ -387,7 +387,7 @@ export default function Header() {
                     </DropdownMenuItem>
                     {user?.role === 'admin' && (
                       <DropdownMenuItem
-                        onClick={() => window.location.href = '/admin'}
+                        onClick={() => window.location.href = '/admin/dashboard'}
                         className="cursor-pointer font-semibold text-orange-500 focus:text-orange-500"
                       >
                         <Shield className="mr-2 h-4 w-4" />
