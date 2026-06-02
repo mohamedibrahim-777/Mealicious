@@ -8,7 +8,8 @@ import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { toast } from 'sonner'
-import { Search, Eye, FileText } from 'lucide-react'
+import { Search, Eye, FileText, Truck, ExternalLink } from 'lucide-react'
+import { Label } from '@/components/ui/label'
 
 const STATUSES = ['all', 'pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled']
 const STATUS_COLORS: Record<string, string> = {
@@ -34,6 +35,11 @@ export function OrdersClient({ orders }: { orders: Order[] }) {
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [viewing, setViewing] = useState<Order | null>(null)
+  const [shipOpen, setShipOpen] = useState(false)
+  const [shipOrder, setShipOrder] = useState<Order | null>(null)
+  const [shipWeight, setShipWeight] = useState('0.5')
+  const [shipping, setShipping] = useState(false)
+  const [shipResult, setShipResult] = useState<{ awb?: string; courierName?: string; labelUrl?: string; trackingUrl?: string } | null>(null)
 
   const filtered = orders.filter(o => {
     const matchSearch = o.orderNumber.toLowerCase().includes(search.toLowerCase()) ||
@@ -42,6 +48,24 @@ export function OrdersClient({ orders }: { orders: Order[] }) {
     const matchStatus = statusFilter === 'all' || o.status === statusFilter
     return matchSearch && matchStatus
   })
+
+  async function createShipment() {
+    if (!shipOrder) return
+    setShipping(true)
+    try {
+      const res = await fetch('/api/admin/shipping/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderNumber: shipOrder.orderNumber, weight: Number(shipWeight) }),
+      })
+      const data = await res.json()
+      if (!res.ok) { toast.error(data.error || 'Shipment creation failed'); return }
+      setShipResult({ awb: data.awb, courierName: data.courierName, labelUrl: data.labelUrl, trackingUrl: data.trackingUrl })
+      toast.success(`Shipment created! AWB: ${data.awb}`)
+      startTransition(() => router.refresh())
+    } catch { toast.error('Network error') }
+    finally { setShipping(false) }
+  }
 
   async function updateStatus(id: string, status: string) {
     const res = await fetch(`/api/admin/orders/${id}`, {
@@ -113,6 +137,10 @@ export function OrdersClient({ orders }: { orders: Order[] }) {
                   <a href={`/api/admin/invoices/${o.id}`} target="_blank" rel="noreferrer">
                     <Button size="icon" variant="ghost" title="Download GST Invoice"><FileText className="h-4 w-4" /></Button>
                   </a>
+                  <Button size="icon" variant="ghost" title="Create Shiprocket Shipment" className="text-blue-600"
+                    onClick={() => { setShipOrder(o); setShipResult(null); setShipOpen(true) }}>
+                    <Truck className="h-4 w-4" />
+                  </Button>
                 </td>
               </tr>
             ))}
@@ -157,6 +185,59 @@ export function OrdersClient({ orders }: { orders: Order[] }) {
                 <div className="flex justify-between font-bold text-base"><span>Total</span><span>₹{viewing.total}</span></div>
               </div>
             </div>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Shiprocket shipment dialog */}
+      {shipOpen && shipOrder && (
+        <Dialog open onOpenChange={v => { if (!v) { setShipOpen(false); setShipResult(null) } }}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2"><Truck className="h-5 w-5 text-blue-600" />Create Shipment — {shipOrder.orderNumber}</DialogTitle>
+            </DialogHeader>
+            {!shipResult ? (
+              <div className="space-y-4 py-2">
+                <div className="text-sm text-neutral-600 bg-neutral-50 rounded-md p-3">
+                  <p><span className="font-medium">Customer:</span> {shipOrder.customer}</p>
+                  <p><span className="font-medium">Items:</span> {shipOrder.items}</p>
+                  <p><span className="font-medium">Total:</span> ₹{shipOrder.total}</p>
+                  <p><span className="font-medium">Payment:</span> {shipOrder.paymentMethod || 'N/A'}</p>
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Package Weight (kg)</Label>
+                  <Input type="number" step="0.1" min="0.1" value={shipWeight} onChange={e => setShipWeight(e.target.value)} />
+                  <p className="text-xs text-neutral-400">Dimensions default: 15×12×10 cm. Can be customized via API.</p>
+                </div>
+                <div className="flex gap-2 pt-2">
+                  <Button variant="outline" onClick={() => setShipOpen(false)} className="flex-1">Cancel</Button>
+                  <Button onClick={createShipment} disabled={shipping} className="flex-1 bg-blue-600 hover:bg-blue-700">
+                    <Truck className="h-4 w-4 mr-1" />{shipping ? 'Creating…' : 'Create Shipment'}
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-3 py-2">
+                <div className="bg-green-50 border border-green-200 rounded-md p-4 space-y-2 text-sm">
+                  <p className="font-semibold text-green-700">Shipment Created!</p>
+                  {shipResult.awb && <p><span className="font-medium">AWB:</span> <span className="font-mono">{shipResult.awb}</span></p>}
+                  {shipResult.courierName && <p><span className="font-medium">Courier:</span> {shipResult.courierName}</p>}
+                  {shipResult.trackingUrl && (
+                    <a href={shipResult.trackingUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-blue-600 hover:underline">
+                      Track Shipment <ExternalLink className="h-3.5 w-3.5" />
+                    </a>
+                  )}
+                </div>
+                {shipResult.labelUrl && (
+                  <a href={shipResult.labelUrl} target="_blank" rel="noreferrer">
+                    <Button className="w-full bg-orange-500 hover:bg-orange-600">
+                      <FileText className="h-4 w-4 mr-1" />Download Shipping Label
+                    </Button>
+                  </a>
+                )}
+                <Button variant="outline" className="w-full" onClick={() => { setShipOpen(false); setShipResult(null) }}>Close</Button>
+              </div>
+            )}
           </DialogContent>
         </Dialog>
       )}
