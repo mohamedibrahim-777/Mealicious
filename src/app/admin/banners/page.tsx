@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { db } from '@/lib/db'
 import { AdminHeader } from '@/components/admin/AdminHeader'
 import { BannersClient } from './BannersClient'
