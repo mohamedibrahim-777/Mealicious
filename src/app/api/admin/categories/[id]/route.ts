@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
+import { requireAdminSession } from '@/lib/auth-server'
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { error } = await requireAdminSession(req)
+  if (error) return error
   const { id } = await params
   const body = await req.json()
   const category = await db.category.update({
@@ -19,7 +22,9 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   return NextResponse.json({ category })
 }
 
-export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { error } = await requireAdminSession(req)
+  if (error) return error
   const { id } = await params
   await db.category.delete({ where: { id } })
   return NextResponse.json({ ok: true })
