@@ -74,6 +74,12 @@ interface AppStore {
   logout: () => void
   updateProfile: (data: Partial<{ name: string; email: string; phone: string }>) => void
 
+  // Addresses
+  addresses: { id: string; label: string; fullName: string; phone: string; address1: string; address2: string; city: string; state: string; pincode: string; isDefault: boolean }[]
+  saveAddress: (addr: { id: string; label: string; fullName: string; phone: string; address1: string; address2: string; city: string; state: string; pincode: string; isDefault: boolean }) => void
+  deleteAddress: (id: string) => void
+  setDefaultAddress: (id: string) => void
+
   // Search
   searchQuery: string
   setSearchQuery: (query: string) => void
@@ -204,6 +210,26 @@ export const useAppStore = create<AppStore>()(
         set({ user: { ...user, ...data } })
       },
 
+      // Addresses
+      addresses: [],
+      saveAddress: (addr) => {
+        const existing = get().addresses
+        const idx = existing.findIndex(a => a.id === addr.id)
+        if (idx >= 0) {
+          const updated = [...existing]
+          updated[idx] = addr
+          set({ addresses: updated })
+        } else {
+          set({ addresses: [...existing, addr] })
+        }
+      },
+      deleteAddress: (id) => {
+        set({ addresses: get().addresses.filter(a => a.id !== id) })
+      },
+      setDefaultAddress: (id) => {
+        set({ addresses: get().addresses.map(a => ({ ...a, isDefault: a.id === id })) })
+      },
+
       // Search
       searchQuery: '',
       setSearchQuery: (query) => set({ searchQuery: query }),
@@ -220,6 +246,7 @@ export const useAppStore = create<AppStore>()(
         isLoggedIn: state.isLoggedIn,
         user: state.user,
         currentPage: state.currentPage,
+        addresses: state.addresses,
       }),
     }
   )
