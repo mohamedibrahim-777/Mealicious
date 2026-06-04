@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard, Package, ShoppingCart, Users, Boxes,
-  Tag, ImageIcon, FileText, Star, MessageSquare, Mail, ArrowLeft, FolderTree, MessageCircle
+  Tag, ImageIcon, FileText, Star, MessageSquare, Mail, ArrowLeft, FolderTree, MessageCircle, Bell
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -20,6 +20,7 @@ const NAV = [
   { href: '/admin/blog', label: 'Blog', icon: FileText },
   { href: '/admin/reviews', label: 'Reviews', icon: Star },
   { href: '/admin/whatsapp', label: 'WhatsApp', icon: MessageCircle },
+  { href: '/admin/push', label: 'Push Notify', icon: Bell },
   { href: '/admin/messages', label: 'Messages', icon: MessageSquare },
   { href: '/admin/subscribers', label: 'Subscribers', icon: Mail },
 ]

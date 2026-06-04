@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useAppStore, type CartItem } from '@/lib/store'
+import { trackInitiateCheckout, trackPurchase } from '@/lib/track'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -142,6 +143,14 @@ export default function CheckoutPage() {
 
   // Empty cart redirect - derived state
   const isEmpty = cartItems.length === 0 && !orderDialogOpen
+
+  // Fire InitiateCheckout conversion event once when checkout loads with items
+  useEffect(() => {
+    if (cartItems.length > 0) {
+      trackInitiateCheckout(subtotal, cartItems.reduce((s, i) => s + i.quantity, 0))
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // Record abandoned cart for WhatsApp recovery once phone is valid (debounced)
   useEffect(() => {
@@ -323,10 +332,17 @@ export default function CheckoutPage() {
         setOrderPlacing(false)
         return
       }
-      setOrderId(data.order?.orderNumber ?? newOrderId)
+      const finalOrderId = data.order?.orderNumber ?? newOrderId
+      setOrderId(finalOrderId)
       setEstimatedDelivery(getEstimatedDelivery())
       setOrderPlacing(false)
       setOrderDialogOpen(true)
+      // Purchase conversion event (COD)
+      trackPurchase({
+        orderId: finalOrderId,
+        value: total,
+        items: cartItems.map(i => ({ id: i.productId, name: i.name, quantity: i.quantity, price: i.salePrice ?? i.price })),
+      })
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Unknown error'
       alert(`Order failed: ${message}`)

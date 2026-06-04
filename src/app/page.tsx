@@ -20,6 +20,7 @@ import ShippingPolicyPage from '@/components/mealicious/ShippingPolicyPage'
 import TrackOrderPage from '@/components/mealicious/TrackOrderPage'
 import WishlistPage from '@/components/mealicious/WishlistPage'
 import ProfilePage from '@/components/mealicious/ProfilePage'
+import { PushOptIn } from '@/components/PushOptIn'
 
 function PageRenderer({ page }: { page: Page }) {
   switch (page) {
@@ -73,6 +74,15 @@ export default function MealiciousStore() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }, [currentPage])
 
+  // Capture referral code from ?ref= and persist for signup
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const ref = new URL(window.location.href).searchParams.get('ref')
+    if (ref) {
+      try { localStorage.setItem('mealicious-ref', ref.toUpperCase()) } catch {}
+    }
+  }, [])
+
   // Cashfree return-URL handler: after the user pays, Cashfree redirects to
   // `/?cashfree_order_id=...#payment-return`. Verify the order server-side and notify the user.
   useEffect(() => {
@@ -85,7 +95,14 @@ export default function MealiciousStore() {
         const res = await fetch(`/api/payments/cashfree/verify?orderId=${encodeURIComponent(cfOrderId)}`)
         const data = await res.json()
         if (data.paid) {
-          const { clearCart, navigate } = useAppStore.getState()
+          const { clearCart, navigate, cartItems } = useAppStore.getState()
+          // Purchase conversion event (online payment)
+          const orderValue = cartItems.reduce((s, i) => s + (i.salePrice ?? i.price) * i.quantity, 0)
+          import('@/lib/track').then(({ trackPurchase }) => trackPurchase({
+            orderId: cfOrderId,
+            value: orderValue,
+            items: cartItems.map(i => ({ id: i.productId, name: i.name, quantity: i.quantity, price: i.salePrice ?? i.price })),
+          })).catch(() => {})
           clearCart()
           alert(`Payment successful! Order ${cfOrderId} confirmed.`)
           navigate('track-order', { orderId: cfOrderId })
@@ -143,6 +160,9 @@ export default function MealiciousStore() {
       </main>
       <Footer />
       <CartSidebar />
+
+      {/* Push notification opt-in */}
+      <PushOptIn />
 
       {/* WhatsApp floating button */}
       <a

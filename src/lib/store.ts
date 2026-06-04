@@ -121,6 +121,12 @@ export const useAppStore = create<AppStore>()(
         } else {
           set({ cartItems: [...cartItems, item], cartOpen: true })
         }
+        // AddToCart conversion event
+        if (typeof window !== 'undefined') {
+          import('@/lib/track').then(({ trackAddToCart }) =>
+            trackAddToCart({ id: item.productId, name: item.name, price: item.salePrice ?? item.price, quantity: item.quantity })
+          ).catch(() => {})
+        }
       },
       removeFromCart: (productId, variant) => {
         set({
@@ -196,6 +202,19 @@ export const useAppStore = create<AppStore>()(
           if (!res.ok) return data.error || 'Registration failed'
           const u = data.user
           set({ isLoggedIn: true, user: { name: u.name, email: u.email, phone: u.phone, role: 'user' }, currentPage: 'home' })
+          // Record referral if a ref code was captured
+          if (typeof window !== 'undefined') {
+            try {
+              const refCode = localStorage.getItem('mealicious-ref')
+              if (refCode) {
+                fetch('/api/referral', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ code: refCode, refereeEmail: email, refereePhone: phone }),
+                }).then(() => localStorage.removeItem('mealicious-ref')).catch(() => {})
+              }
+            } catch {}
+          }
           return null
         } catch {
           return 'Network error. Try again.'

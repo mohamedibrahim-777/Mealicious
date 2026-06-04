@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAppStore } from '@/lib/store'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { toast } from 'sonner'
 import {
   User as UserIcon, Mail, Phone, Heart, Package, LogOut,
-  Shield, ShoppingBag, MapPin, Plus, Pencil, Trash2, Star,
+  Shield, ShoppingBag, MapPin, Plus, Pencil, Trash2, Star, Gift, Copy,
 } from 'lucide-react'
 
 const INDIAN_STATES = [
@@ -51,6 +51,16 @@ export default function ProfilePage() {
   const [addrOpen, setAddrOpen] = useState(false)
   const [editingAddr, setEditingAddr] = useState<Address | null>(null)
   const [addrForm, setAddrForm] = useState(EMPTY_ADDR)
+
+  // Referral
+  const [referral, setReferral] = useState<{ code: string; shareUrl: string; credits: number; totalReferrals: number; completedReferrals: number } | null>(null)
+  useEffect(() => {
+    if (!user?.email) return
+    fetch(`/api/referral?email=${encodeURIComponent(user.email)}`)
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d && d.code) setReferral(d) })
+      .catch(() => {})
+  }, [user?.email])
 
   if (!user) {
     return (
@@ -230,6 +240,54 @@ export default function ProfilePage() {
               )}
             </CardContent>
           </Card>
+
+          {/* Referral Card */}
+          {referral && (
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center gap-2 mb-1">
+                  <Gift className="h-5 w-5 text-orange-400" />
+                  <h2 className="text-xl font-bold">Refer & Earn</h2>
+                </div>
+                <p className="text-sm text-gray-500 mb-4">Share your code. Friend gets a deal, you earn ₹50 credit per successful referral.</p>
+                <Separator className="mb-4" />
+                <div className="grid grid-cols-3 gap-3 mb-4">
+                  <div className="text-center bg-orange-50 rounded-lg p-3">
+                    <p className="text-2xl font-bold text-orange-500">₹{referral.credits}</p>
+                    <p className="text-xs text-gray-500">Credits earned</p>
+                  </div>
+                  <div className="text-center bg-blue-50 rounded-lg p-3">
+                    <p className="text-2xl font-bold text-blue-500">{referral.completedReferrals}</p>
+                    <p className="text-xs text-gray-500">Completed</p>
+                  </div>
+                  <div className="text-center bg-neutral-50 rounded-lg p-3">
+                    <p className="text-2xl font-bold text-neutral-700">{referral.totalReferrals}</p>
+                    <p className="text-xs text-gray-500">Total invites</p>
+                  </div>
+                </div>
+                <Label className="text-xs mb-1 block">Your Referral Code</Label>
+                <div className="flex gap-2">
+                  <Input readOnly value={referral.code} className="font-mono font-bold text-orange-600" />
+                  <Button variant="outline" onClick={() => { navigator.clipboard.writeText(referral.code); toast.success('Code copied!') }}>
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                </div>
+                <div className="flex gap-2 mt-2">
+                  <Input readOnly value={referral.shareUrl} className="text-xs text-gray-500" />
+                  <Button className="bg-orange-400 hover:bg-orange-500 shrink-0" onClick={() => { navigator.clipboard.writeText(referral.shareUrl); toast.success('Share link copied!') }}>
+                    <Copy className="h-4 w-4 mr-1" />Share Link
+                  </Button>
+                </div>
+                <a
+                  href={`https://wa.me/?text=${encodeURIComponent(`Get premium dry fruits at Mealicious! Use my code ${referral.code} 🥜 ${referral.shareUrl}`)}`}
+                  target="_blank" rel="noreferrer"
+                  className="inline-flex items-center gap-1.5 mt-3 text-sm text-[#25D366] font-medium hover:underline"
+                >
+                  <Gift className="h-4 w-4" />Share on WhatsApp
+                </a>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
 

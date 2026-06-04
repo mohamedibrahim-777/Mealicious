@@ -9,19 +9,36 @@ datasource db {
 }
 
 model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  name          String
+  phone         String?
+  avatar        String?
+  role          String   @default("customer")
+  passwordHash  String?
+  addresses     String?  // JSON string of addresses
+  referralCode  String?  @unique
+  referredById  String?
+  referralCredits Float  @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  orders        Order[]
+  reviews       Review[]
+  wishlist      Wishlist[]
+  referrals     Referral[] @relation("Referrer")
+}
+
+model Referral {
   id           String   @id @default(cuid())
-  email        String   @unique
-  name         String
-  phone        String?
-  avatar       String?
-  role         String   @default("customer")
-  passwordHash String?
-  addresses    String?  // JSON string of addresses
+  referrerId   String
+  referrer     User     @relation("Referrer", fields: [referrerId], references: [id])
+  refereeEmail String
+  refereePhone String?
+  status       String   @default("pending") // pending, completed
+  rewardAmount Float    @default(50)
   createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  orders       Order[]
-  reviews      Review[]
-  wishlist     Wishlist[]
+
+  @@index([referrerId])
 }
 
 model Category {
@@ -211,5 +228,14 @@ model AbandonedCart {
 model WhatsAppOptOut {
   id        String   @id @default(cuid())
   phone     String   @unique
+  createdAt DateTime @default(now())
+}
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  email     String?
   createdAt DateTime @default(now())
 }
