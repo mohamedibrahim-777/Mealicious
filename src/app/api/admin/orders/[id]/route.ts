@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { requireAdmin } from '@/lib/auth-server'
 import { notifyOrderShipped, notifyOrderDelivered, notifyOrderCancelled } from '@/lib/whatsapp'
+import { completeReferralReward } from '@/lib/referral-reward'
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { error } = await requireAdmin(req)
@@ -40,6 +41,11 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         notifyOrderCancelled(phone, { customerName: name, orderNumber: existing.orderNumber, total: existing.total }).catch(() => {})
       }
     }
+  }
+
+  // Credit referrer once a COD order is genuinely delivered (prepaid credited at payment)
+  if (existing && body.status && String(body.status).toLowerCase() === 'delivered' && existing.status !== 'delivered') {
+    completeReferralReward(existing.userId).catch(() => {})
   }
 
   return NextResponse.json({ order: updated })

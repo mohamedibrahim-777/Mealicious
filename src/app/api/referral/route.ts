@@ -13,7 +13,10 @@ export async function GET(req: NextRequest) {
   if (!email) return NextResponse.json({ error: 'email required' }, { status: 400 })
 
   const user = await db.user.findUnique({ where: { email } })
-  if (!user) return NextResponse.json({ error: 'User not found. Place an order or register first.' }, { status: 404 })
+  // Generic empty response when no account — avoids account-enumeration oracle
+  if (!user) {
+    return NextResponse.json({ code: null, shareUrl: null, credits: 0, totalReferrals: 0, completedReferrals: 0, pendingReferrals: 0 })
+  }
 
   let code = user.referralCode
   if (!code) {
@@ -30,6 +33,10 @@ export async function GET(req: NextRequest) {
   const referrals = await db.referral.findMany({ where: { referrerId: user.id }, orderBy: { createdAt: 'desc' } })
   const completed = referrals.filter(r => r.status === 'completed')
 
+  // NOTE: customer auth is client-side only (no session cookie), so this endpoint
+  // takes email as a param. Referral code is meant to be shared publicly; credit
+  // balance is low-sensitivity. Reward only triggers on referee's first PAID order,
+  // so the referral flow cannot be abused for free credit.
   return NextResponse.json({
     code,
     shareUrl: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://mealicious.store'}/?ref=${code}`,

@@ -100,24 +100,10 @@ export async function POST(req: NextRequest) {
       include: { items: true },
     })
 
-    // Complete referral reward on referee's first completed order (fire-and-forget)
-    if (user.referredById) {
-      ;(async () => {
-        const orderCount = await db.order.count({ where: { userId: user.id } })
-        if (orderCount === 1) {
-          const ref = await db.referral.findFirst({
-            where: { referrerId: user.referredById!, refereeEmail: user.email, status: 'pending' },
-          })
-          if (ref) {
-            await db.referral.update({ where: { id: ref.id }, data: { status: 'completed' } })
-            await db.user.update({
-              where: { id: user.referredById! },
-              data: { referralCredits: { increment: ref.rewardAmount } },
-            })
-          }
-        }
-      })().catch(() => {})
-    }
+    // NOTE: referral reward is NOT credited at order creation — it is gated on
+    // payment capture (prepaid → /payments/cashfree/verify) or delivery (admin
+    // marks order delivered). This prevents farming credit via unpaid COD orders.
+    // See completeReferralReward() in src/lib/referral-reward.ts.
 
     // Mark abandoned cart recovered (fire-and-forget)
     const waPhone = customerPhone || (JSON.parse(order.shippingAddr) as Record<string, string>).phone

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { verifyCashfreeOrder, CashfreeNotConfiguredError } from '@/lib/cashfree'
 import { db } from '@/lib/db'
+import { completeReferralReward } from '@/lib/referral-reward'
 
 export async function GET(req: NextRequest) {
   const orderId = req.nextUrl.searchParams.get('orderId')
@@ -30,6 +31,8 @@ export async function GET(req: NextRequest) {
         where: { id: dbOrder.id },
         data: { paymentStatus: 'paid' },
       })
+      // Credit referrer now that payment is captured (prepaid)
+      completeReferralReward(dbOrder.userId).catch(() => {})
     }
 
     return NextResponse.json({
