@@ -20,7 +20,6 @@ import ShippingPolicyPage from '@/components/mealicious/ShippingPolicyPage'
 import TrackOrderPage from '@/components/mealicious/TrackOrderPage'
 import WishlistPage from '@/components/mealicious/WishlistPage'
 import ProfilePage from '@/components/mealicious/ProfilePage'
-import { PushOptIn } from '@/components/PushOptIn'
 import { AIChatWidget } from '@/components/AIChatWidget'
 
 function PageRenderer({ page }: { page: Page }) {
@@ -164,9 +163,6 @@ export default function MealiciousStore() {
 
       {/* AI Chat support widget */}
       <AIChatWidget />
-
-      {/* Push notification opt-in */}
-      <PushOptIn />
 
       {/* WhatsApp floating button */}
       <a

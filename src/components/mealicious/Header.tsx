@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useAppStore, type Page } from '@/lib/store'
+import { PushOptIn } from '@/components/PushOptIn'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet'
 import { Input } from '@/components/ui/input'
@@ -324,6 +325,9 @@ export default function Header() {
                   </Button>
                 )}
               </div>
+
+              {/* Notifications */}
+              <PushOptIn variant="header" />
 
               {/* Wishlist */}
               <Button

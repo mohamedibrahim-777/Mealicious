@@ -16,7 +16,7 @@ function urlBase64ToUint8Array(base64: string): Uint8Array {
   return arr
 }
 
-export function PushOptIn() {
+export function PushOptIn({ variant = 'floating' }: { variant?: 'floating' | 'header' }) {
   const user = useAppStore(s => s.user)
   const [supported, setSupported] = useState(false)
   const [subscribed, setSubscribed] = useState(false)
@@ -70,6 +70,22 @@ export function PushOptIn() {
   }
 
   if (!supported) return null
+
+  if (variant === 'header') {
+    return (
+      <button
+        onClick={subscribed ? unsubscribe : subscribe}
+        disabled={busy}
+        className="relative flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-md text-gray-600 hover:text-orange-400 hover:bg-blue-50 transition-colors"
+        title={subscribed ? 'Disable notifications' : 'Enable notifications'}
+        aria-label="Notifications"
+      >
+        {subscribed
+          ? <Bell className="h-[18px] w-[18px] sm:h-5 sm:w-5 text-orange-500 fill-orange-500" />
+          : <Bell className="h-[18px] w-[18px] sm:h-5 sm:w-5" />}
+      </button>
+    )
+  }
 
   return (
     <button
