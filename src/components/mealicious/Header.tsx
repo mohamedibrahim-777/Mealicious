@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useAppStore, type Page } from '@/lib/store'
-import { PushOptIn } from '@/components/PushOptIn'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet'
 import { Input } from '@/components/ui/input'
@@ -19,6 +18,7 @@ import {
   Search,
   ShoppingCart,
   Heart,
+  Bell,
   User,
   Menu,
   X,
@@ -327,7 +327,15 @@ export default function Header() {
               </div>
 
               {/* Notifications */}
-              <PushOptIn variant="header" />
+              <Button
+                variant="ghost"
+                size="icon"
+                className="relative text-gray-600 hover:text-orange-400 hover:bg-blue-50 h-9 w-9 sm:h-10 sm:w-10"
+                onClick={() => handleNavClick('notifications')}
+                aria-label="Notifications"
+              >
+                <Bell className="h-[18px] w-[18px] sm:h-5 sm:w-5" />
+              </Button>
 
               {/* Wishlist */}
               <Button

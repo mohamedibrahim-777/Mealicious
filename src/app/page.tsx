@@ -20,6 +20,7 @@ import ShippingPolicyPage from '@/components/mealicious/ShippingPolicyPage'
 import TrackOrderPage from '@/components/mealicious/TrackOrderPage'
 import WishlistPage from '@/components/mealicious/WishlistPage'
 import ProfilePage from '@/components/mealicious/ProfilePage'
+import NotificationsPage from '@/components/mealicious/NotificationsPage'
 import { AIChatWidget } from '@/components/AIChatWidget'
 
 function PageRenderer({ page }: { page: Page }) {
@@ -62,6 +63,8 @@ function PageRenderer({ page }: { page: Page }) {
       return <CheckoutPage />
     case 'profile':
       return <ProfilePage />
+    case 'notifications':
+      return <NotificationsPage />
     default:
       return <HomePage />
   }
