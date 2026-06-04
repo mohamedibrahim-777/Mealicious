@@ -2,6 +2,9 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  compress: true,
+  poweredByHeader: false,
+  productionBrowserSourceMaps: false,
   outputFileTracingExcludes: {
     "*": [
       "node_modules/typescript/**",
@@ -23,6 +26,7 @@ const nextConfig: NextConfig = {
   reactStrictMode: false,
   devIndicators: false,
   images: {
+    formats: ["image/avif", "image/webp"],
     remotePatterns: [
       {
         protocol: "https",
@@ -32,11 +36,25 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "plus.unsplash.com",
       },
+      {
+        protocol: "https",
+        hostname: "**.mealicious.store",
+      },
     ],
   },
   // Security headers — applied to every response (malware/clickjacking/XSS hardening)
   async headers() {
     return [
+      // Immutable long-cache for hashed static assets (perf / Core Web Vitals)
+      {
+        source: "/_next/static/:path*",
+        headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
+      },
+      // Service worker must always revalidate
+      {
+        source: "/sw.js",
+        headers: [{ key: "Cache-Control", value: "public, max-age=0, must-revalidate" }],
+      },
       {
         source: "/:path*",
         headers: [
