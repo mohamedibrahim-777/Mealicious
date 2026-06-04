@@ -26,7 +26,6 @@ import {
   ChevronRight,
   LogOut,
   UserCircle,
-  Sparkles,
   Shield,
 } from 'lucide-react'
 
@@ -112,15 +111,6 @@ export default function Header() {
 
   return (
     <>
-      {/* Announcement Bar */}
-      <div className="bg-orange-400 text-white text-center py-2 px-4 text-xs sm:text-sm font-medium relative z-50">
-        <div className="max-w-7xl mx-auto flex items-center justify-center gap-2">
-          <Sparkles className="hidden sm:inline-block h-4 w-4" />
-          <span>Free Shipping on Orders Above ₹599 | Use Code WELCOME10 for 10% Off!</span>
-          <Sparkles className="hidden sm:inline-block h-4 w-4" />
-        </div>
-      </div>
-
       {/* Main Header */}
       <header
         className={`sticky top-0 z-40 w-full transition-all duration-300 ${
