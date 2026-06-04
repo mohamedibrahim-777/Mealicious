@@ -21,6 +21,7 @@ import TrackOrderPage from '@/components/mealicious/TrackOrderPage'
 import WishlistPage from '@/components/mealicious/WishlistPage'
 import ProfilePage from '@/components/mealicious/ProfilePage'
 import { PushOptIn } from '@/components/PushOptIn'
+import { AIChatWidget } from '@/components/AIChatWidget'
 
 function PageRenderer({ page }: { page: Page }) {
   switch (page) {
@@ -160,6 +161,9 @@ export default function MealiciousStore() {
       </main>
       <Footer />
       <CartSidebar />
+
+      {/* AI Chat support widget */}
+      <AIChatWidget />
 
       {/* Push notification opt-in */}
       <PushOptIn />
