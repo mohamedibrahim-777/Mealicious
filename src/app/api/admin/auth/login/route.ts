@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { signSession, setSessionCookie } from '@/lib/admin-session'
 import { timingSafeEqual } from 'crypto'
+import { limitByIp } from '@/lib/rate-limit'
 
 const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || '')
   .toLowerCase().split(',').map(e => e.trim()).filter(Boolean)
@@ -29,6 +30,9 @@ function safeEqual(a: string, b: string): boolean {
 }
 
 export async function POST(req: NextRequest) {
+  const limited = limitByIp(req, 'admin-login', 8, 15 * 60 * 1000)
+  if (limited) return limited
+
   if (req.headers.get('content-type') !== 'application/json') {
     return NextResponse.json({ error: 'Bad request' }, { status: 400 })
   }

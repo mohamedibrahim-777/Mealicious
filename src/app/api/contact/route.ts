@@ -1,9 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
+import { limitByIp } from '@/lib/rate-limit'
 
 export async function POST(req: NextRequest) {
   try {
-    const { name, email, phone, subject, message } = await req.json()
+    const limited = limitByIp(req, 'contact', 5, 10 * 60 * 1000)
+    if (limited) return limited
+
+    const { name, email, phone, subject, message, website } = await req.json()
+    // Honeypot — bots fill hidden "website" field; humans never see it
+    if (website) return NextResponse.json({ success: true })
     if (!name || !email || !subject || !message) {
       return NextResponse.json({ error: 'All required fields must be filled' }, { status: 400 })
     }

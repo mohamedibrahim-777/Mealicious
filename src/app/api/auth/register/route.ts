@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { hashPassword } from '@/lib/password'
+import { limitByIp } from '@/lib/rate-limit'
 
 const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || 'admin@mealicious.com')
   .toLowerCase().split(',').map(e => e.trim()).filter(Boolean)
 
 export async function POST(req: NextRequest) {
+  const limited = limitByIp(req, 'register', 5, 15 * 60 * 1000)
+  if (limited) return limited
+
   const { name, email, phone, password } = await req.json()
 
   if (!name || !email || !password) {

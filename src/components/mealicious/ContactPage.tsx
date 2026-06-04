@@ -100,6 +100,7 @@ export default function ContactPage() {
     phone: '',
     subject: '',
     message: '',
+    website: '', // honeypot
   })
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
@@ -122,7 +123,7 @@ export default function ContactPage() {
       toast.success(data.message ?? 'Message sent!')
       setTimeout(() => {
         setSubmitted(false)
-        setFormState({ name: '', email: '', phone: '', subject: '', message: '' })
+        setFormState({ name: '', email: '', phone: '', subject: '', message: '', website: '' })
       }, 3000)
     } catch {
       toast.error('Network error. Try again.')
@@ -184,6 +185,16 @@ export default function ContactPage() {
                     </motion.div>
                   ) : (
                     <form onSubmit={handleSubmit} className="space-y-5">
+                      {/* Honeypot — hidden from humans, bots fill it */}
+                      <input
+                        type="text"
+                        name="website"
+                        tabIndex={-1}
+                        autoComplete="off"
+                        aria-hidden="true"
+                        className="absolute -left-[9999px] h-0 w-0 opacity-0"
+                        onChange={(e) => setFormState({ ...formState, website: e.target.value })}
+                      />
                       <div className="grid sm:grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <label className="text-sm font-medium text-foreground">

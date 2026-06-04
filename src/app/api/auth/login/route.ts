@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { verifyPassword } from '@/lib/password'
 import { timingSafeEqual } from 'crypto'
+import { limitByIp } from '@/lib/rate-limit'
 
 const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || 'admin@mealicious.com')
   .toLowerCase().split(',').map(e => e.trim()).filter(Boolean)
@@ -19,6 +20,10 @@ function safeCompare(a: string, b: string): boolean {
 }
 
 export async function POST(req: NextRequest) {
+  // Brute-force protection: 10 attempts / 15 min per IP
+  const limited = limitByIp(req, 'login', 10, 15 * 60 * 1000)
+  if (limited) return limited
+
   const body = await req.json()
   const email = typeof body.email === 'string' ? body.email : ''
   const password = typeof body.password === 'string' ? body.password : ''

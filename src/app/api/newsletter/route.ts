@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Prisma } from '@prisma/client'
 import { db } from '@/lib/db'
+import { limitByIp } from '@/lib/rate-limit'
 
 export async function POST(req: NextRequest) {
   try {
+    const limited = limitByIp(req, 'newsletter', 8, 10 * 60 * 1000)
+    if (limited) return limited
+
     const { email } = await req.json()
     if (!email || typeof email !== 'string' || !email.includes('@')) {
       return NextResponse.json({ error: 'Valid email is required' }, { status: 400 })

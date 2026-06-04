@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
+import { limitByIp } from '@/lib/rate-limit'
 
 // Called from checkout when a guest enters phone but hasn't completed payment.
 // Records the cart so admin/cron can send recovery messages later.
@@ -20,6 +21,9 @@ function sanitizeName(raw: unknown): string | null {
 }
 
 export async function POST(req: NextRequest) {
+  const limited = limitByIp(req, 'abandon', 10, 10 * 60 * 1000)
+  if (limited) return limited
+
   const body = await req.json()
   const { phone, name, email, items, cartValue } = body
 

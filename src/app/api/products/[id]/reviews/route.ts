@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
+import { limitByIp } from '@/lib/rate-limit'
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -22,6 +23,9 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 }
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const limited = limitByIp(req, 'review', 5, 10 * 60 * 1000)
+  if (limited) return limited
+
   const { id } = await params
   const body = await req.json()
   const { rating, title, comment, name, email } = body
