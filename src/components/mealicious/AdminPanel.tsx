@@ -65,8 +65,10 @@ export default function AdminPanel() {
     updateProduct,
     deleteProduct,
     updateOrderStatus,
+    updateOrder,
     deleteOrder,
     updateUserRole,
+    updateUser,
     deleteUser,
     resetCatalog,
     loadAll,
@@ -83,6 +85,8 @@ export default function AdminPanel() {
   const [editing, setEditing] = useState<Product | null>(null)
   const [creating, setCreating] = useState(false)
   const [viewingOrder, setViewingOrder] = useState<AdminOrder | null>(null)
+  const [editingOrder, setEditingOrder] = useState<AdminOrder | null>(null)
+  const [editingUser, setEditingUser] = useState<AdminUser | null>(null)
 
   const stats = useMemo(() => {
     const totalStock = products.reduce((s, p) => s + p.stock, 0)
@@ -370,6 +374,14 @@ export default function AdminPanel() {
                           <Button
                             size="icon"
                             variant="ghost"
+                            onClick={() => setEditingOrder(o)}
+                            title="Edit"
+                          >
+                            <Pencil className="h-4 w-4 text-blue-500" />
+                          </Button>
+                          <Button
+                            size="icon"
+                            variant="ghost"
                             onClick={() => {
                               if (confirm(`Delete order ${o.id}?`)) {
                                 deleteOrder(o.id)
@@ -432,7 +444,15 @@ export default function AdminPanel() {
                           </SelectContent>
                         </Select>
                       </td>
-                      <td className="py-2 px-2 text-right">
+                      <td className="py-2 px-2 text-right space-x-1">
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          onClick={() => setEditingUser(u)}
+                          title="Edit"
+                        >
+                          <Pencil className="h-4 w-4 text-blue-500" />
+                        </Button>
                         <Button
                           size="icon"
                           variant="ghost"
@@ -503,6 +523,34 @@ export default function AdminPanel() {
       />
 
       <BillDialog order={viewingOrder} onClose={() => setViewingOrder(null)} />
+
+      <OrderDialog
+        open={editingOrder !== null}
+        order={editingOrder}
+        onClose={() => setEditingOrder(null)}
+        onSubmit={(data) => {
+          if (editingOrder) {
+            updateOrder(editingOrder.id, data)
+              .then(() => toast.success('Order updated'))
+              .catch((e) => toast.error(e.message))
+          }
+          setEditingOrder(null)
+        }}
+      />
+
+      <UserDialog
+        open={editingUser !== null}
+        user={editingUser}
+        onClose={() => setEditingUser(null)}
+        onSubmit={(data) => {
+          if (editingUser) {
+            updateUser(editingUser.id, data)
+              .then(() => toast.success('User updated'))
+              .catch((e) => toast.error(e.message))
+          }
+          setEditingUser(null)
+        }}
+      />
     </div>
   )
 }
@@ -776,6 +824,197 @@ function ProductDialog({
             </Button>
             <Button type="submit" className="bg-orange-400 hover:bg-orange-500">
               {product ? 'Save changes' : 'Create product'}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+function OrderDialog({
+  open,
+  order,
+  onClose,
+  onSubmit,
+}: {
+  open: boolean
+  order: AdminOrder | null
+  onClose: () => void
+  onSubmit: (data: Partial<AdminOrder>) => void
+}) {
+  const [form, setForm] = useState<Partial<AdminOrder>>(order ?? {})
+
+  useEffect(() => {
+    setForm(order ?? {})
+  }, [order?.id, open])
+
+  const handle = (key: keyof AdminOrder, value: unknown) =>
+    setForm((f) => ({ ...f, [key]: value }))
+
+  return (
+    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Edit order</DialogTitle>
+          <DialogDescription>Update order details.</DialogDescription>
+        </DialogHeader>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault()
+            onSubmit(form)
+          }}
+          className="space-y-3"
+        >
+          <div>
+            <Label className="mb-1.5 block">Order Number</Label>
+            <Input value={form.id ?? ''} disabled />
+          </div>
+          <div>
+            <Label className="mb-1.5 block">Customer Name</Label>
+            <Input
+              value={form.customer ?? ''}
+              onChange={(e) => handle('customer', e.target.value)}
+            />
+          </div>
+          <div>
+            <Label className="mb-1.5 block">Customer Email</Label>
+            <Input
+              value={form.email ?? ''}
+              onChange={(e) => handle('email', e.target.value)}
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label className="mb-1.5 block">Items</Label>
+              <Input
+                type="number"
+                value={form.items ?? 0}
+                onChange={(e) => handle('items', Number(e.target.value))}
+              />
+            </div>
+            <div>
+              <Label className="mb-1.5 block">Total (₹)</Label>
+              <Input
+                type="number"
+                value={form.total ?? 0}
+                onChange={(e) => handle('total', Number(e.target.value))}
+              />
+            </div>
+          </div>
+          <div>
+            <Label className="mb-1.5 block">Status</Label>
+            <Select
+              value={form.status ?? 'Pending'}
+              onValueChange={(v) => handle('status', v)}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'].map((s) => (
+                  <SelectItem key={s} value={s}>
+                    {s}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button type="submit" className="bg-orange-400 hover:bg-orange-500">
+              Save changes
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+function UserDialog({
+  open,
+  user,
+  onClose,
+  onSubmit,
+}: {
+  open: boolean
+  user: AdminUser | null
+  onClose: () => void
+  onSubmit: (data: Partial<AdminUser>) => void
+}) {
+  const [form, setForm] = useState<Partial<AdminUser>>(user ?? {})
+
+  useEffect(() => {
+    setForm(user ?? {})
+  }, [user?.id, open])
+
+  const handle = (key: keyof AdminUser, value: unknown) =>
+    setForm((f) => ({ ...f, [key]: value }))
+
+  return (
+    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Edit user</DialogTitle>
+          <DialogDescription>Update user details.</DialogDescription>
+        </DialogHeader>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault()
+            onSubmit(form)
+          }}
+          className="space-y-3"
+        >
+          <div>
+            <Label className="mb-1.5 block">Name</Label>
+            <Input
+              value={form.name ?? ''}
+              onChange={(e) => handle('name', e.target.value)}
+            />
+          </div>
+          <div>
+            <Label className="mb-1.5 block">Email</Label>
+            <Input
+              value={form.email ?? ''}
+              onChange={(e) => handle('email', e.target.value)}
+              disabled
+            />
+          </div>
+          <div>
+            <Label className="mb-1.5 block">Phone</Label>
+            <Input
+              value={form.phone ?? ''}
+              onChange={(e) => handle('phone', e.target.value)}
+            />
+          </div>
+          <div>
+            <Label className="mb-1.5 block">Role</Label>
+            <Select
+              value={form.role ?? 'user'}
+              onValueChange={(v) => handle('role', v)}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="user">user</SelectItem>
+                <SelectItem value="admin">admin</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label className="mb-1.5 block">Joined</Label>
+            <Input value={form.joined ?? ''} disabled />
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button type="submit" className="bg-orange-400 hover:bg-orange-500">
+              Save changes
             </Button>
           </DialogFooter>
         </form>

@@ -72,9 +72,11 @@ interface CatalogStore {
   deleteProduct: (id: string) => Promise<void>
 
   updateOrderStatus: (orderNumber: string, status: AdminOrder['status']) => Promise<void>
+  updateOrder: (orderNumber: string, patch: Partial<AdminOrder>) => Promise<void>
   deleteOrder: (orderNumber: string) => Promise<void>
 
   updateUserRole: (id: string, role: AdminUser['role']) => Promise<void>
+  updateUser: (id: string, patch: Partial<AdminUser>) => Promise<void>
   deleteUser: (id: string) => Promise<void>
 
   markMessageRead: (id: string, isRead?: boolean) => Promise<void>
@@ -169,6 +171,19 @@ export const useCatalogStore = create<CatalogStore>()((set, get) => ({
     })
     await get().loadOrders()
   },
+  updateOrder: async (orderNumber, patch: Partial<AdminOrder>) => {
+    const data: Record<string, unknown> = {}
+    if (patch.customer !== undefined) data.customer = patch.customer
+    if (patch.email !== undefined) data.email = patch.email
+    if (patch.total !== undefined) data.total = patch.total
+    if (patch.status !== undefined) data.status = patch.status.toLowerCase()
+    if (patch.items !== undefined) data.items = patch.items
+    await adminFetch(`/api/admin/orders/${orderNumber}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    })
+    await get().loadOrders()
+  },
   deleteOrder: async (orderNumber) => {
     await adminFetch(`/api/admin/orders/${orderNumber}`, { method: 'DELETE' })
     await get().loadOrders()
@@ -176,6 +191,14 @@ export const useCatalogStore = create<CatalogStore>()((set, get) => ({
 
   updateUserRole: async (id, role) => {
     await adminFetch(`/api/admin/users/${id}`, { method: 'PATCH', body: JSON.stringify({ role }) })
+    await get().loadUsers()
+  },
+  updateUser: async (id, patch: Partial<AdminUser>) => {
+    const data: Record<string, unknown> = {}
+    if (patch.name !== undefined) data.name = patch.name
+    if (patch.phone !== undefined) data.phone = patch.phone
+    if (patch.role !== undefined) data.role = patch.role
+    await adminFetch(`/api/admin/users/${id}`, { method: 'PATCH', body: JSON.stringify(data) })
     await get().loadUsers()
   },
   deleteUser: async (id) => {
