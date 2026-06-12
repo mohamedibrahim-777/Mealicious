@@ -44,7 +44,7 @@ import {
   Receipt,
 } from 'lucide-react'
 
-type Tab = 'overview' | 'products' | 'orders' | 'users' | 'bills'
+type Tab = 'overview' | 'products' | 'categories' | 'orders' | 'users' | 'messages' | 'subscribers' | 'banners' | 'coupons' | 'blog' | 'reviews' | 'inventory'
 
 const ORDER_STATUSES: AdminOrder['status'][] = [
   'Pending',
@@ -154,7 +154,7 @@ export default function AdminPanel() {
 
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-wrap gap-2 mb-6">
-          {(['overview', 'products', 'orders', 'users', 'bills'] as Tab[]).map((t) => (
+          {(['overview', 'products', 'categories', 'orders', 'users', 'messages', 'subscribers', 'banners', 'coupons', 'blog', 'reviews', 'inventory'] as Tab[]).map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
@@ -480,14 +480,136 @@ export default function AdminPanel() {
           </Card>
         )}
 
-        {tab === 'bills' && (
+        {tab === 'categories' && (
           <Card>
             <CardContent className="p-5">
-              <h3 className="font-semibold mb-3">All Bills</h3>
-              <div className="grid sm:grid-cols-2 gap-4">
-                {orders.map((o) => (
-                  <BillCard key={o.id} order={o} onOpen={() => setViewingOrder(o)} />
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold">Categories ({categories.length})</h3>
+                <Button className="bg-orange-400 hover:bg-orange-500" size="sm">
+                  <Plus className="h-4 w-4 mr-1" /> Add Category
+                </Button>
+              </div>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {categories.map((cat) => (
+                  <Card key={cat.id} className="p-4 hover:shadow-md transition">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-semibold">{cat.name}</p>
+                        <p className="text-xs text-gray-500">{cat.slug}</p>
+                      </div>
+                      <div className="space-x-1">
+                        <Button size="icon" variant="ghost"><Pencil className="h-4 w-4 text-blue-500" /></Button>
+                        <Button size="icon" variant="ghost"><Trash2 className="h-4 w-4 text-red-500" /></Button>
+                      </div>
+                    </div>
+                  </Card>
                 ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {tab === 'messages' && (
+          <Card>
+            <CardContent className="p-5">
+              <h3 className="font-semibold mb-3">Contact Messages</h3>
+              <div className="space-y-2">
+                <p className="text-sm text-gray-500">Messages from contact form will appear here</p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {tab === 'subscribers' && (
+          <Card>
+            <CardContent className="p-5">
+              <h3 className="font-semibold mb-3">Newsletter Subscribers</h3>
+              <div className="space-y-2">
+                <p className="text-sm text-gray-500">Email subscribers will appear here</p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {tab === 'banners' && (
+          <Card>
+            <CardContent className="p-5">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold">Banners</h3>
+                <Button className="bg-orange-400 hover:bg-orange-500" size="sm">
+                  <Plus className="h-4 w-4 mr-1" /> Add Banner
+                </Button>
+              </div>
+              <div className="grid gap-3">
+                <p className="text-sm text-gray-500">Promotional banners will appear here</p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {tab === 'coupons' && (
+          <Card>
+            <CardContent className="p-5">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold">Coupons & Discounts</h3>
+                <Button className="bg-orange-400 hover:bg-orange-500" size="sm">
+                  <Plus className="h-4 w-4 mr-1" /> Add Coupon
+                </Button>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="text-left text-gray-500 border-b">
+                      <th className="py-2 px-2">Code</th>
+                      <th className="py-2 px-2">Discount</th>
+                      <th className="py-2 px-2">Status</th>
+                      <th className="py-2 px-2 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td colSpan={4} className="py-8 text-center text-gray-500">No coupons yet</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {tab === 'blog' && (
+          <Card>
+            <CardContent className="p-5">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold">Blog Posts</h3>
+                <Button className="bg-orange-400 hover:bg-orange-500" size="sm">
+                  <Plus className="h-4 w-4 mr-1" /> New Post
+                </Button>
+              </div>
+              <div className="space-y-2">
+                <p className="text-sm text-gray-500">Blog posts will appear here</p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {tab === 'reviews' && (
+          <Card>
+            <CardContent className="p-5">
+              <h3 className="font-semibold mb-3">Product Reviews</h3>
+              <div className="space-y-2">
+                <p className="text-sm text-gray-500">Customer reviews and ratings will appear here</p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {tab === 'inventory' && (
+          <Card>
+            <CardContent className="p-5">
+              <h3 className="font-semibold mb-3">Inventory Management</h3>
+              <div className="space-y-2">
+                <p className="text-sm text-gray-500">Stock levels and inventory data will appear here</p>
               </div>
             </CardContent>
           </Card>

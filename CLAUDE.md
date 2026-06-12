@@ -52,3 +52,13 @@ The `mini-services/` directory is currently empty in this checkout but the tooli
 
 ### Path aliases
 `@/*` → `src/*` (see `tsconfig.json`).
+
+## ⛔ VPS Infrastructure — LOCKED (do not modify)
+
+The nginx/pm2/port mapping on this server is intentionally locked by the owner — see
+`/root/AGENTS.md` and `/root/SERVER-PORTS.md` BEFORE touching any nginx config, pm2
+process, port, or `.env` `DATABASE_URL`. mealicious.store → 3000 (this app, pm2
+`mealicious`), ijrnexus.com → 3001. Never stop docker container `mealicious-db` (live
+database). Locked files are `chattr +i` immutable — if an edit fails with "Operation
+not permitted" as root, that is intentional: stop and tell the user. Deploy this app
+ONLY with: `bun run build && pm2 restart mealicious`.
