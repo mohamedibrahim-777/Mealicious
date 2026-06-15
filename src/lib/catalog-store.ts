@@ -43,6 +43,13 @@ export interface AdminCategory {
   slug: string
 }
 
+export interface AdminCoupon {
+  id: string
+  code: string
+  discount: number
+  status: 'active' | 'inactive'
+}
+
 export interface DashboardSummary {
   counts: {
     products: number; orders: number; users: number;
@@ -57,6 +64,7 @@ interface CatalogStore {
   products: Product[]
   categories: Category[]
   adminCategories: AdminCategory[]
+  coupons: AdminCoupon[]
   orders: AdminOrder[]
   users: AdminUser[]
   subscribers: AdminSubscriber[]
@@ -94,6 +102,11 @@ interface CatalogStore {
   updateCategory: (id: string, patch: Partial<AdminCategory>) => Promise<void>
   deleteCategory: (id: string) => Promise<void>
 
+  loadCoupons: () => Promise<void>
+  addCoupon: (coupon: Partial<AdminCoupon>) => Promise<void>
+  updateCoupon: (id: string, patch: Partial<AdminCoupon>) => Promise<void>
+  deleteCoupon: (id: string) => Promise<void>
+
   resetCatalog: () => Promise<void>
 }
 
@@ -101,6 +114,7 @@ export const useCatalogStore = create<CatalogStore>()((set, get) => ({
   products: seedProducts,
   categories: seedCategories,
   adminCategories: [],
+  coupons: [],
   orders: [],
   users: [],
   subscribers: [],
@@ -243,6 +257,23 @@ export const useCatalogStore = create<CatalogStore>()((set, get) => ({
   deleteCategory: async (id) => {
     await adminFetch(`/api/admin/categories/${id}`, { method: 'DELETE' })
     await get().loadCategories()
+  },
+
+  loadCoupons: async () => {
+    const data = await adminFetch<{ coupons: AdminCoupon[] }>('/api/admin/coupons')
+    set({ coupons: data.coupons })
+  },
+  addCoupon: async (coupon) => {
+    await adminFetch('/api/admin/coupons', { method: 'POST', body: JSON.stringify(coupon) })
+    await get().loadCoupons()
+  },
+  updateCoupon: async (id, patch) => {
+    await adminFetch(`/api/admin/coupons/${id}`, { method: 'PATCH', body: JSON.stringify(patch) })
+    await get().loadCoupons()
+  },
+  deleteCoupon: async (id) => {
+    await adminFetch(`/api/admin/coupons/${id}`, { method: 'DELETE' })
+    await get().loadCoupons()
   },
 
   resetCatalog: async () => {

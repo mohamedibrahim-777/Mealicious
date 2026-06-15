@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { useAppStore } from '@/lib/store'
-import { useCatalogStore, type AdminOrder, type AdminUser, type AdminCategory } from '@/lib/catalog-store'
+import { useCatalogStore, type AdminOrder, type AdminUser, type AdminCategory, type AdminCoupon } from '@/lib/catalog-store'
 import type { Product } from '@/lib/data'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -60,6 +60,7 @@ export default function AdminPanel() {
     products,
     categories,
     adminCategories,
+    coupons,
     orders,
     users,
     addProduct,
@@ -69,6 +70,10 @@ export default function AdminPanel() {
     addCategory,
     updateCategory,
     deleteCategory,
+    loadCoupons,
+    addCoupon,
+    updateCoupon,
+    deleteCoupon,
     updateOrderStatus,
     updateOrder,
     deleteOrder,
@@ -82,10 +87,10 @@ export default function AdminPanel() {
   useEffect(() => {
     if (user?.role === 'admin') {
       loadAll()
-        .then(() => loadCategories())
+        .then(() => Promise.all([loadCategories(), loadCoupons()]))
         .catch((e) => toast.error(`Failed to load admin data: ${e.message}`))
     }
-  }, [user?.role, loadAll, loadCategories])
+  }, [user?.role, loadAll, loadCategories, loadCoupons])
 
   const [tab, setTab] = useState<Tab>('overview')
   const [search, setSearch] = useState('')
@@ -96,6 +101,8 @@ export default function AdminPanel() {
   const [editingUser, setEditingUser] = useState<AdminUser | null>(null)
   const [editingCategory, setEditingCategory] = useState<AdminCategory | null>(null)
   const [creatingCategory, setCreatingCategory] = useState(false)
+  const [editingCoupon, setEditingCoupon] = useState<AdminCoupon | null>(null)
+  const [creatingCoupon, setCreatingCoupon] = useState(false)
 
   const stats = useMemo(() => {
     const totalStock = products.reduce((s, p) => s + p.stock, 0)
@@ -595,8 +602,8 @@ export default function AdminPanel() {
           <Card>
             <CardContent className="p-5">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold">Coupons & Discounts</h3>
-                <Button className="bg-orange-400 hover:bg-orange-500" size="sm">
+                <h3 className="font-semibold">Coupons & Discounts ({coupons.length})</h3>
+                <Button onClick={() => setCreatingCoupon(true)} className="bg-orange-400 hover:bg-orange-500">
                   <Plus className="h-4 w-4 mr-1" /> Add Coupon
                 </Button>
               </div>
@@ -611,9 +618,48 @@ export default function AdminPanel() {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <td colSpan={4} className="py-8 text-center text-gray-500">No coupons yet</td>
-                    </tr>
+                    {coupons.map((coupon) => (
+                      <tr key={coupon.id} className="border-b last:border-0 hover:bg-orange-50/40">
+                        <td className="py-2 px-2 font-medium">{coupon.code}</td>
+                        <td className="py-2 px-2">{coupon.discount}%</td>
+                        <td className="py-2 px-2">
+                          <Badge variant="outline" className={coupon.status === 'active' ? 'text-green-600 border-green-300' : 'text-gray-600 border-gray-300'}>
+                            {coupon.status}
+                          </Badge>
+                        </td>
+                        <td className="py-2 px-2 text-right space-x-1">
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            onClick={() => setEditingCoupon(coupon)}
+                            title="Edit"
+                          >
+                            <Pencil className="h-4 w-4 text-blue-500" />
+                          </Button>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            onClick={() => {
+                              if (confirm(`Delete coupon ${coupon.code}?`)) {
+                                deleteCoupon(coupon.id)
+                                  .then(() => toast.success('Coupon deleted'))
+                                  .catch((e) => toast.error(e.message))
+                              }
+                            }}
+                            title="Delete"
+                          >
+                            <Trash2 className="h-4 w-4 text-red-500" />
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                    {coupons.length === 0 && (
+                      <tr>
+                        <td colSpan={4} className="py-8 text-center text-gray-500">
+                          No coupons yet
+                        </td>
+                      </tr>
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -742,6 +788,28 @@ export default function AdminPanel() {
           }
           setCreatingCategory(false)
           setEditingCategory(null)
+        }}
+      />
+
+      <CouponDialog
+        open={creatingCoupon || editingCoupon !== null}
+        coupon={editingCoupon}
+        onClose={() => {
+          setCreatingCoupon(false)
+          setEditingCoupon(null)
+        }}
+        onSubmit={(data) => {
+          if (editingCoupon) {
+            updateCoupon(editingCoupon.id, data)
+              .then(() => toast.success('Coupon updated'))
+              .catch((e) => toast.error(e.message))
+          } else {
+            addCoupon(data)
+              .then(() => toast.success('Coupon created'))
+              .catch((e) => toast.error(e.message))
+          }
+          setCreatingCoupon(false)
+          setEditingCoupon(null)
         }}
       />
     </div>
@@ -1279,6 +1347,89 @@ function CategoryDialog({
             </Button>
             <Button type="submit" className="bg-orange-400 hover:bg-orange-500">
               {category ? 'Save changes' : 'Create category'}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+function CouponDialog({
+  open,
+  coupon,
+  onClose,
+  onSubmit,
+}: {
+  open: boolean
+  coupon: AdminCoupon | null
+  onClose: () => void
+  onSubmit: (data: Partial<AdminCoupon>) => void
+}) {
+  const [form, setForm] = useState<Partial<AdminCoupon>>(coupon ?? { code: '', discount: 0, status: 'active' })
+
+  useEffect(() => {
+    setForm(coupon ?? { code: '', discount: 0, status: 'active' })
+  }, [coupon?.id, open])
+
+  const handle = (key: keyof AdminCoupon, value: unknown) =>
+    setForm((f) => ({ ...f, [key]: value }))
+
+  return (
+    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="sm:max-w-lg">
+        <DialogHeader>
+          <DialogTitle>{coupon ? 'Edit coupon' : 'New coupon'}</DialogTitle>
+          <DialogDescription>
+            {coupon ? 'Update coupon details.' : 'Add a new coupon.'}
+          </DialogDescription>
+        </DialogHeader>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault()
+            onSubmit(form)
+          }}
+          className="space-y-3"
+        >
+          <div>
+            <Label className="mb-1.5 block">Code</Label>
+            <Input
+              value={form.code ?? ''}
+              onChange={(e) => handle('code', e.target.value.toUpperCase())}
+              required
+            />
+          </div>
+          <div>
+            <Label className="mb-1.5 block">Discount (%)</Label>
+            <Input
+              type="number"
+              min="0"
+              max="100"
+              value={form.discount ?? 0}
+              onChange={(e) => handle('discount', Number(e.target.value))}
+            />
+          </div>
+          <div>
+            <Label className="mb-1.5 block">Status</Label>
+            <Select
+              value={form.status ?? 'active'}
+              onValueChange={(v) => handle('status', v as 'active' | 'inactive')}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="inactive">Inactive</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button type="submit" className="bg-orange-400 hover:bg-orange-500">
+              {coupon ? 'Save changes' : 'Create coupon'}
             </Button>
           </DialogFooter>
         </form>
