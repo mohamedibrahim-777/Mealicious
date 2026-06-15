@@ -7,10 +7,15 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (error) return error
   const { id } = await params
   const body = await req.json()
+
+  // Support both simplified schema (code, discount, status) and full schema
   const coupon = await db.coupon.update({
     where: { id },
     data: {
       ...(body.code !== undefined && { code: String(body.code).toUpperCase() }),
+      ...(body.discount !== undefined && { value: Number(body.discount) }),
+      ...(body.status !== undefined && { isActive: body.status === 'active' }),
+      // Support full schema for backward compatibility
       ...(body.type !== undefined && { type: body.type }),
       ...(body.value !== undefined && { value: Number(body.value) }),
       ...(body.minOrder !== undefined && { minOrder: Number(body.minOrder) }),

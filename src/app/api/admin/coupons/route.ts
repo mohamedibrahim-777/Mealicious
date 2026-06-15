@@ -13,17 +13,21 @@ export async function POST(req: NextRequest) {
   const { error } = await requireAdminSession(req)
   if (error) return error
   const body = await req.json()
+
+  // Simplified schema: code, discount (%), status
+  // Maps discount to value, status to isActive
+  // Defaults other fields for backward compatibility
   const coupon = await db.coupon.create({
     data: {
       code: String(body.code).toUpperCase(),
-      type: body.type,
-      value: Number(body.value),
-      minOrder: Number(body.minOrder) || 0,
-      maxDiscount: body.maxDiscount ? Number(body.maxDiscount) : null,
-      usageLimit: body.usageLimit ? Number(body.usageLimit) : null,
-      validFrom: new Date(body.validFrom),
-      validTo: new Date(body.validTo),
-      isActive: body.isActive ?? true,
+      type: 'percentage',
+      value: Number(body.discount) || 0,
+      minOrder: 0,
+      maxDiscount: null,
+      usageLimit: null,
+      validFrom: new Date(),
+      validTo: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year from now
+      isActive: body.status === 'active',
     },
   })
   return NextResponse.json({ coupon }, { status: 201 })

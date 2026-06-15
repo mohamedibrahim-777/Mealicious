@@ -48,6 +48,8 @@ export interface AdminCoupon {
   code: string
   discount: number
   status: 'active' | 'inactive'
+  // Note: Database stores type, value, minOrder, maxDiscount, usageLimit, usedCount, validFrom, validTo, isActive
+  // but admin UI simplified to core 3 fields per spec (code, discount, status)
 }
 
 export interface DashboardSummary {
