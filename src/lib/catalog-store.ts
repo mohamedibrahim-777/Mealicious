@@ -37,6 +37,12 @@ export interface AdminMessage {
   subject: string; message: string; isRead: boolean; createdAt: string
 }
 
+export interface AdminCategory {
+  id: string
+  name: string
+  slug: string
+}
+
 export interface DashboardSummary {
   counts: {
     products: number; orders: number; users: number;
@@ -50,6 +56,7 @@ export interface DashboardSummary {
 interface CatalogStore {
   products: Product[]
   categories: Category[]
+  adminCategories: AdminCategory[]
   orders: AdminOrder[]
   users: AdminUser[]
   subscribers: AdminSubscriber[]
@@ -82,12 +89,18 @@ interface CatalogStore {
   markMessageRead: (id: string, isRead?: boolean) => Promise<void>
   deleteMessage: (id: string) => Promise<void>
 
+  loadCategories: () => Promise<void>
+  addCategory: (category: Partial<AdminCategory>) => Promise<void>
+  updateCategory: (id: string, patch: Partial<AdminCategory>) => Promise<void>
+  deleteCategory: (id: string) => Promise<void>
+
   resetCatalog: () => Promise<void>
 }
 
 export const useCatalogStore = create<CatalogStore>()((set, get) => ({
   products: seedProducts,
   categories: seedCategories,
+  adminCategories: [],
   orders: [],
   users: [],
   subscribers: [],
@@ -145,6 +158,10 @@ export const useCatalogStore = create<CatalogStore>()((set, get) => ({
   loadMessages: async () => {
     const data = await adminFetch<{ messages: AdminMessage[] }>('/api/admin/messages')
     set({ messages: data.messages })
+  },
+  loadCategories: async () => {
+    const data = await adminFetch<{ categories: AdminCategory[] }>('/api/admin/categories')
+    set({ adminCategories: data.categories })
   },
   loadDashboard: async () => {
     const data = await adminFetch<DashboardSummary>('/api/admin/dashboard')
@@ -213,6 +230,19 @@ export const useCatalogStore = create<CatalogStore>()((set, get) => ({
   deleteMessage: async (id) => {
     await adminFetch(`/api/admin/messages/${id}`, { method: 'DELETE' })
     await get().loadMessages()
+  },
+
+  addCategory: async (category) => {
+    await adminFetch('/api/admin/categories', { method: 'POST', body: JSON.stringify(category) })
+    await get().loadCategories()
+  },
+  updateCategory: async (id, patch) => {
+    await adminFetch(`/api/admin/categories/${id}`, { method: 'PATCH', body: JSON.stringify(patch) })
+    await get().loadCategories()
+  },
+  deleteCategory: async (id) => {
+    await adminFetch(`/api/admin/categories/${id}`, { method: 'DELETE' })
+    await get().loadCategories()
   },
 
   resetCatalog: async () => {
