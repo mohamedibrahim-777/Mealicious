@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { useAppStore } from '@/lib/store'
-import { useCatalogStore, type AdminOrder, type AdminUser } from '@/lib/catalog-store'
+import { useCatalogStore, type AdminOrder, type AdminUser, type AdminCategory } from '@/lib/catalog-store'
 import type { Product } from '@/lib/data'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -59,11 +59,16 @@ export default function AdminPanel() {
   const {
     products,
     categories,
+    adminCategories,
     orders,
     users,
     addProduct,
     updateProduct,
     deleteProduct,
+    loadCategories,
+    addCategory,
+    updateCategory,
+    deleteCategory,
     updateOrderStatus,
     updateOrder,
     deleteOrder,
@@ -76,9 +81,11 @@ export default function AdminPanel() {
 
   useEffect(() => {
     if (user?.role === 'admin') {
-      loadAll().catch((e) => toast.error(`Failed to load admin data: ${e.message}`))
+      loadAll()
+        .then(() => loadCategories())
+        .catch((e) => toast.error(`Failed to load admin data: ${e.message}`))
     }
-  }, [user?.role, loadAll])
+  }, [user?.role, loadAll, loadCategories])
 
   const [tab, setTab] = useState<Tab>('overview')
   const [search, setSearch] = useState('')
@@ -87,6 +94,8 @@ export default function AdminPanel() {
   const [viewingOrder, setViewingOrder] = useState<AdminOrder | null>(null)
   const [editingOrder, setEditingOrder] = useState<AdminOrder | null>(null)
   const [editingUser, setEditingUser] = useState<AdminUser | null>(null)
+  const [editingCategory, setEditingCategory] = useState<AdminCategory | null>(null)
+  const [creatingCategory, setCreatingCategory] = useState(false)
 
   const stats = useMemo(() => {
     const totalStock = products.reduce((s, p) => s + p.stock, 0)
@@ -484,26 +493,61 @@ export default function AdminPanel() {
           <Card>
             <CardContent className="p-5">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold">Categories ({categories.length})</h3>
-                <Button className="bg-orange-400 hover:bg-orange-500" size="sm">
+                <h3 className="font-semibold">Categories ({adminCategories.length})</h3>
+                <Button onClick={() => setCreatingCategory(true)} className="bg-orange-400 hover:bg-orange-500" size="sm">
                   <Plus className="h-4 w-4 mr-1" /> Add Category
                 </Button>
               </div>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {categories.map((cat) => (
-                  <Card key={cat.id} className="p-4 hover:shadow-md transition">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-semibold">{cat.name}</p>
-                        <p className="text-xs text-gray-500">{cat.slug}</p>
-                      </div>
-                      <div className="space-x-1">
-                        <Button size="icon" variant="ghost"><Pencil className="h-4 w-4 text-blue-500" /></Button>
-                        <Button size="icon" variant="ghost"><Trash2 className="h-4 w-4 text-red-500" /></Button>
-                      </div>
-                    </div>
-                  </Card>
-                ))}
+              <Separator className="mb-4" />
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="text-left text-gray-500 border-b">
+                      <th className="py-2 px-2">Name</th>
+                      <th className="py-2 px-2">Slug</th>
+                      <th className="py-2 px-2 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {adminCategories.map((cat) => (
+                      <tr key={cat.id} className="border-b last:border-0 hover:bg-orange-50/40">
+                        <td className="py-2 px-2 font-medium">{cat.name}</td>
+                        <td className="py-2 px-2 text-gray-600">{cat.slug}</td>
+                        <td className="py-2 px-2 text-right space-x-1">
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            onClick={() => setEditingCategory(cat)}
+                            title="Edit"
+                          >
+                            <Pencil className="h-4 w-4 text-blue-500" />
+                          </Button>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            onClick={() => {
+                              if (confirm(`Delete "${cat.name}"?`)) {
+                                deleteCategory(cat.id)
+                                  .then(() => toast.success('Category deleted'))
+                                  .catch((e) => toast.error(e.message))
+                              }
+                            }}
+                            title="Delete"
+                          >
+                            <Trash2 className="h-4 w-4 text-red-500" />
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                    {adminCategories.length === 0 && (
+                      <tr>
+                        <td colSpan={3} className="py-8 text-center text-gray-500">
+                          No categories found.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
               </div>
             </CardContent>
           </Card>
@@ -671,6 +715,33 @@ export default function AdminPanel() {
               .catch((e) => toast.error(e.message))
           }
           setEditingUser(null)
+        }}
+      />
+
+      <CategoryDialog
+        open={creatingCategory || editingCategory !== null}
+        category={editingCategory}
+        onClose={() => {
+          setCreatingCategory(false)
+          setEditingCategory(null)
+        }}
+        onSubmit={(data) => {
+          if (editingCategory) {
+            updateCategory(editingCategory.id, data)
+              .then(() => toast.success('Category updated'))
+              .catch((e) => toast.error(e.message))
+          } else {
+            const newCat = {
+              id: `cat-${Date.now()}`,
+              name: data.name ?? '',
+              slug: data.slug ?? '',
+            }
+            addCategory(newCat)
+              .then(() => toast.success('Category created'))
+              .catch((e) => toast.error(e.message))
+          }
+          setCreatingCategory(false)
+          setEditingCategory(null)
         }}
       />
     </div>
@@ -1137,6 +1208,77 @@ function UserDialog({
             </Button>
             <Button type="submit" className="bg-orange-400 hover:bg-orange-500">
               Save changes
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+function CategoryDialog({
+  open,
+  category,
+  onClose,
+  onSubmit,
+}: {
+  open: boolean
+  category: AdminCategory | null
+  onClose: () => void
+  onSubmit: (data: Partial<AdminCategory>) => void
+}) {
+  const [form, setForm] = useState<Partial<AdminCategory>>(category ?? { name: '', slug: '' })
+
+  useEffect(() => {
+    setForm(category ?? { name: '', slug: '' })
+  }, [category?.id, open])
+
+  const handle = (key: keyof AdminCategory, value: unknown) =>
+    setForm((f) => ({ ...f, [key]: value }))
+
+  const handleNameChange = (name: string) => {
+    handle('name', name)
+    // Auto-generate slug from name
+    handle('slug', name.toLowerCase().replace(/\s+/g, '-'))
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>{category ? 'Edit category' : 'New category'}</DialogTitle>
+          <DialogDescription>
+            {category ? 'Update category details.' : 'Add a new category.'}
+          </DialogDescription>
+        </DialogHeader>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault()
+            onSubmit(form)
+          }}
+          className="space-y-3"
+        >
+          <div>
+            <Label className="mb-1.5 block">Name</Label>
+            <Input
+              value={form.name ?? ''}
+              onChange={(e) => handleNameChange(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <Label className="mb-1.5 block">Slug</Label>
+            <Input
+              value={form.slug ?? ''}
+              onChange={(e) => handle('slug', e.target.value)}
+            />
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button type="submit" className="bg-orange-400 hover:bg-orange-500">
+              {category ? 'Save changes' : 'Create category'}
             </Button>
           </DialogFooter>
         </form>
