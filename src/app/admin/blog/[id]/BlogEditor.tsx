@@ -36,7 +36,7 @@ export function BlogEditor({ id, initial }: { id: string | null; initial?: Parti
     setSaving(true)
     try {
       const payload = { ...form, tags: form.tags.split(',').map(t => t.trim()).filter(Boolean) }
-      const url = id ? `/api/admin/blog/${id}` : '/api/admin/blog'
+      const url = id ? `/api/admin/blogs/${id}` : '/api/admin/blogs'
       const res = await fetch(url, { method: id ? 'PATCH' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
       if (!res.ok) throw new Error((await res.json()).error || 'Failed')
       toast.success(id ? 'Post updated' : 'Post created')

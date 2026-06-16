@@ -5,8 +5,8 @@ import { requireAdminSession } from '@/lib/auth-server'
 export async function GET(req: NextRequest) {
   const { error } = await requireAdminSession(req)
   if (error) return error
-  const posts = await db.blogPost.findMany({ orderBy: { createdAt: 'desc' } })
-  return NextResponse.json({ posts })
+  const blogs = await db.blogPost.findMany({ orderBy: { createdAt: 'desc' } })
+  return NextResponse.json({ blogs })
 }
 
 export async function POST(req: NextRequest) {

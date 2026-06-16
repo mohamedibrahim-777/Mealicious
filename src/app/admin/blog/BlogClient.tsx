@@ -16,7 +16,7 @@ export function BlogClient({ posts }: { posts: Post[] }) {
 
   async function handleDelete(id: string, title: string) {
     if (!confirm(`Delete "${title}"?`)) return
-    const res = await fetch(`/api/admin/blog/${id}`, { method: 'DELETE' })
+    const res = await fetch(`/api/admin/blogs/${id}`, { method: 'DELETE' })
     if (res.ok) { toast.success('Post deleted'); startTransition(() => router.refresh()) }
     else toast.error('Failed')
   }
