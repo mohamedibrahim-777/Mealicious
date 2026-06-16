@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
-import { requireAdminSession } from '@/lib/auth-server'
+import { requireAdmin } from '@/lib/auth-server'
 
 interface RouteContext {
   params: { id: string }
@@ -16,7 +16,7 @@ function transformReview(review: any) {
 }
 
 export async function PATCH(req: NextRequest, { params }: RouteContext) {
-  const { error } = await requireAdminSession(req)
+  const { error } = await requireAdmin(req)
   if (error) return error
 
   const body = await req.json()
@@ -51,7 +51,7 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
 }
 
 export async function DELETE(req: NextRequest, { params }: RouteContext) {
-  const { error } = await requireAdminSession(req)
+  const { error } = await requireAdmin(req)
   if (error) return error
 
   const { id } = params

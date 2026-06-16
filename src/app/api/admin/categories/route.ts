@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
-import { requireAdminSession } from '@/lib/auth-server'
+import { requireAdmin } from '@/lib/auth-server'
 
 export async function GET(_req: NextRequest) {
   const categories = await db.category.findMany({
@@ -11,7 +11,7 @@ export async function GET(_req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const { error } = await requireAdminSession(req)
+  const { error } = await requireAdmin(req)
   if (error) return error
   const body = await req.json()
   const slug = (body.slug || String(body.name || '').toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')).slice(0, 80)

@@ -1,16 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
-import { requireAdminSession } from '@/lib/auth-server'
+import { requireAdmin } from '@/lib/auth-server'
 
 export async function GET(req: NextRequest) {
-  const { error } = await requireAdminSession(req)
+  const { error } = await requireAdmin(req)
   if (error) return error
   const coupons = await db.coupon.findMany({ orderBy: { createdAt: 'desc' } })
   return NextResponse.json({ coupons })
 }
 
 export async function POST(req: NextRequest) {
-  const { error } = await requireAdminSession(req)
+  const { error } = await requireAdmin(req)
   if (error) return error
   const body = await req.json()
 

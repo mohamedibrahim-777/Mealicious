@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
-import { requireAdminSession } from '@/lib/auth-server'
+import { requireAdmin } from '@/lib/auth-server'
 
 function transformReview(review: any) {
   return {
@@ -12,7 +12,7 @@ function transformReview(review: any) {
 }
 
 export async function GET(req: NextRequest) {
-  const { error } = await requireAdminSession(req)
+  const { error } = await requireAdmin(req)
   if (error) return error
   const url = new URL(req.url)
   const approved = url.searchParams.get('approved')

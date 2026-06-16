@@ -1,16 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
-import { requireAdminSession } from '@/lib/auth-server'
+import { requireAdmin } from '@/lib/auth-server'
 
 export async function GET(req: NextRequest) {
-  const { error } = await requireAdminSession(req)
+  const { error } = await requireAdmin(req)
   if (error) return error
   const blogs = await db.blogPost.findMany({ orderBy: { createdAt: 'desc' } })
   return NextResponse.json({ blogs })
 }
 
 export async function POST(req: NextRequest) {
-  const { error } = await requireAdminSession(req)
+  const { error } = await requireAdmin(req)
   if (error) return error
   const body = await req.json()
   const slug = (body.slug || String(body.title || 'post').toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')).slice(0, 100)

@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
-import { requireAdminSession } from '@/lib/auth-server'
+import { requireAdmin } from '@/lib/auth-server'
 import type { AdminInventory } from '@/lib/catalog-store'
 
 export async function GET(req: NextRequest) {
-  const { error } = await requireAdminSession(req)
+  const { error } = await requireAdmin(req)
   if (error) return error
   try {
     const products = await db.product.findMany({
