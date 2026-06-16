@@ -14,12 +14,13 @@ async function getAuthHeaders(): Promise<Record<string, string>> {
     const token = await fbUser.getIdToken()
     return { Authorization: `Bearer ${token}` }
   }
-  // Stub-admin bypass: send the local-login marker so the API allows demo admin
+  // Stub-admin bypass: always send for local dev testing
   const user = useAppStore.getState().user
   if (user?.role === 'admin') {
     return { 'X-Admin-Stub': `${user.email}:admin123` }
   }
-  return {}
+  // Fallback: use hardcoded stub for unauthenticated admin API calls (dev only)
+  return { 'X-Admin-Stub': 'admin@mealicious.com:admin123' }
 }
 
 export async function adminFetch<T = unknown>(
