@@ -33,15 +33,59 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'productName is required' }, { status: 400 })
     }
 
+    const trimmedName = body.productName.trim()
+    if (!trimmedName) {
+      return NextResponse.json({ error: 'productName cannot be empty' }, { status: 400 })
+    }
+
+    // Check for duplicate product names
+    const existing = await db.product.findUnique({
+      where: { name: trimmedName },
+    })
+    if (existing) {
+      return NextResponse.json(
+        { error: 'Product with this name already exists' },
+        { status: 400 }
+      )
+    }
+
+    // Validate stock fields
+    const stock = body.stock ?? 0
+    const lowStockAlert = body.lowStockAlert ?? 10
+
+    if (stock < 0) {
+      return NextResponse.json(
+        { error: 'Stock must be non-negative' },
+        { status: 400 }
+      )
+    }
+    if (lowStockAlert < 0) {
+      return NextResponse.json(
+        { error: 'Low stock alert must be non-negative' },
+        { status: 400 }
+      )
+    }
+    if (lowStockAlert > stock) {
+      return NextResponse.json(
+        { error: 'Low stock alert cannot exceed stock' },
+        { status: 400 }
+      )
+    }
+
+    // Get a default category (use first existing or create a fallback)
+    const categories = await db.category.findMany({ take: 1 })
+    const defaultCategoryId = categories[0]?.id || 'cat-1'
+
     const newProduct = await db.product.create({
       data: {
-        name: body.productName,
-        slug: body.productName.toLowerCase().replace(/\s+/g, '-'),
-        description: '',
+        name: trimmedName,
+        slug: trimmedName.toLowerCase().replace(/\s+/g, '-'),
+        description: 'Inventory item',
         price: 0,
-        categoryId: '', // Dummy; should be provided
-        stock: body.stock ?? 0,
-        lowStock: body.lowStockAlert ?? 10,
+        categoryId: defaultCategoryId,
+        stock,
+        lowStock: lowStockAlert,
+        images: JSON.stringify([]),
       },
     })
 
