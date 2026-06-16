@@ -62,6 +62,13 @@ export interface AdminBanner {
   isActive: boolean
 }
 
+export interface AdminBlog {
+  id: string
+  title: string
+  excerpt: string
+  published: boolean
+}
+
 export interface DashboardSummary {
   counts: {
     products: number; orders: number; users: number;
@@ -78,6 +85,7 @@ interface CatalogStore {
   adminCategories: AdminCategory[]
   coupons: AdminCoupon[]
   banners: AdminBanner[]
+  blogs: AdminBlog[]
   orders: AdminOrder[]
   users: AdminUser[]
   subscribers: AdminSubscriber[]
@@ -125,6 +133,11 @@ interface CatalogStore {
   updateBanner: (id: string, patch: Partial<AdminBanner>) => Promise<void>
   deleteBanner: (id: string) => Promise<void>
 
+  loadBlogs: () => Promise<void>
+  addBlog: (blog: Partial<AdminBlog>) => Promise<void>
+  updateBlog: (id: string, patch: Partial<AdminBlog>) => Promise<void>
+  deleteBlog: (id: string) => Promise<void>
+
   resetCatalog: () => Promise<void>
 }
 
@@ -134,6 +147,7 @@ export const useCatalogStore = create<CatalogStore>()((set, get) => ({
   adminCategories: [],
   coupons: [],
   banners: [],
+  blogs: [],
   orders: [],
   users: [],
   subscribers: [],
@@ -310,6 +324,23 @@ export const useCatalogStore = create<CatalogStore>()((set, get) => ({
   deleteBanner: async (id) => {
     await adminFetch(`/api/admin/banners/${id}`, { method: 'DELETE' })
     await get().loadBanners()
+  },
+
+  loadBlogs: async () => {
+    const data = await adminFetch<{ blogs: AdminBlog[] }>('/api/admin/blogs')
+    set({ blogs: data.blogs })
+  },
+  addBlog: async (blog) => {
+    await adminFetch('/api/admin/blogs', { method: 'POST', body: JSON.stringify(blog) })
+    await get().loadBlogs()
+  },
+  updateBlog: async (id, patch) => {
+    await adminFetch(`/api/admin/blogs/${id}`, { method: 'PATCH', body: JSON.stringify(patch) })
+    await get().loadBlogs()
+  },
+  deleteBlog: async (id) => {
+    await adminFetch(`/api/admin/blogs/${id}`, { method: 'DELETE' })
+    await get().loadBlogs()
   },
 
   resetCatalog: async () => {

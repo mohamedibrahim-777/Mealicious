@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { useAppStore } from '@/lib/store'
-import { useCatalogStore, type AdminOrder, type AdminUser, type AdminCategory, type AdminCoupon, type AdminBanner } from '@/lib/catalog-store'
+import { useCatalogStore, type AdminOrder, type AdminUser, type AdminCategory, type AdminCoupon, type AdminBanner, type AdminBlog } from '@/lib/catalog-store'
 import type { Product } from '@/lib/data'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -62,6 +62,7 @@ export default function AdminPanel() {
     adminCategories,
     coupons,
     banners,
+    blogs,
     orders,
     users,
     addProduct,
@@ -79,6 +80,10 @@ export default function AdminPanel() {
     addBanner,
     updateBanner,
     deleteBanner,
+    loadBlogs,
+    addBlog,
+    updateBlog,
+    deleteBlog,
     updateOrderStatus,
     updateOrder,
     deleteOrder,
@@ -92,10 +97,10 @@ export default function AdminPanel() {
   useEffect(() => {
     if (user?.role === 'admin') {
       loadAll()
-        .then(() => Promise.all([loadCategories(), loadCoupons(), loadBanners()]))
+        .then(() => Promise.all([loadCategories(), loadCoupons(), loadBanners(), loadBlogs()]))
         .catch((e) => toast.error(`Failed to load admin data: ${e.message}`))
     }
-  }, [user?.role, loadAll, loadCategories, loadCoupons, loadBanners])
+  }, [user?.role, loadAll, loadCategories, loadCoupons, loadBanners, loadBlogs])
 
   const [tab, setTab] = useState<Tab>('overview')
   const [search, setSearch] = useState('')
@@ -110,6 +115,8 @@ export default function AdminPanel() {
   const [creatingCoupon, setCreatingCoupon] = useState(false)
   const [editingBanner, setEditingBanner] = useState<AdminBanner | null>(null)
   const [creatingBanner, setCreatingBanner] = useState(false)
+  const [editingBlog, setEditingBlog] = useState<AdminBlog | null>(null)
+  const [creatingBlog, setCreatingBlog] = useState(false)
 
   const stats = useMemo(() => {
     const totalStock = products.reduce((s, p) => s + p.stock, 0)
@@ -728,13 +735,65 @@ export default function AdminPanel() {
           <Card>
             <CardContent className="p-5">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold">Blog Posts</h3>
-                <Button className="bg-orange-400 hover:bg-orange-500" size="sm">
+                <h3 className="font-semibold">Blog Posts ({blogs.length})</h3>
+                <Button onClick={() => setCreatingBlog(true)} className="bg-orange-400 hover:bg-orange-500" size="sm">
                   <Plus className="h-4 w-4 mr-1" /> New Post
                 </Button>
               </div>
-              <div className="space-y-2">
-                <p className="text-sm text-gray-500">Blog posts will appear here</p>
+              <Separator className="mb-4" />
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="text-left text-gray-500 border-b">
+                      <th className="py-2 px-2">Title</th>
+                      <th className="py-2 px-2">Status</th>
+                      <th className="py-2 px-2 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {blogs.map((blog) => (
+                      <tr key={blog.id} className="border-b last:border-0 hover:bg-orange-50/40">
+                        <td className="py-2 px-2 font-medium">{blog.title}</td>
+                        <td className="py-2 px-2">
+                          <Badge variant="outline" className={blog.published ? 'text-green-600 border-green-300' : 'text-gray-600 border-gray-300'}>
+                            {blog.published ? 'Published' : 'Draft'}
+                          </Badge>
+                        </td>
+                        <td className="py-2 px-2 text-right space-x-1">
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            onClick={() => setEditingBlog(blog)}
+                            title="Edit"
+                          >
+                            <Pencil className="h-4 w-4 text-blue-500" />
+                          </Button>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            onClick={() => {
+                              if (confirm(`Delete "${blog.title}"?`)) {
+                                deleteBlog(blog.id)
+                                  .then(() => toast.success('Blog deleted'))
+                                  .catch((e) => toast.error(e.message))
+                              }
+                            }}
+                            title="Delete"
+                          >
+                            <Trash2 className="h-4 w-4 text-red-500" />
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                    {blogs.length === 0 && (
+                      <tr>
+                        <td colSpan={3} className="py-8 text-center text-gray-500">
+                          No blog posts yet
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
               </div>
             </CardContent>
           </Card>
@@ -889,6 +948,28 @@ export default function AdminPanel() {
           }
           setCreatingBanner(false)
           setEditingBanner(null)
+        }}
+      />
+
+      <BlogDialog
+        open={creatingBlog || editingBlog !== null}
+        blog={editingBlog}
+        onClose={() => {
+          setCreatingBlog(false)
+          setEditingBlog(null)
+        }}
+        onSubmit={(data) => {
+          if (editingBlog) {
+            updateBlog(editingBlog.id, data)
+              .then(() => toast.success('Blog updated'))
+              .catch((e) => toast.error(e.message))
+          } else {
+            addBlog(data)
+              .then(() => toast.success('Blog created'))
+              .catch((e) => toast.error(e.message))
+          }
+          setCreatingBlog(false)
+          setEditingBlog(null)
         }}
       />
     </div>
@@ -1585,6 +1666,84 @@ function BannerDialog({
             </Button>
             <Button type="submit" className="bg-orange-400 hover:bg-orange-500">
               {banner ? 'Save changes' : 'Create banner'}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+function BlogDialog({
+  open,
+  blog,
+  onClose,
+  onSubmit,
+}: {
+  open: boolean
+  blog: AdminBlog | null
+  onClose: () => void
+  onSubmit: (data: Partial<AdminBlog>) => void
+}) {
+  const [form, setForm] = useState<Partial<AdminBlog>>(blog ?? { title: '', excerpt: '', published: false })
+
+  useEffect(() => {
+    setForm(blog ?? { title: '', excerpt: '', published: false })
+  }, [blog?.id, open])
+
+  const handle = (key: keyof AdminBlog, value: unknown) =>
+    setForm((f) => ({ ...f, [key]: value }))
+
+  return (
+    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="sm:max-w-lg">
+        <DialogHeader>
+          <DialogTitle>{blog ? 'Edit blog post' : 'New blog post'}</DialogTitle>
+          <DialogDescription>
+            {blog ? 'Update blog post details.' : 'Add a new blog post.'}
+          </DialogDescription>
+        </DialogHeader>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault()
+            onSubmit(form)
+          }}
+          className="space-y-3"
+        >
+          <div>
+            <Label className="mb-1.5 block">Title</Label>
+            <Input
+              value={form.title ?? ''}
+              onChange={(e) => handle('title', e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <Label className="mb-1.5 block">Excerpt</Label>
+            <Textarea
+              rows={3}
+              value={form.excerpt ?? ''}
+              onChange={(e) => handle('excerpt', e.target.value)}
+              required
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="published"
+              checked={!!form.published}
+              onChange={(e) => handle('published', e.target.checked)}
+            />
+            <Label htmlFor="published" className="mb-0 cursor-pointer">
+              {form.published ? 'Published' : 'Draft'}
+            </Label>
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button type="submit" className="bg-orange-400 hover:bg-orange-500">
+              {blog ? 'Save changes' : 'Create blog post'}
             </Button>
           </DialogFooter>
         </form>
