@@ -1,34 +1,59 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { requireAdminSession } from '@/lib/auth-server'
+import type { AdminInventory } from '@/lib/catalog-store'
 
 export async function GET(req: NextRequest) {
   const { error } = await requireAdminSession(req)
   if (error) return error
-  const products = await db.product.findMany({
-    include: { category: true },
-    orderBy: { stock: 'asc' },
-  })
-  return NextResponse.json({
-    products: products.map(p => ({
+  try {
+    const products = await db.product.findMany({
+      orderBy: { stock: 'asc' },
+    })
+    const inventory: AdminInventory[] = products.map(p => ({
       id: p.id,
-      name: p.name,
-      sku: p.sku ?? '',
-      category: p.category?.name ?? '',
+      productName: p.name,
       stock: p.stock,
-      lowStock: p.lowStock,
-      isActive: p.isActive,
-    })),
-  })
+      lowStockAlert: p.lowStock,
+    }))
+    return NextResponse.json({ inventory })
+  } catch (e) {
+    console.error('GET /api/admin/inventory error:', e)
+    return NextResponse.json({ error: 'Failed to load inventory' }, { status: 500 })
+  }
 }
 
-export async function PATCH(req: NextRequest) {
+export async function POST(req: NextRequest) {
   const { error } = await requireAdminSession(req)
   if (error) return error
-  const body = await req.json()
-  const updates: { id: string; stock: number }[] = body.updates ?? []
-  await Promise.all(
-    updates.map(u => db.product.update({ where: { id: u.id }, data: { stock: Number(u.stock) } }))
-  )
-  return NextResponse.json({ ok: true, updated: updates.length })
+  try {
+    const body = (await req.json()) as Partial<AdminInventory>
+
+    if (!body.productName) {
+      return NextResponse.json({ error: 'productName is required' }, { status: 400 })
+    }
+
+    const newProduct = await db.product.create({
+      data: {
+        name: body.productName,
+        slug: body.productName.toLowerCase().replace(/\s+/g, '-'),
+        description: '',
+        price: 0,
+        categoryId: '', // Dummy; should be provided
+        stock: body.stock ?? 0,
+        lowStock: body.lowStockAlert ?? 10,
+      },
+    })
+
+    const inventory: AdminInventory = {
+      id: newProduct.id,
+      productName: newProduct.name,
+      stock: newProduct.stock,
+      lowStockAlert: newProduct.lowStock,
+    }
+    return NextResponse.json(inventory, { status: 201 })
+  } catch (e) {
+    console.error('POST /api/admin/inventory error:', e)
+    return NextResponse.json({ error: 'Failed to create inventory item' }, { status: 500 })
+  }
 }
