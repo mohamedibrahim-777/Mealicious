@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { useAppStore } from '@/lib/store'
-import { useCatalogStore, type AdminOrder, type AdminUser, type AdminCategory, type AdminCoupon } from '@/lib/catalog-store'
+import { useCatalogStore, type AdminOrder, type AdminUser, type AdminCategory, type AdminCoupon, type AdminBanner } from '@/lib/catalog-store'
 import type { Product } from '@/lib/data'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -61,6 +61,7 @@ export default function AdminPanel() {
     categories,
     adminCategories,
     coupons,
+    banners,
     orders,
     users,
     addProduct,
@@ -74,6 +75,10 @@ export default function AdminPanel() {
     addCoupon,
     updateCoupon,
     deleteCoupon,
+    loadBanners,
+    addBanner,
+    updateBanner,
+    deleteBanner,
     updateOrderStatus,
     updateOrder,
     deleteOrder,
@@ -87,10 +92,10 @@ export default function AdminPanel() {
   useEffect(() => {
     if (user?.role === 'admin') {
       loadAll()
-        .then(() => Promise.all([loadCategories(), loadCoupons()]))
+        .then(() => Promise.all([loadCategories(), loadCoupons(), loadBanners()]))
         .catch((e) => toast.error(`Failed to load admin data: ${e.message}`))
     }
-  }, [user?.role, loadAll, loadCategories, loadCoupons])
+  }, [user?.role, loadAll, loadCategories, loadCoupons, loadBanners])
 
   const [tab, setTab] = useState<Tab>('overview')
   const [search, setSearch] = useState('')
@@ -103,6 +108,8 @@ export default function AdminPanel() {
   const [creatingCategory, setCreatingCategory] = useState(false)
   const [editingCoupon, setEditingCoupon] = useState<AdminCoupon | null>(null)
   const [creatingCoupon, setCreatingCoupon] = useState(false)
+  const [editingBanner, setEditingBanner] = useState<AdminBanner | null>(null)
+  const [creatingBanner, setCreatingBanner] = useState(false)
 
   const stats = useMemo(() => {
     const totalStock = products.reduce((s, p) => s + p.stock, 0)
@@ -586,13 +593,63 @@ export default function AdminPanel() {
           <Card>
             <CardContent className="p-5">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold">Banners</h3>
-                <Button className="bg-orange-400 hover:bg-orange-500" size="sm">
+                <h3 className="font-semibold">Banners ({banners.length})</h3>
+                <Button onClick={() => setCreatingBanner(true)} className="bg-orange-400 hover:bg-orange-500" size="sm">
                   <Plus className="h-4 w-4 mr-1" /> Add Banner
                 </Button>
               </div>
-              <div className="grid gap-3">
-                <p className="text-sm text-gray-500">Promotional banners will appear here</p>
+              <Separator className="mb-4" />
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="text-left text-gray-500 border-b">
+                      <th className="py-2 px-2">Title</th>
+                      <th className="py-2 px-2">Image</th>
+                      <th className="py-2 px-2">Link</th>
+                      <th className="py-2 px-2 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {banners.map((banner) => (
+                      <tr key={banner.id} className="border-b last:border-0 hover:bg-orange-50/40">
+                        <td className="py-2 px-2 font-medium">{banner.title}</td>
+                        <td className="py-2 px-2 text-gray-600 truncate max-w-xs">{banner.image}</td>
+                        <td className="py-2 px-2 text-gray-600 truncate max-w-xs">{banner.link}</td>
+                        <td className="py-2 px-2 text-right space-x-1">
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            onClick={() => setEditingBanner(banner)}
+                            title="Edit"
+                          >
+                            <Pencil className="h-4 w-4 text-blue-500" />
+                          </Button>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            onClick={() => {
+                              if (confirm(`Delete "${banner.title}"?`)) {
+                                deleteBanner(banner.id)
+                                  .then(() => toast.success('Banner deleted'))
+                                  .catch((e) => toast.error(e.message))
+                              }
+                            }}
+                            title="Delete"
+                          >
+                            <Trash2 className="h-4 w-4 text-red-500" />
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                    {banners.length === 0 && (
+                      <tr>
+                        <td colSpan={4} className="py-8 text-center text-gray-500">
+                          No banners yet
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
               </div>
             </CardContent>
           </Card>
@@ -810,6 +867,28 @@ export default function AdminPanel() {
           }
           setCreatingCoupon(false)
           setEditingCoupon(null)
+        }}
+      />
+
+      <BannerDialog
+        open={creatingBanner || editingBanner !== null}
+        banner={editingBanner}
+        onClose={() => {
+          setCreatingBanner(false)
+          setEditingBanner(null)
+        }}
+        onSubmit={(data) => {
+          if (editingBanner) {
+            updateBanner(editingBanner.id, data)
+              .then(() => toast.success('Banner updated'))
+              .catch((e) => toast.error(e.message))
+          } else {
+            addBanner(data)
+              .then(() => toast.success('Banner created'))
+              .catch((e) => toast.error(e.message))
+          }
+          setCreatingBanner(false)
+          setEditingBanner(null)
         }}
       />
     </div>
@@ -1430,6 +1509,82 @@ function CouponDialog({
             </Button>
             <Button type="submit" className="bg-orange-400 hover:bg-orange-500">
               {coupon ? 'Save changes' : 'Create coupon'}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+function BannerDialog({
+  open,
+  banner,
+  onClose,
+  onSubmit,
+}: {
+  open: boolean
+  banner: AdminBanner | null
+  onClose: () => void
+  onSubmit: (data: Partial<AdminBanner>) => void
+}) {
+  const [form, setForm] = useState<Partial<AdminBanner>>(banner ?? { title: '', image: '', link: '' })
+
+  useEffect(() => {
+    setForm(banner ?? { title: '', image: '', link: '' })
+  }, [banner?.id, open])
+
+  const handle = (key: keyof AdminBanner, value: unknown) =>
+    setForm((f) => ({ ...f, [key]: value }))
+
+  return (
+    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="sm:max-w-lg">
+        <DialogHeader>
+          <DialogTitle>{banner ? 'Edit banner' : 'New banner'}</DialogTitle>
+          <DialogDescription>
+            {banner ? 'Update banner details.' : 'Add a new banner.'}
+          </DialogDescription>
+        </DialogHeader>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault()
+            onSubmit(form)
+          }}
+          className="space-y-3"
+        >
+          <div>
+            <Label className="mb-1.5 block">Title</Label>
+            <Input
+              value={form.title ?? ''}
+              onChange={(e) => handle('title', e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <Label className="mb-1.5 block">Image URL</Label>
+            <Input
+              type="url"
+              value={form.image ?? ''}
+              onChange={(e) => handle('image', e.target.value)}
+              placeholder="https://..."
+            />
+          </div>
+          <div>
+            <Label className="mb-1.5 block">Link</Label>
+            <Input
+              type="url"
+              value={form.link ?? ''}
+              onChange={(e) => handle('link', e.target.value)}
+              placeholder="https://..."
+            />
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button type="submit" className="bg-orange-400 hover:bg-orange-500">
+              {banner ? 'Save changes' : 'Create banner'}
             </Button>
           </DialogFooter>
         </form>

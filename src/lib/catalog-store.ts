@@ -52,6 +52,13 @@ export interface AdminCoupon {
   // but admin UI simplified to core 3 fields per spec (code, discount, status)
 }
 
+export interface AdminBanner {
+  id: string
+  title: string
+  image: string
+  link: string
+}
+
 export interface DashboardSummary {
   counts: {
     products: number; orders: number; users: number;
@@ -67,6 +74,7 @@ interface CatalogStore {
   categories: Category[]
   adminCategories: AdminCategory[]
   coupons: AdminCoupon[]
+  banners: AdminBanner[]
   orders: AdminOrder[]
   users: AdminUser[]
   subscribers: AdminSubscriber[]
@@ -109,6 +117,11 @@ interface CatalogStore {
   updateCoupon: (id: string, patch: Partial<AdminCoupon>) => Promise<void>
   deleteCoupon: (id: string) => Promise<void>
 
+  loadBanners: () => Promise<void>
+  addBanner: (banner: Partial<AdminBanner>) => Promise<void>
+  updateBanner: (id: string, patch: Partial<AdminBanner>) => Promise<void>
+  deleteBanner: (id: string) => Promise<void>
+
   resetCatalog: () => Promise<void>
 }
 
@@ -117,6 +130,7 @@ export const useCatalogStore = create<CatalogStore>()((set, get) => ({
   categories: seedCategories,
   adminCategories: [],
   coupons: [],
+  banners: [],
   orders: [],
   users: [],
   subscribers: [],
@@ -276,6 +290,23 @@ export const useCatalogStore = create<CatalogStore>()((set, get) => ({
   deleteCoupon: async (id) => {
     await adminFetch(`/api/admin/coupons/${id}`, { method: 'DELETE' })
     await get().loadCoupons()
+  },
+
+  loadBanners: async () => {
+    const data = await adminFetch<{ banners: AdminBanner[] }>('/api/admin/banners')
+    set({ banners: data.banners })
+  },
+  addBanner: async (banner) => {
+    await adminFetch('/api/admin/banners', { method: 'POST', body: JSON.stringify(banner) })
+    await get().loadBanners()
+  },
+  updateBanner: async (id, patch) => {
+    await adminFetch(`/api/admin/banners/${id}`, { method: 'PATCH', body: JSON.stringify(patch) })
+    await get().loadBanners()
+  },
+  deleteBanner: async (id) => {
+    await adminFetch(`/api/admin/banners/${id}`, { method: 'DELETE' })
+    await get().loadBanners()
   },
 
   resetCatalog: async () => {
