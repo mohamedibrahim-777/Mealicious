@@ -23,19 +23,29 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
   const { id } = params
 
   try {
+    // If productName is being updated, find the product by name
+    let updateData: any = {
+      ...(body.rating !== undefined && { rating: Number(body.rating) }),
+      ...(body.status !== undefined && { approved: body.status === 'approved' }),
+    }
+
+    if (body.productName !== undefined) {
+      const product = await db.product.findUnique({ where: { name: body.productName } })
+      if (!product) {
+        return NextResponse.json({ error: 'Product not found' }, { status: 404 })
+      }
+      updateData.product = { connect: { id: product.id } }
+    }
+
     const review = await db.review.update({
       where: { id },
-      data: {
-        ...(body.rating !== undefined && { rating: Number(body.rating) }),
-        ...(body.status !== undefined && { approved: body.status === 'approved' }),
-        // Note: productName updates would require a product lookup by name
-        // For now, we only support rating and status updates
-      },
+      data: updateData,
       include: { product: true, user: true },
     })
 
     return NextResponse.json(transformReview(review))
   } catch (error) {
+    console.error('Error updating review:', error)
     return NextResponse.json({ error: 'Failed to update review' }, { status: 500 })
   }
 }
@@ -50,6 +60,7 @@ export async function DELETE(req: NextRequest, { params }: RouteContext) {
     await db.review.delete({ where: { id } })
     return NextResponse.json({ success: true })
   } catch (error) {
+    console.error('Error deleting review:', error)
     return NextResponse.json({ error: 'Failed to delete review' }, { status: 500 })
   }
 }

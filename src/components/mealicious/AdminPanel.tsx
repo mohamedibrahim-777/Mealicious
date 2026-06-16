@@ -1870,6 +1870,7 @@ function ReviewDialog({
 }) {
   const [form, setForm] = useState<Partial<AdminReview>>(review ?? { productName: '', rating: 1, status: 'pending' })
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     setForm(review ?? { productName: '', rating: 1, status: 'pending' })
   }, [review?.id, open])
@@ -1889,6 +1890,11 @@ function ReviewDialog({
         <form
           onSubmit={(e) => {
             e.preventDefault()
+            const rating = form.rating ?? 1
+            if (rating < 1 || rating > 5) {
+              alert('Rating must be between 1 and 5')
+              return
+            }
             onSubmit(form)
           }}
           className="space-y-3"
