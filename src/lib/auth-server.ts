@@ -41,16 +41,19 @@ export async function verifyFirebaseToken(authHeader: string | null): Promise<Au
 }
 
 export async function requireAdmin(req: Request) {
-  // Local stub-admin bypass: allow header X-Admin-Stub: admin@mealicious.com:admin123
+  // Dev-only stub-admin bypass: allow header X-Admin-Stub: admin@mealicious.com:admin123
   // (matches the client-side stub login in the Zustand store, so the existing
   // demo admin flow keeps working without a real Firebase session).
-  const stub = req.headers.get('x-admin-stub')
-  if (stub) {
-    const [email, password] = stub.split(':')
-    if (email && password === 'admin123' && ADMIN_EMAILS.includes(email.toLowerCase())) {
-      return {
-        user: { uid: 'stub-admin', email: email.toLowerCase(), isAdmin: true } as AuthUser,
-        error: null as NextResponse | null,
+  // Only enabled in development, never in production.
+  if (process.env.NODE_ENV !== 'production') {
+    const stub = req.headers.get('x-admin-stub')
+    if (stub) {
+      const [email, password] = stub.split(':')
+      if (email && password === 'admin123' && ADMIN_EMAILS.includes(email.toLowerCase())) {
+        return {
+          user: { uid: 'stub-admin', email: email.toLowerCase(), isAdmin: true } as AuthUser,
+          error: null as NextResponse | null,
+        }
       }
     }
   }
