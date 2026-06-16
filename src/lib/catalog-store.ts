@@ -55,8 +55,11 @@ export interface AdminCoupon {
 export interface AdminBanner {
   id: string
   title: string
+  subtitle?: string
   image: string
   link: string
+  sortOrder: number
+  isActive: boolean
 }
 
 export interface DashboardSummary {

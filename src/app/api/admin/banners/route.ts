@@ -13,12 +13,24 @@ export async function POST(req: NextRequest) {
   const { error } = await requireAdminSession(req)
   if (error) return error
   const body = await req.json()
+
+  // Validation
+  if (!body.title?.trim()) {
+    return NextResponse.json({ error: 'Title is required' }, { status: 400 })
+  }
+  if (!body.image?.trim()) {
+    return NextResponse.json({ error: 'Image URL is required' }, { status: 400 })
+  }
+  if (!body.link?.trim()) {
+    return NextResponse.json({ error: 'Link is required' }, { status: 400 })
+  }
+
   const banner = await db.banner.create({
     data: {
-      title: body.title,
-      subtitle: body.subtitle ?? null,
-      image: body.image ?? null,
-      link: body.link ?? null,
+      title: body.title.trim(),
+      subtitle: body.subtitle?.trim() ?? null,
+      image: body.image.trim(),
+      link: body.link.trim(),
       isActive: body.isActive ?? true,
       sortOrder: Number(body.sortOrder) || 0,
     },

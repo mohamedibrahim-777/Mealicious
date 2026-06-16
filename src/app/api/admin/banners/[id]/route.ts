@@ -7,13 +7,25 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (error) return error
   const { id } = await params
   const body = await req.json()
+
+  // Validation
+  if (body.title !== undefined && !body.title?.trim()) {
+    return NextResponse.json({ error: 'Title cannot be empty' }, { status: 400 })
+  }
+  if (body.image !== undefined && !body.image?.trim()) {
+    return NextResponse.json({ error: 'Image URL cannot be empty' }, { status: 400 })
+  }
+  if (body.link !== undefined && !body.link?.trim()) {
+    return NextResponse.json({ error: 'Link cannot be empty' }, { status: 400 })
+  }
+
   const banner = await db.banner.update({
     where: { id },
     data: {
-      ...(body.title !== undefined && { title: body.title }),
-      ...(body.subtitle !== undefined && { subtitle: body.subtitle }),
-      ...(body.image !== undefined && { image: body.image }),
-      ...(body.link !== undefined && { link: body.link }),
+      ...(body.title !== undefined && { title: body.title.trim() }),
+      ...(body.subtitle !== undefined && { subtitle: body.subtitle?.trim() ?? null }),
+      ...(body.image !== undefined && { image: body.image.trim() }),
+      ...(body.link !== undefined && { link: body.link.trim() }),
       ...(body.isActive !== undefined && { isActive: Boolean(body.isActive) }),
       ...(body.sortOrder !== undefined && { sortOrder: Number(body.sortOrder) }),
     },

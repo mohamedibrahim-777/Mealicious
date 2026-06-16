@@ -22,7 +22,13 @@ export function BannersClient({ banners }: { banners: Banner[] }) {
   const [form, setForm] = useState<FormState>(EMPTY)
   const [saving, setSaving] = useState(false)
 
-  function set(key: keyof FormState, value: unknown) { setForm(prev => ({ ...prev, [key]: value })) }
+  function set(key: keyof FormState, value: unknown) {
+    if (key === 'sortOrder') {
+      setForm(prev => ({ ...prev, [key]: Number(value) }))
+    } else {
+      setForm(prev => ({ ...prev, [key]: value }))
+    }
+  }
   function openNew() { setForm(EMPTY); setEditing(null); setOpen(true) }
   function openEdit(b: Banner) { setForm({ title: b.title, subtitle: b.subtitle, image: b.image, link: b.link, sortOrder: b.sortOrder, isActive: b.isActive }); setEditing(b.id); setOpen(true) }
 
