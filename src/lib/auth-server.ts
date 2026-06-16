@@ -41,7 +41,7 @@ export async function verifyFirebaseToken(authHeader: string | null): Promise<Au
 }
 
 export async function requireAdmin(req: Request) {
-  // Local stub-admin bypass: allow header X-Admin-Stub: admin@mealicious.com:admin123
+  // Stub-admin bypass: X-Admin-Stub header auth (dev testing only)
   const stub = req.headers.get('x-admin-stub')
   if (stub) {
     const parts = stub.split(':')
