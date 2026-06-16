@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { useAppStore } from '@/lib/store'
-import { useCatalogStore, type AdminOrder, type AdminUser, type AdminCategory, type AdminCoupon, type AdminBanner, type AdminBlog } from '@/lib/catalog-store'
+import { useCatalogStore, type AdminOrder, type AdminUser, type AdminCategory, type AdminCoupon, type AdminBanner, type AdminBlog, type AdminReview } from '@/lib/catalog-store'
 import type { Product } from '@/lib/data'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -63,6 +63,7 @@ export default function AdminPanel() {
     coupons,
     banners,
     blogs,
+    reviews,
     orders,
     users,
     addProduct,
@@ -84,6 +85,10 @@ export default function AdminPanel() {
     addBlog,
     updateBlog,
     deleteBlog,
+    loadReviews,
+    addReview,
+    updateReview,
+    deleteReview,
     updateOrderStatus,
     updateOrder,
     deleteOrder,
@@ -97,10 +102,10 @@ export default function AdminPanel() {
   useEffect(() => {
     if (user?.role === 'admin') {
       loadAll()
-        .then(() => Promise.all([loadCategories(), loadCoupons(), loadBanners(), loadBlogs()]))
+        .then(() => Promise.all([loadCategories(), loadCoupons(), loadBanners(), loadBlogs(), loadReviews()]))
         .catch((e) => toast.error(`Failed to load admin data: ${e.message}`))
     }
-  }, [user?.role, loadAll, loadCategories, loadCoupons, loadBanners, loadBlogs])
+  }, [user?.role, loadAll, loadCategories, loadCoupons, loadBanners, loadBlogs, loadReviews])
 
   const [tab, setTab] = useState<Tab>('overview')
   const [search, setSearch] = useState('')
@@ -117,6 +122,8 @@ export default function AdminPanel() {
   const [creatingBanner, setCreatingBanner] = useState(false)
   const [editingBlog, setEditingBlog] = useState<AdminBlog | null>(null)
   const [creatingBlog, setCreatingBlog] = useState(false)
+  const [editingReview, setEditingReview] = useState<AdminReview | null>(null)
+  const [creatingReview, setCreatingReview] = useState(false)
 
   const stats = useMemo(() => {
     const totalStock = products.reduce((s, p) => s + p.stock, 0)
@@ -802,9 +809,85 @@ export default function AdminPanel() {
         {tab === 'reviews' && (
           <Card>
             <CardContent className="p-5">
-              <h3 className="font-semibold mb-3">Product Reviews</h3>
-              <div className="space-y-2">
-                <p className="text-sm text-gray-500">Customer reviews and ratings will appear here</p>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold">Product Reviews ({reviews.length})</h3>
+                <Button onClick={() => setCreatingReview(true)} className="bg-orange-400 hover:bg-orange-500" size="sm">
+                  <Plus className="h-4 w-4 mr-1" /> Add Review
+                </Button>
+              </div>
+              <Separator className="mb-4" />
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="text-left text-gray-500 border-b">
+                      <th className="py-2 px-2">Product</th>
+                      <th className="py-2 px-2">Rating</th>
+                      <th className="py-2 px-2">Status</th>
+                      <th className="py-2 px-2 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {reviews.map((review) => (
+                      <tr key={review.id} className="border-b last:border-0 hover:bg-orange-50/40">
+                        <td className="py-2 px-2 font-medium">{review.productName}</td>
+                        <td className="py-2 px-2 inline-flex items-center gap-1">
+                          {Array.from({ length: 5 }).map((_, i) => (
+                            <Star
+                              key={i}
+                              className={`h-3 w-3 ${i < review.rating ? 'text-orange-400 fill-orange-400' : 'text-gray-300'}`}
+                            />
+                          ))}
+                          <span className="ml-1">{review.rating}</span>
+                        </td>
+                        <td className="py-2 px-2">
+                          <Badge
+                            variant="outline"
+                            className={
+                              review.status === 'approved'
+                                ? 'text-green-600 border-green-300'
+                                : review.status === 'pending'
+                                  ? 'text-yellow-600 border-yellow-300'
+                                  : 'text-red-600 border-red-300'
+                            }
+                          >
+                            {review.status}
+                          </Badge>
+                        </td>
+                        <td className="py-2 px-2 text-right space-x-1">
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            onClick={() => setEditingReview(review)}
+                            title="Edit"
+                          >
+                            <Pencil className="h-4 w-4 text-blue-500" />
+                          </Button>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            onClick={() => {
+                              if (confirm(`Delete review for "${review.productName}"?`)) {
+                                deleteReview(review.id)
+                                  .then(() => toast.success('Review deleted'))
+                                  .catch((e) => toast.error(e.message))
+                              }
+                            }}
+                            title="Delete"
+                          >
+                            <Trash2 className="h-4 w-4 text-red-500" />
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                    {reviews.length === 0 && (
+                      <tr>
+                        <td colSpan={4} className="py-8 text-center text-gray-500">
+                          No reviews yet
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
               </div>
             </CardContent>
           </Card>
@@ -970,6 +1053,28 @@ export default function AdminPanel() {
           }
           setCreatingBlog(false)
           setEditingBlog(null)
+        }}
+      />
+
+      <ReviewDialog
+        open={creatingReview || editingReview !== null}
+        review={editingReview}
+        onClose={() => {
+          setCreatingReview(false)
+          setEditingReview(null)
+        }}
+        onSubmit={(data) => {
+          if (editingReview) {
+            updateReview(editingReview.id, data)
+              .then(() => toast.success('Review updated'))
+              .catch((e) => toast.error(e.message))
+          } else {
+            addReview(data)
+              .then(() => toast.success('Review created'))
+              .catch((e) => toast.error(e.message))
+          }
+          setCreatingReview(false)
+          setEditingReview(null)
         }}
       />
     </div>
@@ -1744,6 +1849,91 @@ function BlogDialog({
             </Button>
             <Button type="submit" className="bg-orange-400 hover:bg-orange-500">
               {blog ? 'Save changes' : 'Create blog post'}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+function ReviewDialog({
+  open,
+  review,
+  onClose,
+  onSubmit,
+}: {
+  open: boolean
+  review: AdminReview | null
+  onClose: () => void
+  onSubmit: (data: Partial<AdminReview>) => void
+}) {
+  const [form, setForm] = useState<Partial<AdminReview>>(review ?? { productName: '', rating: 1, status: 'pending' })
+
+  useEffect(() => {
+    setForm(review ?? { productName: '', rating: 1, status: 'pending' })
+  }, [review?.id, open])
+
+  const handle = (key: keyof AdminReview, value: unknown) =>
+    setForm((f) => ({ ...f, [key]: value }))
+
+  return (
+    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="sm:max-w-lg">
+        <DialogHeader>
+          <DialogTitle>{review ? 'Edit review' : 'New review'}</DialogTitle>
+          <DialogDescription>
+            {review ? 'Update review details.' : 'Add a new review.'}
+          </DialogDescription>
+        </DialogHeader>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault()
+            onSubmit(form)
+          }}
+          className="space-y-3"
+        >
+          <div>
+            <Label className="mb-1.5 block">Product Name</Label>
+            <Input
+              value={form.productName ?? ''}
+              onChange={(e) => handle('productName', e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <Label className="mb-1.5 block">Rating</Label>
+            <Input
+              type="number"
+              min="1"
+              max="5"
+              value={form.rating ?? 1}
+              onChange={(e) => handle('rating', Number(e.target.value))}
+              required
+            />
+          </div>
+          <div>
+            <Label className="mb-1.5 block">Status</Label>
+            <Select
+              value={form.status ?? 'pending'}
+              onValueChange={(v) => handle('status', v as 'approved' | 'pending' | 'rejected')}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="approved">Approved</SelectItem>
+                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="rejected">Rejected</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button type="submit" className="bg-orange-400 hover:bg-orange-500">
+              {review ? 'Save changes' : 'Create review'}
             </Button>
           </DialogFooter>
         </form>

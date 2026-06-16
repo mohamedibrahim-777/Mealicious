@@ -69,6 +69,13 @@ export interface AdminBlog {
   published: boolean
 }
 
+export interface AdminReview {
+  id: string
+  productName: string
+  rating: number
+  status: 'approved' | 'pending' | 'rejected'
+}
+
 export interface DashboardSummary {
   counts: {
     products: number; orders: number; users: number;
@@ -86,6 +93,7 @@ interface CatalogStore {
   coupons: AdminCoupon[]
   banners: AdminBanner[]
   blogs: AdminBlog[]
+  reviews: AdminReview[]
   orders: AdminOrder[]
   users: AdminUser[]
   subscribers: AdminSubscriber[]
@@ -138,6 +146,11 @@ interface CatalogStore {
   updateBlog: (id: string, patch: Partial<AdminBlog>) => Promise<void>
   deleteBlog: (id: string) => Promise<void>
 
+  loadReviews: () => Promise<void>
+  addReview: (review: Partial<AdminReview>) => Promise<void>
+  updateReview: (id: string, patch: Partial<AdminReview>) => Promise<void>
+  deleteReview: (id: string) => Promise<void>
+
   resetCatalog: () => Promise<void>
 }
 
@@ -148,6 +161,7 @@ export const useCatalogStore = create<CatalogStore>()((set, get) => ({
   coupons: [],
   banners: [],
   blogs: [],
+  reviews: [],
   orders: [],
   users: [],
   subscribers: [],
@@ -341,6 +355,23 @@ export const useCatalogStore = create<CatalogStore>()((set, get) => ({
   deleteBlog: async (id) => {
     await adminFetch(`/api/admin/blogs/${id}`, { method: 'DELETE' })
     await get().loadBlogs()
+  },
+
+  loadReviews: async () => {
+    const data = await adminFetch<{ reviews: AdminReview[] }>('/api/admin/reviews')
+    set({ reviews: data.reviews })
+  },
+  addReview: async (review) => {
+    await adminFetch('/api/admin/reviews', { method: 'POST', body: JSON.stringify(review) })
+    await get().loadReviews()
+  },
+  updateReview: async (id, patch) => {
+    await adminFetch(`/api/admin/reviews/${id}`, { method: 'PATCH', body: JSON.stringify(patch) })
+    await get().loadReviews()
+  },
+  deleteReview: async (id) => {
+    await adminFetch(`/api/admin/reviews/${id}`, { method: 'DELETE' })
+    await get().loadReviews()
   },
 
   resetCatalog: async () => {
