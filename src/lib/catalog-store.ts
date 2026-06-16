@@ -76,6 +76,13 @@ export interface AdminReview {
   status: 'approved' | 'pending' | 'rejected'
 }
 
+export interface AdminInventory {
+  id: string
+  productName: string
+  stock: number
+  lowStockAlert: number
+}
+
 export interface DashboardSummary {
   counts: {
     products: number; orders: number; users: number;
@@ -94,6 +101,7 @@ interface CatalogStore {
   banners: AdminBanner[]
   blogs: AdminBlog[]
   reviews: AdminReview[]
+  inventory: AdminInventory[]
   orders: AdminOrder[]
   users: AdminUser[]
   subscribers: AdminSubscriber[]
@@ -151,6 +159,11 @@ interface CatalogStore {
   updateReview: (id: string, patch: Partial<AdminReview>) => Promise<void>
   deleteReview: (id: string) => Promise<void>
 
+  loadInventory: () => Promise<void>
+  addInventory: (inventory: Partial<AdminInventory>) => Promise<void>
+  updateInventory: (id: string, patch: Partial<AdminInventory>) => Promise<void>
+  deleteInventory: (id: string) => Promise<void>
+
   resetCatalog: () => Promise<void>
 }
 
@@ -162,6 +175,7 @@ export const useCatalogStore = create<CatalogStore>()((set, get) => ({
   banners: [],
   blogs: [],
   reviews: [],
+  inventory: [],
   orders: [],
   users: [],
   subscribers: [],
@@ -372,6 +386,23 @@ export const useCatalogStore = create<CatalogStore>()((set, get) => ({
   deleteReview: async (id) => {
     await adminFetch(`/api/admin/reviews/${id}`, { method: 'DELETE' })
     await get().loadReviews()
+  },
+
+  loadInventory: async () => {
+    const data = await adminFetch<{ inventory: AdminInventory[] }>('/api/admin/inventory')
+    set({ inventory: data.inventory })
+  },
+  addInventory: async (inventory) => {
+    await adminFetch('/api/admin/inventory', { method: 'POST', body: JSON.stringify(inventory) })
+    await get().loadInventory()
+  },
+  updateInventory: async (id, patch) => {
+    await adminFetch(`/api/admin/inventory/${id}`, { method: 'PATCH', body: JSON.stringify(patch) })
+    await get().loadInventory()
+  },
+  deleteInventory: async (id) => {
+    await adminFetch(`/api/admin/inventory/${id}`, { method: 'DELETE' })
+    await get().loadInventory()
   },
 
   resetCatalog: async () => {

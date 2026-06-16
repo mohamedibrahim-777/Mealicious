@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { useAppStore } from '@/lib/store'
-import { useCatalogStore, type AdminOrder, type AdminUser, type AdminCategory, type AdminCoupon, type AdminBanner, type AdminBlog, type AdminReview } from '@/lib/catalog-store'
+import { useCatalogStore, type AdminOrder, type AdminUser, type AdminCategory, type AdminCoupon, type AdminBanner, type AdminBlog, type AdminReview, type AdminInventory } from '@/lib/catalog-store'
 import type { Product } from '@/lib/data'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -64,6 +64,7 @@ export default function AdminPanel() {
     banners,
     blogs,
     reviews,
+    inventory,
     orders,
     users,
     addProduct,
@@ -89,6 +90,10 @@ export default function AdminPanel() {
     addReview,
     updateReview,
     deleteReview,
+    loadInventory,
+    addInventory,
+    updateInventory,
+    deleteInventory,
     updateOrderStatus,
     updateOrder,
     deleteOrder,
@@ -102,10 +107,10 @@ export default function AdminPanel() {
   useEffect(() => {
     if (user?.role === 'admin') {
       loadAll()
-        .then(() => Promise.all([loadCategories(), loadCoupons(), loadBanners(), loadBlogs(), loadReviews()]))
+        .then(() => Promise.all([loadCategories(), loadCoupons(), loadBanners(), loadBlogs(), loadReviews(), loadInventory()]))
         .catch((e) => toast.error(`Failed to load admin data: ${e.message}`))
     }
-  }, [user?.role, loadAll, loadCategories, loadCoupons, loadBanners, loadBlogs, loadReviews])
+  }, [user?.role, loadAll, loadCategories, loadCoupons, loadBanners, loadBlogs, loadReviews, loadInventory])
 
   const [tab, setTab] = useState<Tab>('overview')
   const [search, setSearch] = useState('')
@@ -124,6 +129,8 @@ export default function AdminPanel() {
   const [creatingBlog, setCreatingBlog] = useState(false)
   const [editingReview, setEditingReview] = useState<AdminReview | null>(null)
   const [creatingReview, setCreatingReview] = useState(false)
+  const [editingInventory, setEditingInventory] = useState<AdminInventory | null>(null)
+  const [creatingInventory, setCreatingInventory] = useState(false)
 
   const stats = useMemo(() => {
     const totalStock = products.reduce((s, p) => s + p.stock, 0)
@@ -896,9 +903,75 @@ export default function AdminPanel() {
         {tab === 'inventory' && (
           <Card>
             <CardContent className="p-5">
-              <h3 className="font-semibold mb-3">Inventory Management</h3>
-              <div className="space-y-2">
-                <p className="text-sm text-gray-500">Stock levels and inventory data will appear here</p>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold">Inventory ({inventory.length})</h3>
+                <Button onClick={() => setCreatingInventory(true)} className="bg-orange-400 hover:bg-orange-500" size="sm">
+                  <Plus className="h-4 w-4 mr-1" /> Add Item
+                </Button>
+              </div>
+              <Separator className="mb-4" />
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="text-left text-gray-500 border-b">
+                      <th className="py-2 px-2">Product</th>
+                      <th className="py-2 px-2">Stock</th>
+                      <th className="py-2 px-2">Low Stock Alert</th>
+                      <th className="py-2 px-2 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {inventory.map((item) => (
+                      <tr key={item.id} className="border-b last:border-0 hover:bg-orange-50/40">
+                        <td className="py-2 px-2 font-medium">{item.productName}</td>
+                        <td className="py-2 px-2">
+                          <Badge
+                            variant="outline"
+                            className={
+                              item.stock < item.lowStockAlert
+                                ? 'text-orange-500 border-orange-300'
+                                : 'text-green-600 border-green-300'
+                            }
+                          >
+                            {item.stock}
+                          </Badge>
+                        </td>
+                        <td className="py-2 px-2">{item.lowStockAlert}</td>
+                        <td className="py-2 px-2 text-right space-x-1">
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            onClick={() => setEditingInventory(item)}
+                            title="Edit"
+                          >
+                            <Pencil className="h-4 w-4 text-blue-500" />
+                          </Button>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            onClick={() => {
+                              if (confirm(`Delete inventory for "${item.productName}"?`)) {
+                                deleteInventory(item.id)
+                                  .then(() => toast.success('Inventory item deleted'))
+                                  .catch((e) => toast.error(e.message))
+                              }
+                            }}
+                            title="Delete"
+                          >
+                            <Trash2 className="h-4 w-4 text-red-500" />
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                    {inventory.length === 0 && (
+                      <tr>
+                        <td colSpan={4} className="py-8 text-center text-gray-500">
+                          No inventory items yet
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
               </div>
             </CardContent>
           </Card>
@@ -1075,6 +1148,28 @@ export default function AdminPanel() {
           }
           setCreatingReview(false)
           setEditingReview(null)
+        }}
+      />
+
+      <InventoryDialog
+        open={creatingInventory || editingInventory !== null}
+        inventory={editingInventory}
+        onClose={() => {
+          setCreatingInventory(false)
+          setEditingInventory(null)
+        }}
+        onSubmit={(data) => {
+          if (editingInventory) {
+            updateInventory(editingInventory.id, data)
+              .then(() => toast.success('Inventory updated'))
+              .catch((e) => toast.error(e.message))
+          } else {
+            addInventory(data)
+              .then(() => toast.success('Inventory created'))
+              .catch((e) => toast.error(e.message))
+          }
+          setCreatingInventory(false)
+          setEditingInventory(null)
         }}
       />
     </div>
@@ -1940,6 +2035,83 @@ function ReviewDialog({
             </Button>
             <Button type="submit" className="bg-orange-400 hover:bg-orange-500">
               {review ? 'Save changes' : 'Create review'}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+function InventoryDialog({
+  open,
+  inventory,
+  onClose,
+  onSubmit,
+}: {
+  open: boolean
+  inventory: AdminInventory | null
+  onClose: () => void
+  onSubmit: (data: Partial<AdminInventory>) => void
+}) {
+  const [form, setForm] = useState<Partial<AdminInventory>>(inventory ?? { productName: '', stock: 0, lowStockAlert: 10 })
+
+  useEffect(() => {
+    setForm(inventory ?? { productName: '', stock: 0, lowStockAlert: 10 })
+  }, [inventory?.id, open])
+
+  const handle = (key: keyof AdminInventory, value: unknown) =>
+    setForm((f) => ({ ...f, [key]: value }))
+
+  return (
+    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="sm:max-w-lg">
+        <DialogHeader>
+          <DialogTitle>{inventory ? 'Edit inventory' : 'New inventory'}</DialogTitle>
+          <DialogDescription>
+            {inventory ? 'Update inventory details.' : 'Add new inventory item.'}
+          </DialogDescription>
+        </DialogHeader>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault()
+            onSubmit(form)
+          }}
+          className="space-y-3"
+        >
+          <div>
+            <Label className="mb-1.5 block">Product Name</Label>
+            <Input
+              value={form.productName ?? ''}
+              onChange={(e) => handle('productName', e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <Label className="mb-1.5 block">Stock</Label>
+            <Input
+              type="number"
+              min="0"
+              value={form.stock ?? 0}
+              onChange={(e) => handle('stock', Number(e.target.value))}
+              required
+            />
+          </div>
+          <div>
+            <Label className="mb-1.5 block">Low Stock Alert</Label>
+            <Input
+              type="number"
+              min="0"
+              value={form.lowStockAlert ?? 10}
+              onChange={(e) => handle('lowStockAlert', Number(e.target.value))}
+            />
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button type="submit" className="bg-orange-400 hover:bg-orange-500">
+              {inventory ? 'Save changes' : 'Create inventory'}
             </Button>
           </DialogFooter>
         </form>
