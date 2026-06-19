@@ -1307,9 +1307,6 @@ function ProductDialog({
       <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{product ? 'Edit product' : 'New product'}</DialogTitle>
-          <DialogDescription>
-            {product ? 'Update product details.' : 'Add a new product to the catalog.'}
-          </DialogDescription>
         </DialogHeader>
         <form
           onSubmit={(e) => {
@@ -1680,9 +1677,6 @@ function CategoryDialog({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>{category ? 'Edit category' : 'New category'}</DialogTitle>
-          <DialogDescription>
-            {category ? 'Update category details.' : 'Add a new category.'}
-          </DialogDescription>
         </DialogHeader>
         <form
           onSubmit={(e) => {
@@ -1745,9 +1739,6 @@ function CouponDialog({
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>{coupon ? 'Edit coupon' : 'New coupon'}</DialogTitle>
-          <DialogDescription>
-            {coupon ? 'Update coupon details.' : 'Add a new coupon.'}
-          </DialogDescription>
         </DialogHeader>
         <form
           onSubmit={(e) => {
@@ -1828,9 +1819,6 @@ function BannerDialog({
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>{banner ? 'Edit banner' : 'New banner'}</DialogTitle>
-          <DialogDescription>
-            {banner ? 'Update banner details.' : 'Add a new banner.'}
-          </DialogDescription>
         </DialogHeader>
         <form
           onSubmit={(e) => {
@@ -1904,9 +1892,6 @@ function BlogDialog({
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>{blog ? 'Edit blog post' : 'New blog post'}</DialogTitle>
-          <DialogDescription>
-            {blog ? 'Update blog post details.' : 'Add a new blog post.'}
-          </DialogDescription>
         </DialogHeader>
         <form
           onSubmit={(e) => {
@@ -1983,9 +1968,6 @@ function ReviewDialog({
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>{review ? 'Edit review' : 'New review'}</DialogTitle>
-          <DialogDescription>
-            {review ? 'Update review details.' : 'Add a new review.'}
-          </DialogDescription>
         </DialogHeader>
         <form
           onSubmit={(e) => {
@@ -2073,9 +2055,6 @@ function InventoryDialog({
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>{inventory ? 'Edit inventory' : 'New inventory'}</DialogTitle>
-          <DialogDescription>
-            {inventory ? 'Update inventory details.' : 'Add new inventory item.'}
-          </DialogDescription>
         </DialogHeader>
         <form
           onSubmit={(e) => {
