@@ -28,6 +28,15 @@ export async function adminFetch<T = unknown>(
 ): Promise<T> {
   const headers = new Headers(init.headers)
   const auth = await getAuthHeaders()
+  const user = useAppStore.getState().user
+  console.log('[adminFetch] Diagnostic:', {
+    path,
+    userLoggedIn: !!user,
+    userRole: user?.role,
+    userEmail: user?.email,
+    authHeaders: Object.keys(auth),
+    willSendStubHeader: 'X-Admin-Stub' in auth,
+  })
   for (const [k, v] of Object.entries(auth)) headers.set(k, v)
   if (init.body && !headers.has('Content-Type')) headers.set('Content-Type', 'application/json')
   const res = await fetch(path, { ...init, headers })

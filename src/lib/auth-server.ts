@@ -41,6 +41,15 @@ export async function verifyFirebaseToken(authHeader: string | null): Promise<Au
 }
 
 export async function requireAdmin(req: Request) {
+  // Try admin-session cookie first (most reliable for browser requests)
+  const nextReq = req instanceof NextRequest ? req : new NextRequest(req)
+  const session = await getSessionFromRequest(nextReq as NextRequest)
+  if (session && ADMIN_EMAILS.includes(session.email.toLowerCase())) {
+    return {
+      user: { uid: 'session-admin', email: session.email, isAdmin: true } as AuthUser,
+      error: null as NextResponse | null,
+    }
+  }
   // Stub-admin bypass: testing only, gated by ALLOW_STUB_ADMIN env flag
   if (process.env.ALLOW_STUB_ADMIN === '1') {
     const stub = req.headers.get('x-admin-stub')
@@ -54,6 +63,7 @@ export async function requireAdmin(req: Request) {
       }
     }
   }
+  // Firebase token fallback
   const user = await verifyFirebaseToken(req.headers.get('authorization'))
   if (!user) return { user: null, error: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) }
   if (!user.isAdmin) return { user, error: NextResponse.json({ error: 'Forbidden' }, { status: 403 }) }
