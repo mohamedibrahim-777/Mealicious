@@ -25,6 +25,7 @@ import { Separator } from '@/components/ui/separator'
 import { useAppStore } from '@/lib/store'
 import { useCatalogStore } from '@/lib/catalog-store'
 import ProductCard from '@/components/mealicious/ProductCard'
+import { ShippingBox } from '@/components/mealicious/ShippingBox'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
@@ -512,8 +513,15 @@ export default function ProductDetail() {
             </div>
           </div>
 
+          {/* Shipping Details */}
+          <ShippingBox
+            productPrice={product.price || 0}
+            productWeight={0.5}
+            declaredValue={product.price || 500}
+          />
+
           {/* SKU */}
-          <p className="text-xs text-muted-foreground mt-2">
+          <p className="text-xs text-muted-foreground mt-4">
             SKU: <span className="font-mono font-medium">{product.sku}</span>
           </p>
         </motion.div>
