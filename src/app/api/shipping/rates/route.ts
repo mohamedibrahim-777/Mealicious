@@ -38,7 +38,12 @@ export async function POST(req: NextRequest) {
       })).sort((a, b) => a.rate - b.rate),
     })
   } catch (e: unknown) {
-    const msg = e instanceof Error ? e.message : 'Failed'
-    return NextResponse.json({ error: msg, rates: [] }, { status: 500 })
+    const msg = e instanceof Error ? e.message : 'Failed to fetch rates'
+    console.error('Shipping rates error:', msg)
+    // Graceful fallback on any API error
+    return NextResponse.json({
+      rates: [],
+      fallback: { rate: declaredValue >= 599 ? 0 : 49, label: 'Standard Delivery' },
+    })
   }
 }

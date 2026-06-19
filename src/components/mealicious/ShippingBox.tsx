@@ -64,15 +64,14 @@ export function ShippingBox({ productPrice, productWeight = 0.5, declaredValue =
         toast.success('Shipping rates calculated')
       } else if (data.fallback) {
         setFallbackRate(data.fallback)
-        toast.success('Using standard shipping rate')
+        toast.info('Using standard shipping rate')
       } else {
         setError('No shipping options available for this area')
       }
     } catch (e) {
-      setError('Network error - using standard rate')
-      // Use demo fallback
       const shippingCost = productPrice >= 599 ? 0 : 49
       setFallbackRate({ rate: shippingCost, label: 'Standard Delivery' })
+      toast.info('Using standard shipping rate')
     } finally {
       setLoading(false)
     }
@@ -163,7 +162,7 @@ export function ShippingBox({ productPrice, productWeight = 0.5, declaredValue =
         <div className="bg-white border border-gray-200 rounded p-3 text-sm">
           <p className="flex items-center gap-2 text-gray-700">
             <MapPin className="h-4 w-4 text-orange-400" />
-            Ships from Chennai, India
+            Ships from Salem, India
           </p>
         </div>
       </div>
