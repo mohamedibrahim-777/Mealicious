@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Truck, MapPin, Calendar, AlertCircle } from 'lucide-react'
+import { Truck, MapPin, Calendar } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
@@ -107,17 +107,6 @@ export function ShippingBox({ productPrice, productWeight = 0.5, declaredValue =
             {loading ? 'Calculating...' : 'Check'}
           </Button>
         </div>
-
-        {/* Demo Rate Info */}
-        {!pincode && (
-          <div className="bg-blue-100 border border-blue-300 rounded p-3 text-sm text-blue-800 flex items-start gap-2">
-            <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
-            <div>
-              <p className="font-medium">Demo Rates:</p>
-              <p>Free on orders ≥₹599, else ₹49 • Delivery in 3-5 days</p>
-            </div>
-          </div>
-        )}
 
         {/* Error Message */}
         {error && (
