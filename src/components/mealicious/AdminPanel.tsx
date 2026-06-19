@@ -1314,6 +1314,10 @@ function ProductDialog({
         <form
           onSubmit={(e) => {
             e.preventDefault()
+            if (!form.category || !form.name) {
+              alert('Name and Category are required')
+              return
+            }
             onSubmit(form)
           }}
           className="space-y-3"
@@ -1373,7 +1377,7 @@ function ProductDialog({
               <Input value={form.sku ?? ''} onChange={(e) => handle('sku', e.target.value)} />
             </div>
             <div>
-              <Label className="mb-1.5 block">Category</Label>
+              <Label className="mb-1.5 block">Category *</Label>
               <Select
                 value={form.category ?? ''}
                 onValueChange={(v) => {
@@ -1381,8 +1385,8 @@ function ProductDialog({
                   handle('categorySlug', v.toLowerCase().replace(/\s+/g, '-'))
                 }}
               >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select" />
+                <SelectTrigger className={!form.category ? 'border-red-500' : ''}>
+                  <SelectValue placeholder="Select category" />
                 </SelectTrigger>
                 <SelectContent>
                   {categories.map((c) => (
@@ -1392,6 +1396,7 @@ function ProductDialog({
                   ))}
                 </SelectContent>
               </Select>
+              {!form.category && <p className="text-red-500 text-xs mt-1">Category is required</p>}
             </div>
             <div>
               <Label className="mb-1.5 block">Rating</Label>
