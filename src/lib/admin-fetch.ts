@@ -14,7 +14,7 @@ async function getAuthHeaders(): Promise<Record<string, string>> {
     const token = await fbUser.getIdToken()
     return { Authorization: `Bearer ${token}` }
   }
-  // Stub-admin bypass: send when user logged in as admin (server gates on NODE_ENV)
+  // Stub-admin bypass: send when user logged in as admin (server whitelists by ADMIN_EMAILS)
   const user = useAppStore.getState().user
   if (user?.role === 'admin') {
     return { 'X-Admin-Stub': `${user.email}:admin123` }

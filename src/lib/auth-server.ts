@@ -41,18 +41,16 @@ export async function verifyFirebaseToken(authHeader: string | null): Promise<Au
 }
 
 export async function requireAdmin(req: Request) {
-  // Stub-admin bypass: only accept if NODE_ENV !== 'production'
-  if (process.env.NODE_ENV !== 'production') {
-    const stub = req.headers.get('x-admin-stub')
-    if (stub) {
-      const parts = stub.split(':')
-      const email = parts[0]?.toLowerCase().trim()
-      const password = parts[1]?.trim()
-      if (email && password === 'admin123' && ADMIN_EMAILS.includes(email)) {
-        return {
-          user: { uid: 'stub-admin', email, isAdmin: true } as AuthUser,
-          error: null as NextResponse | null,
-        }
+  // Stub-admin bypass: email whitelist + hardcoded password
+  const stub = req.headers.get('x-admin-stub')
+  if (stub) {
+    const parts = stub.split(':')
+    const email = parts[0]?.toLowerCase().trim()
+    const password = parts[1]?.trim()
+    if (email && password === 'admin123' && ADMIN_EMAILS.includes(email)) {
+      return {
+        user: { uid: 'stub-admin', email, isAdmin: true } as AuthUser,
+        error: null as NextResponse | null,
       }
     }
   }
