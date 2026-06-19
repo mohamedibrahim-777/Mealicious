@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
-import { requireAdminSession } from '@/lib/auth-server'
+import { requireAdmin } from '@/lib/auth-server'
 import { renderToBuffer } from '@react-pdf/renderer'
 import { GstInvoiceDoc } from '@/components/admin/GstInvoice'
 import { createElement } from 'react'
@@ -13,7 +13,7 @@ const SELLER_NAME = process.env.SELLER_NAME || 'Mealicious Store'
 const SELLER_ADDRESS = process.env.SELLER_ADDRESS || 'India'
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ orderId: string }> }) {
-  const { error } = await requireAdminSession(req)
+  const { error } = await requireAdmin(req)
   if (error) return error
 
   const { orderId } = await params

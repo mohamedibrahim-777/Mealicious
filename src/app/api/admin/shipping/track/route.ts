@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { requireAdminSession } from '@/lib/auth-server'
+import { requireAdmin } from '@/lib/auth-server'
 import { getShipmentTracking } from '@/lib/shiprocket'
 import { db } from '@/lib/db'
 
 export async function GET(req: NextRequest) {
-  const { error } = await requireAdminSession(req)
+  const { error } = await requireAdmin(req)
   if (error) return error
 
   const awb = new URL(req.url).searchParams.get('awb')

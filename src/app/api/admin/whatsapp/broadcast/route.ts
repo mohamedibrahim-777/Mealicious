@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
-import { requireAdminSession } from '@/lib/auth-server'
+import { requireAdmin } from '@/lib/auth-server'
 import { sendPromotion, isConfigured } from '@/lib/whatsapp'
 
 // Broadcast a promotional message to a customer segment
 export async function POST(req: NextRequest) {
-  const { error } = await requireAdminSession(req)
+  const { error } = await requireAdmin(req)
   if (error) return error
 
   const { message, couponCode, segment = 'all' } = await req.json()

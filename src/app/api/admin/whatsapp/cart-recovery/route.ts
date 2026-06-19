@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
-import { requireAdminSession } from '@/lib/auth-server'
+import { requireAdmin } from '@/lib/auth-server'
 import { sendCartRecovery, isConfigured } from '@/lib/whatsapp'
 
 // GET — list abandoned carts (not recovered, reminder not sent)
 export async function GET(req: NextRequest) {
-  const { error } = await requireAdminSession(req)
+  const { error } = await requireAdmin(req)
   if (error) return error
 
   const carts = await db.abandonedCart.findMany({
@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
 
 // POST — send recovery messages to all (or one) abandoned cart(s)
 export async function POST(req: NextRequest) {
-  const { error } = await requireAdminSession(req)
+  const { error } = await requireAdmin(req)
   if (error) return error
 
   if (!isConfigured()) {

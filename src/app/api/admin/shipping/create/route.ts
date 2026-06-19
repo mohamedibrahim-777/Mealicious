@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
-import { requireAdminSession } from '@/lib/auth-server'
+import { requireAdmin } from '@/lib/auth-server'
 import { createShiprocketOrder, assignAWB, generateLabel } from '@/lib/shiprocket'
 import { notifyOrderShipped } from '@/lib/whatsapp'
 import { format } from 'date-fns'
 
 export async function POST(req: NextRequest) {
-  const { error } = await requireAdminSession(req)
+  const { error } = await requireAdmin(req)
   if (error) return error
 
   const { orderNumber, courierId, weight = 0.5, length = 15, breadth = 12, height = 10 } = await req.json()
