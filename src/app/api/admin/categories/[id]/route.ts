@@ -2,6 +2,18 @@ import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { requireAdmin } from '@/lib/auth-server'
 
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { error } = await requireAdmin(req)
+  if (error) return error
+  const { id } = await params
+  const category = await db.category.findUnique({
+    where: { id },
+    include: { children: true, parent: true },
+  })
+  if (!category) return NextResponse.json({ error: 'Category not found' }, { status: 404 })
+  return NextResponse.json({ category })
+}
+
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { error } = await requireAdmin(req)
   if (error) return error
