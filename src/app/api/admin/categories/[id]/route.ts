@@ -26,6 +26,13 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
   const { error } = await requireAdmin(req)
   if (error) return error
   const { id } = await params
-  await db.category.delete({ where: { id } })
-  return NextResponse.json({ ok: true })
+  try {
+    await db.category.delete({ where: { id } })
+    return NextResponse.json({ ok: true })
+  } catch (e) {
+    const msg = (e as { code?: string }).code === 'P2014'
+      ? 'Cannot delete category with products. Remove products first.'
+      : 'Failed to delete category'
+    return NextResponse.json({ error: msg }, { status: 400 })
+  }
 }
