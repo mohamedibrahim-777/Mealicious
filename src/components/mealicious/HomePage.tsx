@@ -180,8 +180,8 @@ export default function HomePage() {
   const hasBanners = banners.length > 0
   const activeBanner = hasBanners ? banners[currentBannerIndex] : null
 
-  const heroTitle = activeBanner ? activeBanner.title : 'Premium Dry Fruits & Healthy Snacks'
-  const heroSubtitle = activeBanner ? activeBanner.subtitle : "Experience nature's premium harvest. Indulge in clean, nutrient-dense snacking sourced from elite farms."
+  const heroTitle = (activeBanner && typeof activeBanner.title === 'string') ? activeBanner.title.trim() : 'Premium Dry Fruits & Healthy Snacks'
+  const heroSubtitle = (activeBanner && typeof activeBanner.subtitle === 'string') ? activeBanner.subtitle : "Experience nature's premium harvest. Indulge in clean, nutrient-dense snacking sourced from elite farms."
   const heroLink = activeBanner ? activeBanner.link : null
 
   const handleBannerClick = () => {
@@ -358,15 +358,15 @@ export default function HomePage() {
                   {banners.length > 1 && (
                     <>
                       <button
-                        onClick={prevSlide}
-                        className="absolute left-4 top-1/2 -translate-y-1/2 z-20 h-10 w-10 flex items-center justify-center rounded-full bg-stone-950/60 hover:bg-stone-950/80 text-white backdrop-blur-sm border border-white/10 hover:border-white/20 transition-all opacity-0 group-hover:opacity-100"
+                        onClick={(e) => { e.stopPropagation(); prevSlide(); }}
+                        className="absolute left-4 top-1/2 -translate-y-1/2 z-20 h-10 w-10 flex items-center justify-center rounded-full bg-stone-950/60 hover:bg-stone-950/80 text-white backdrop-blur-sm border border-white/10 hover:border-white/20 transition-all opacity-100 lg:opacity-0 lg:group-hover:opacity-100"
                         aria-label="Previous slide"
                       >
                         <ChevronLeft className="h-6 w-6 text-white" />
                       </button>
                       <button
-                        onClick={nextSlide}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 z-20 h-10 w-10 flex items-center justify-center rounded-full bg-stone-950/60 hover:bg-stone-950/80 text-white backdrop-blur-sm border border-white/10 hover:border-white/20 transition-all opacity-0 group-hover:opacity-100"
+                        onClick={(e) => { e.stopPropagation(); nextSlide(); }}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 z-20 h-10 w-10 flex items-center justify-center rounded-full bg-stone-950/60 hover:bg-stone-950/80 text-white backdrop-blur-sm border border-white/10 hover:border-white/20 transition-all opacity-100 lg:opacity-0 lg:group-hover:opacity-100"
                         aria-label="Next slide"
                       >
                         <ChevronRight className="h-6 w-6 text-white" />
