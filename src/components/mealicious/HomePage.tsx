@@ -149,7 +149,7 @@ export default function HomePage() {
   const [currentBannerIndex, setCurrentBannerIndex] = useState(0)
 
   useEffect(() => {
-    fetch('/api/banners')
+    fetch('/api/banners?t=' + Date.now())
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data.banners) && data.banners.length > 0) {
