@@ -9,7 +9,7 @@ import { Switch } from '@/components/ui/switch'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { toast } from 'sonner'
-import { Plus, Trash2 } from 'lucide-react'
+import { adminFetch } from '@/lib/admin-fetch'
 
 interface Category { id: string; name: string; slug: string }
 
@@ -57,7 +57,16 @@ const EMPTY: ProductData = {
 }
 
 export function ProductForm({ open, onClose, onSaved, categories, initial }: Props) {
-  const [form, setForm] = useState<ProductData>(() => ({ ...EMPTY, ...initial }))
+  const [form, setForm] = useState<ProductData>(() => {
+    const base = { ...EMPTY, ...initial }
+    if (Array.isArray(base.images)) {
+      base.images = base.images.join(', ')
+    }
+    if (Array.isArray(base.tags)) {
+      base.tags = base.tags.join(', ')
+    }
+    return base as unknown as ProductData
+  })
   const [saving, setSaving] = useState(false)
 
   const [weightOptions, setWeightOptions] = useState<WeightOption[]>(() => {
@@ -157,21 +166,28 @@ export function ProductForm({ open, onClose, onSaved, categories, initial }: Pro
         })
       }
 
+      const imagesVal = typeof form.images === 'string'
+        ? form.images.split(',').map(s => s.trim()).filter(Boolean)
+        : (Array.isArray(form.images) ? form.images : [])
+
+      const tagsVal = typeof form.tags === 'string'
+        ? form.tags.split(',').map(s => s.trim()).filter(Boolean)
+        : (Array.isArray(form.tags) ? form.tags : [])
+
       const payload = {
         ...form,
         price: Number(form.price),
         salePrice: form.salePrice ? Number(form.salePrice) : null,
         stock: Number(form.stock),
         lowStock: Number(form.lowStock),
-        images: form.images.split(',').map(s => s.trim()).filter(Boolean),
-        tags: form.tags.split(',').map(s => s.trim()).filter(Boolean),
+        images: imagesVal,
+        tags: tagsVal,
         variants: finalVariants,
       }
 
       const url = isEdit ? `/api/admin/products/${form.id}` : '/api/admin/products'
       const method = isEdit ? 'PATCH' : 'POST'
-      const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
-      if (!res.ok) { const d = await res.json(); throw new Error(d.error || 'Failed') }
+      await adminFetch(url, { method, body: JSON.stringify(payload) })
       toast.success(isEdit ? 'Product updated' : 'Product created')
       onSaved()
       onClose()

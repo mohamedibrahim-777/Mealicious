@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { toast } from 'sonner'
 import { Search, Eye, FileText, Truck, ExternalLink } from 'lucide-react'
 import { Label } from '@/components/ui/label'
+import { adminFetch } from '@/lib/admin-fetch'
 
 const STATUSES = ['all', 'pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled']
 const STATUS_COLORS: Record<string, string> = {
@@ -53,28 +54,30 @@ export function OrdersClient({ orders }: { orders: Order[] }) {
     if (!shipOrder) return
     setShipping(true)
     try {
-      const res = await fetch('/api/admin/shipping/create', {
+      const data = await adminFetch<{ awb: string; courierName: string; labelUrl?: string; trackingUrl?: string }>('/api/admin/shipping/create', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ orderNumber: shipOrder.orderNumber, weight: Number(shipWeight) }),
       })
-      const data = await res.json()
-      if (!res.ok) { toast.error(data.error || 'Shipment creation failed'); return }
       setShipResult({ awb: data.awb, courierName: data.courierName, labelUrl: data.labelUrl, trackingUrl: data.trackingUrl })
       toast.success(`Shipment created! AWB: ${data.awb}`)
       startTransition(() => router.refresh())
-    } catch { toast.error('Network error') }
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : 'Shipment creation failed')
+    }
     finally { setShipping(false) }
   }
 
   async function updateStatus(id: string, status: string) {
-    const res = await fetch(`/api/admin/orders/${id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status }),
-    })
-    if (res.ok) { toast.success('Status updated'); startTransition(() => router.refresh()) }
-    else toast.error('Failed')
+    try {
+      await adminFetch(`/api/admin/orders/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ status }),
+      })
+      toast.success('Status updated')
+      startTransition(() => router.refresh())
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : 'Failed')
+    }
   }
 
   return (

@@ -12,6 +12,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { toast } from 'sonner'
 import { Plus, Pencil, Trash2, ChevronRight } from 'lucide-react'
 
+import { adminFetch } from '@/lib/admin-fetch'
+
 interface Category {
   id: string; name: string; slug: string; image: string; icon: string
   featured: boolean; sortOrder: number; parentId: string | null; parentName?: string
@@ -52,8 +54,7 @@ export function CategoriesClient({ categories }: { categories: Category[] }) {
     try {
       const payload = { ...form, parentId: form.parentId || null, sortOrder: Number(form.sortOrder) }
       const url = editing ? `/api/admin/categories/${editing}` : '/api/admin/categories'
-      const res = await fetch(url, { method: editing ? 'PATCH' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
-      if (!res.ok) throw new Error((await res.json()).error || 'Failed')
+      await adminFetch(url, { method: editing ? 'PATCH' : 'POST', body: JSON.stringify(payload) })
       toast.success(editing ? 'Updated' : 'Created')
       setOpen(false); startTransition(() => router.refresh())
     } catch (e: unknown) { toast.error(e instanceof Error ? e.message : 'Error') }
@@ -63,9 +64,13 @@ export function CategoriesClient({ categories }: { categories: Category[] }) {
   async function handleDelete(id: string, name: string, childCount: number) {
     if (childCount > 0) { toast.error('Remove subcategories first'); return }
     if (!confirm(`Delete "${name}"?`)) return
-    const res = await fetch(`/api/admin/categories/${id}`, { method: 'DELETE' })
-    if (res.ok) { toast.success('Deleted'); startTransition(() => router.refresh()) }
-    else toast.error('Failed — category may have products')
+    try {
+      await adminFetch(`/api/admin/categories/${id}`, { method: 'DELETE' })
+      toast.success('Deleted')
+      startTransition(() => router.refresh())
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : 'Failed — category may have products')
+    }
   }
 
   const parentCategories = categories.filter(c => !c.parentId)

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import crypto from 'crypto'
 import { db } from '@/lib/db'
+import { notifyOrderConfirmed } from '@/lib/whatsapp'
 
 // Cashfree PG v3 webhook signature:
 //   HMAC-SHA256(timestamp + rawBody, SECRET_KEY) -> base64
@@ -69,10 +70,59 @@ export async function POST(req: NextRequest) {
   }
 
   if (nextStatus && dbOrder.paymentStatus !== nextStatus) {
-    await db.order.update({
-      where: { id: dbOrder.id },
-      data: { paymentStatus: nextStatus },
-    })
+    if (nextStatus === 'paid') {
+      await db.$transaction(async (tx) => {
+        await tx.order.update({
+          where: { id: dbOrder.id },
+          data: {
+            paymentStatus: 'paid',
+            status: 'confirmed'
+          },
+        })
+
+        const items = await tx.orderItem.findMany({
+          where: { orderId: dbOrder.id }
+        })
+
+        for (const item of items) {
+          await tx.product.update({
+            where: { id: item.productId },
+            data: {
+              stock: {
+                decrement: item.quantity
+              }
+            }
+          })
+        }
+      })
+
+      // Get the order with items and user details for notification
+      const fullOrder = await db.order.findUnique({
+        where: { id: dbOrder.id },
+        include: { user: true, items: true }
+      })
+
+      if (fullOrder) {
+        let addr: Record<string, string> = {}
+        try { addr = JSON.parse(fullOrder.shippingAddr) } catch {}
+        const waPhone = fullOrder.user?.phone || addr.phone
+        if (waPhone) {
+          const itemsSummary = fullOrder.items.map(i => `${i.quantity}× ${i.name}`).join(', ')
+          notifyOrderConfirmed(waPhone, {
+            customerName: fullOrder.user?.name || addr.fullName || 'Customer',
+            orderNumber: fullOrder.orderNumber,
+            items: itemsSummary,
+            total: fullOrder.total,
+            paymentMethod: 'Online Payment',
+          }).catch(() => {})
+        }
+      }
+    } else {
+      await db.order.update({
+        where: { id: dbOrder.id },
+        data: { paymentStatus: nextStatus },
+      })
+    }
   }
 
   return NextResponse.json({ ok: true, status: nextStatus ?? 'ignored' })

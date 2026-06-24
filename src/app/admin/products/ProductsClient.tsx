@@ -9,6 +9,8 @@ import { ProductForm } from '@/components/admin/ProductForm'
 import { toast } from 'sonner'
 import { Plus, Pencil, Trash2, Search } from 'lucide-react'
 
+import { adminFetch } from '@/lib/admin-fetch'
+
 interface Product {
   id: string; name: string; slug: string; description: string; shortDesc: string
   price: number; salePrice: number | null; images: string; categorySlug: string
@@ -31,9 +33,13 @@ export function ProductsClient({ products, categories }: { products: Product[]; 
 
   async function handleDelete(id: string, name: string) {
     if (!confirm(`Delete "${name}"?`)) return
-    const res = await fetch(`/api/admin/products/${id}`, { method: 'DELETE' })
-    if (res.ok) { toast.success('Deleted'); startTransition(() => router.refresh()) }
-    else toast.error('Failed to delete')
+    try {
+      await adminFetch(`/api/admin/products/${id}`, { method: 'DELETE' })
+      toast.success('Deleted')
+      startTransition(() => router.refresh())
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : 'Failed to delete')
+    }
   }
 
   function openNew() { setEditing(undefined); setFormOpen(true) }

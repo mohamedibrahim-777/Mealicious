@@ -7,6 +7,8 @@ import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Eye } from 'lucide-react'
 
+import { adminFetch } from '@/lib/admin-fetch'
+
 interface Message { id: string; name: string; email: string; phone: string; subject: string; message: string; isRead: boolean; date: string }
 
 export function MessagesClient({ messages }: { messages: Message[] }) {
@@ -15,8 +17,10 @@ export function MessagesClient({ messages }: { messages: Message[] }) {
   const [viewing, setViewing] = useState<Message | null>(null)
 
   async function markRead(id: string) {
-    await fetch(`/api/admin/messages/${id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ isRead: true }) })
-    startTransition(() => router.refresh())
+    try {
+      await adminFetch(`/api/admin/messages/${id}`, { method: 'PATCH', body: JSON.stringify({ isRead: true }) })
+      startTransition(() => router.refresh())
+    } catch {}
   }
 
   function viewMessage(m: Message) {

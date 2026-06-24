@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { toast } from 'sonner'
 import { Save, ArrowLeft } from 'lucide-react'
-import Link from 'next/link'
+import { adminFetch } from '@/lib/admin-fetch'
 
 interface PostForm {
   title: string; slug: string; excerpt: string; content: string
@@ -37,8 +37,7 @@ export function BlogEditor({ id, initial }: { id: string | null; initial?: Parti
     try {
       const payload = { ...form, tags: form.tags.split(',').map(t => t.trim()).filter(Boolean) }
       const url = id ? `/api/admin/blogs/${id}` : '/api/admin/blogs'
-      const res = await fetch(url, { method: id ? 'PATCH' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
-      if (!res.ok) throw new Error((await res.json()).error || 'Failed')
+      await adminFetch(url, { method: id ? 'PATCH' : 'POST', body: JSON.stringify(payload) })
       toast.success(id ? 'Post updated' : 'Post created')
       router.push('/admin/blog')
     } catch (e: unknown) { toast.error(e instanceof Error ? e.message : 'Error') }

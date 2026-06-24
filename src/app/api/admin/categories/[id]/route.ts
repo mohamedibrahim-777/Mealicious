@@ -39,12 +39,38 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
   if (error) return error
   const { id } = await params
   try {
+    const cat = await db.category.findUnique({ where: { id } })
+    if (!cat) return NextResponse.json({ error: 'Category not found' }, { status: 404 })
+
+    // Find or create "Uncategorized" category
+    let uncategorized = await db.category.findUnique({ where: { slug: 'uncategorized' } })
+    if (!uncategorized) {
+      uncategorized = await db.category.create({
+        data: {
+          name: 'Uncategorized',
+          slug: 'uncategorized',
+        }
+      })
+    }
+
+    // Move all products of the deleted category to "Uncategorized"
+    if (uncategorized.id !== id) {
+      await db.product.updateMany({
+        where: { categoryId: id },
+        data: { categoryId: uncategorized.id }
+      })
+    }
+
+    // Nullify parentId of child categories if they exist (to avoid constraint errors)
+    await db.category.updateMany({
+      where: { parentId: id },
+      data: { parentId: null }
+    })
+
     await db.category.delete({ where: { id } })
     return NextResponse.json({ ok: true })
-  } catch (e) {
-    const msg = (e as { code?: string }).code === 'P2014'
-      ? 'Cannot delete category with products. Remove products first.'
-      : 'Failed to delete category'
-    return NextResponse.json({ error: msg }, { status: 400 })
+  } catch (e: any) {
+    console.error('Error deleting category:', e)
+    return NextResponse.json({ error: e.message || 'Failed to delete category' }, { status: 500 })
   }
 }

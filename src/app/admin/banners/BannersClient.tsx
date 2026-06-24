@@ -10,6 +10,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { toast } from 'sonner'
 import { Plus, Pencil, Trash2, ChevronUp, ChevronDown } from 'lucide-react'
 
+import { adminFetch } from '@/lib/admin-fetch'
+
 interface Banner { id: string; title: string; subtitle: string; image: string; link: string; sortOrder: number; isActive: boolean }
 const EMPTY = { title: '', subtitle: '', image: '', link: '', sortOrder: 0, isActive: true }
 type FormState = typeof EMPTY
@@ -36,8 +38,7 @@ export function BannersClient({ banners }: { banners: Banner[] }) {
     setSaving(true)
     try {
       const url = editing ? `/api/admin/banners/${editing}` : '/api/admin/banners'
-      const res = await fetch(url, { method: editing ? 'PATCH' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...form, sortOrder: Number(form.sortOrder) }) })
-      if (!res.ok) throw new Error((await res.json()).error || 'Failed')
+      await adminFetch(url, { method: editing ? 'PATCH' : 'POST', body: JSON.stringify({ ...form, sortOrder: Number(form.sortOrder) }) })
       toast.success(editing ? 'Updated' : 'Created')
       setOpen(false); startTransition(() => router.refresh())
     } catch (e: unknown) { toast.error(e instanceof Error ? e.message : 'Error') }
@@ -46,19 +47,31 @@ export function BannersClient({ banners }: { banners: Banner[] }) {
 
   async function handleDelete(id: string) {
     if (!confirm('Delete this banner?')) return
-    const res = await fetch(`/api/admin/banners/${id}`, { method: 'DELETE' })
-    if (res.ok) { toast.success('Deleted'); startTransition(() => router.refresh()) }
-    else toast.error('Failed')
+    try {
+      await adminFetch(`/api/admin/banners/${id}`, { method: 'DELETE' })
+      toast.success('Deleted')
+      startTransition(() => router.refresh())
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : 'Failed')
+    }
   }
 
   async function changeOrder(b: Banner, dir: -1 | 1) {
-    await fetch(`/api/admin/banners/${b.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sortOrder: b.sortOrder + dir }) })
-    startTransition(() => router.refresh())
+    try {
+      await adminFetch(`/api/admin/banners/${b.id}`, { method: 'PATCH', body: JSON.stringify({ sortOrder: b.sortOrder + dir }) })
+      startTransition(() => router.refresh())
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : 'Failed')
+    }
   }
 
   async function toggleActive(b: Banner) {
-    await fetch(`/api/admin/banners/${b.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ isActive: !b.isActive }) })
-    startTransition(() => router.refresh())
+    try {
+      await adminFetch(`/api/admin/banners/${b.id}`, { method: 'PATCH', body: JSON.stringify({ isActive: !b.isActive }) })
+      startTransition(() => router.refresh())
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : 'Failed')
+    }
   }
 
   return (

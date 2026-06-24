@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { verifyCashfreeOrder, CashfreeNotConfiguredError } from '@/lib/cashfree'
 import { db } from '@/lib/db'
 import { completeReferralReward } from '@/lib/referral-reward'
+import { notifyOrderConfirmed } from '@/lib/whatsapp'
 
 export async function GET(req: NextRequest) {
   const orderId = req.nextUrl.searchParams.get('orderId')
@@ -27,10 +28,53 @@ export async function GET(req: NextRequest) {
 
     // Persist authoritative paid state (idempotent).
     if (paid && dbOrder.paymentStatus !== 'paid') {
-      await db.order.update({
-        where: { id: dbOrder.id },
-        data: { paymentStatus: 'paid' },
+      await db.$transaction(async (tx) => {
+        await tx.order.update({
+          where: { id: dbOrder.id },
+          data: {
+            paymentStatus: 'paid',
+            status: 'confirmed'
+          },
+        })
+
+        const items = await tx.orderItem.findMany({
+          where: { orderId: dbOrder.id }
+        })
+
+        for (const item of items) {
+          await tx.product.update({
+            where: { id: item.productId },
+            data: {
+              stock: {
+                decrement: item.quantity
+              }
+            }
+          })
+        }
       })
+
+      // Get the order with items and user details for notification
+      const fullOrder = await db.order.findUnique({
+        where: { id: dbOrder.id },
+        include: { user: true, items: true }
+      })
+
+      if (fullOrder) {
+        let addr: Record<string, string> = {}
+        try { addr = JSON.parse(fullOrder.shippingAddr) } catch {}
+        const waPhone = fullOrder.user?.phone || addr.phone
+        if (waPhone) {
+          const itemsSummary = fullOrder.items.map(i => `${i.quantity}× ${i.name}`).join(', ')
+          notifyOrderConfirmed(waPhone, {
+            customerName: fullOrder.user?.name || addr.fullName || 'Customer',
+            orderNumber: fullOrder.orderNumber,
+            items: itemsSummary,
+            total: fullOrder.total,
+            paymentMethod: 'Online Payment',
+          }).catch(() => {})
+        }
+      }
+
       // Credit referrer now that payment is captured (prepaid)
       completeReferralReward(dbOrder.userId).catch(() => {})
     }

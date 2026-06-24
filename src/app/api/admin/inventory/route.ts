@@ -101,3 +101,30 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Failed to create inventory item' }, { status: 500 })
   }
 }
+
+export async function PATCH(req: NextRequest) {
+  const { error } = await requireAdmin(req)
+  if (error) return error
+  try {
+    const body = await req.json()
+    const { updates } = body as { updates: { id: string; stock: number }[] }
+    if (!Array.isArray(updates)) {
+      return NextResponse.json({ error: 'updates array is required' }, { status: 400 })
+    }
+
+    // Run updates in a transaction
+    await db.$transaction(
+      updates.map(u =>
+        db.product.update({
+          where: { id: u.id },
+          data: { stock: Number(u.stock) || 0 }
+        })
+      )
+    )
+
+    return NextResponse.json({ success: true })
+  } catch (e: any) {
+    console.error('PATCH /api/admin/inventory error:', e)
+    return NextResponse.json({ error: e.message || 'Failed to update inventory' }, { status: 500 })
+  }
+}

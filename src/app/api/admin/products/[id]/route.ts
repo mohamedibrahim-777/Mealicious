@@ -40,6 +40,27 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
   const { error } = await requireAdmin(req)
   if (error) return error
   const { id } = await params
-  await db.product.delete({ where: { id } })
-  return NextResponse.json({ ok: true })
+  try {
+    // Delete wishlists and reviews pointing to this product first
+    await db.wishlist.deleteMany({ where: { productId: id } })
+    await db.review.deleteMany({ where: { productId: id } })
+
+    // Check if there are order items for this product
+    const orderItemCount = await db.orderItem.count({ where: { productId: id } })
+    if (orderItemCount > 0) {
+      // Soft delete: hide it from the storefront by setting isActive = false
+      await db.product.update({
+        where: { id },
+        data: { isActive: false }
+      })
+      return NextResponse.json({ ok: true, softDeleted: true, message: 'Product has existing orders. Soft deleted.' })
+    }
+
+    // Hard delete since there are no order items
+    await db.product.delete({ where: { id } })
+    return NextResponse.json({ ok: true })
+  } catch (err: any) {
+    console.error('Error deleting product:', err)
+    return NextResponse.json({ error: err.message || 'Failed to delete product' }, { status: 500 })
+  }
 }

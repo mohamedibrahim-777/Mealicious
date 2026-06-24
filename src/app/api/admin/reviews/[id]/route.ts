@@ -4,7 +4,7 @@ import { requireAdmin } from '@/lib/auth-server'
 import { recalculateProductReviews } from '@/lib/reviews-helper'
 
 interface RouteContext {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }
 
 function transformReview(review: any) {
@@ -21,7 +21,7 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
   if (error) return error
 
   const body = await req.json()
-  const { id } = params
+  const { id } = await params
 
   try {
     // Find old review to know its old product ID
@@ -69,7 +69,7 @@ export async function DELETE(req: NextRequest, { params }: RouteContext) {
   const { error } = await requireAdmin(req)
   if (error) return error
 
-  const { id } = params
+  const { id } = await params
 
   try {
     const review = await db.review.findUnique({ where: { id } })

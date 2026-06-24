@@ -8,6 +8,8 @@ import { Badge } from '@/components/ui/badge'
 import { toast } from 'sonner'
 import { Plus, Pencil, Trash2 } from 'lucide-react'
 
+import { adminFetch } from '@/lib/admin-fetch'
+
 interface Post { id: string; title: string; slug: string; category: string; published: boolean; date: string }
 
 export function BlogClient({ posts }: { posts: Post[] }) {
@@ -16,9 +18,13 @@ export function BlogClient({ posts }: { posts: Post[] }) {
 
   async function handleDelete(id: string, title: string) {
     if (!confirm(`Delete "${title}"?`)) return
-    const res = await fetch(`/api/admin/blogs/${id}`, { method: 'DELETE' })
-    if (res.ok) { toast.success('Post deleted'); startTransition(() => router.refresh()) }
-    else toast.error('Failed')
+    try {
+      await adminFetch(`/api/admin/blogs/${id}`, { method: 'DELETE' })
+      toast.success('Post deleted')
+      startTransition(() => router.refresh())
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : 'Failed')
+    }
   }
 
   return (

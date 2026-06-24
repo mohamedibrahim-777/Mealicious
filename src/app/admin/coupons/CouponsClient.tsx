@@ -10,6 +10,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { toast } from 'sonner'
 import { Plus, Pencil, Trash2 } from 'lucide-react'
 
+import { adminFetch } from '@/lib/admin-fetch'
+
 // Simplified coupon interface matching AdminCoupon spec
 interface Coupon {
   id: string
@@ -41,8 +43,7 @@ export function CouponsClient({ coupons }: { coupons: Coupon[] }) {
     setSaving(true)
     try {
       const url = editing ? `/api/admin/coupons/${editing}` : '/api/admin/coupons'
-      const res = await fetch(url, { method: editing ? 'PATCH' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) })
-      if (!res.ok) throw new Error((await res.json()).error || 'Failed')
+      await adminFetch(url, { method: editing ? 'PATCH' : 'POST', body: JSON.stringify(form) })
       toast.success(editing ? 'Updated' : 'Created')
       setOpen(false)
       startTransition(() => router.refresh())
@@ -55,9 +56,13 @@ export function CouponsClient({ coupons }: { coupons: Coupon[] }) {
 
   async function handleDelete(id: string, code: string) {
     if (!confirm(`Delete coupon "${code}"?`)) return
-    const res = await fetch(`/api/admin/coupons/${id}`, { method: 'DELETE' })
-    if (res.ok) { toast.success('Deleted'); startTransition(() => router.refresh()) }
-    else toast.error('Failed')
+    try {
+      await adminFetch(`/api/admin/coupons/${id}`, { method: 'DELETE' })
+      toast.success('Deleted')
+      startTransition(() => router.refresh())
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : 'Failed to delete coupon')
+    }
   }
 
   return (

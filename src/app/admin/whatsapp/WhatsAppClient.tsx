@@ -11,6 +11,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { toast } from 'sonner'
 import { Send, ShoppingCart, MessageCircle, RefreshCw } from 'lucide-react'
+import { adminFetch } from '@/lib/admin-fetch'
 
 interface AbandonedCart {
   id: string; phone: string; name: string | null; email: string | null
@@ -33,8 +34,8 @@ export function WhatsAppClient({ configured }: { configured: boolean }) {
   const loadCarts = useCallback(async () => {
     setLoadingCarts(true)
     try {
-      const res = await fetch('/api/admin/whatsapp/cart-recovery')
-      if (res.ok) { const d = await res.json(); setCarts(d.carts) }
+      const d = await adminFetch<{ carts: AbandonedCart[] }>('/api/admin/whatsapp/cart-recovery')
+      setCarts(d.carts)
     } catch {}
     setLoadingCarts(false)
   }, [])
@@ -51,32 +52,30 @@ export function WhatsAppClient({ configured }: { configured: boolean }) {
     if (!confirm(`Send this promo to "${segment}" segment? This cannot be undone.`)) return
     setSending(true)
     try {
-      const res = await fetch('/api/admin/whatsapp/broadcast', {
+      const data = await adminFetch<{ sent: number; totalRecipients: number; failed: number }>('/api/admin/whatsapp/broadcast', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message, couponCode: coupon || undefined, segment }),
       })
-      const data = await res.json()
-      if (!res.ok) { toast.error(data.error || 'Failed'); return }
       toast.success(`Sent to ${data.sent}/${data.totalRecipients} (${data.failed} failed)`)
       setMessage(''); setCoupon('')
-    } catch { toast.error('Network error') }
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : 'Network error')
+    }
     finally { setSending(false) }
   }
 
   async function sendRecovery(cartId?: string) {
     setRecovering(true)
     try {
-      const res = await fetch('/api/admin/whatsapp/cart-recovery', {
+      const data = await adminFetch<{ sent: number; failed: number }>('/api/admin/whatsapp/cart-recovery', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ cartId, couponCode: recoveryCoupon || undefined }),
       })
-      const data = await res.json()
-      if (!res.ok) { toast.error(data.error || 'Failed'); return }
       toast.success(`Recovery sent: ${data.sent} (${data.failed} failed)`)
       loadCarts()
-    } catch { toast.error('Network error') }
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : 'Network error')
+    }
     finally { setRecovering(false) }
   }
 

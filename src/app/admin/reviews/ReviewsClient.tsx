@@ -7,6 +7,8 @@ import { Badge } from '@/components/ui/badge'
 import { toast } from 'sonner'
 import { Check, X, Star, Trash2 } from 'lucide-react'
 
+import { adminFetch } from '@/lib/admin-fetch'
+
 interface Review { id: string; user: string; product: string; rating: number; title: string; comment: string; approved: boolean; date: string }
 
 export function ReviewsClient({ reviews }: { reviews: Review[] }) {
@@ -21,16 +23,24 @@ export function ReviewsClient({ reviews }: { reviews: Review[] }) {
   })
 
   async function setApproved(id: string, approved: boolean) {
-    const res = await fetch('/api/admin/reviews', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, approved }) })
-    if (res.ok) { toast.success(approved ? 'Approved' : 'Rejected'); startTransition(() => router.refresh()) }
-    else toast.error('Failed')
+    try {
+      await adminFetch('/api/admin/reviews', { method: 'PATCH', body: JSON.stringify({ id, approved }) })
+      toast.success(approved ? 'Approved' : 'Rejected')
+      startTransition(() => router.refresh())
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : 'Failed')
+    }
   }
 
   async function handleDelete(id: string) {
     if (!confirm('Delete this review?')) return
-    const res = await fetch('/api/admin/reviews', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) })
-    if (res.ok) { toast.success('Deleted'); startTransition(() => router.refresh()) }
-    else toast.error('Failed')
+    try {
+      await adminFetch('/api/admin/reviews', { method: 'DELETE', body: JSON.stringify({ id }) })
+      toast.success('Deleted')
+      startTransition(() => router.refresh())
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : 'Failed')
+    }
   }
 
   return (

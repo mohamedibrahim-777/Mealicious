@@ -8,6 +8,8 @@ import { Badge } from '@/components/ui/badge'
 import { toast } from 'sonner'
 import { Save, AlertTriangle } from 'lucide-react'
 
+import { adminFetch } from '@/lib/admin-fetch'
+
 interface Product { id: string; name: string; sku: string; category: string; stock: number; lowStock: number; isActive: boolean }
 
 export function InventoryClient({ products }: { products: Product[] }) {
@@ -31,17 +33,15 @@ export function InventoryClient({ products }: { products: Product[] }) {
     if (updates.length === 0) { toast.info('No changes'); return }
     setSaving(true)
     try {
-      const res = await fetch('/api/admin/inventory', {
+      await adminFetch('/api/admin/inventory', {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ updates }),
       })
-      if (!res.ok) throw new Error('Failed')
       toast.success(`Updated ${updates.length} product${updates.length > 1 ? 's' : ''}`)
       setEdits({})
       startTransition(() => router.refresh())
-    } catch {
-      toast.error('Save failed')
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : 'Save failed')
     } finally {
       setSaving(false)
     }

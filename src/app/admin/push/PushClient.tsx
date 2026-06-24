@@ -9,6 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { toast } from 'sonner'
 import { Bell, Send } from 'lucide-react'
 
+import { adminFetch } from '@/lib/admin-fetch'
+
 export function PushClient() {
   const [title, setTitle] = useState('')
   const [body, setBody] = useState('')
@@ -17,7 +19,9 @@ export function PushClient() {
   const [stats, setStats] = useState<{ subscriberCount: number; configured: boolean } | null>(null)
 
   useEffect(() => {
-    fetch('/api/admin/push/broadcast').then(r => r.ok ? r.json() : null).then(d => d && setStats(d)).catch(() => {})
+    adminFetch<{ subscriberCount: number; configured: boolean }>('/api/admin/push/broadcast')
+      .then(d => setStats(d))
+      .catch(() => {})
   }, [])
 
   async function send() {
@@ -25,17 +29,17 @@ export function PushClient() {
     if (!confirm(`Send push to ${stats?.subscriberCount ?? 0} subscribers?`)) return
     setSending(true)
     try {
-      const res = await fetch('/api/admin/push/broadcast', {
+      const data = await adminFetch<{ sent: number; failed: number; cleaned: number }>('/api/admin/push/broadcast', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ title, body, url }),
       })
-      const data = await res.json()
-      if (!res.ok) { toast.error(data.error || 'Failed'); return }
       toast.success(`Sent: ${data.sent}, Failed: ${data.failed}, Cleaned: ${data.cleaned}`)
       setTitle(''); setBody('')
-    } catch { toast.error('Network error') }
-    finally { setSending(false) }
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : 'Network error')
+    } finally {
+      setSending(false)
+    }
   }
 
   return (

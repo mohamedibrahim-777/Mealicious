@@ -3,11 +3,11 @@ import { db } from '@/lib/db'
 import { requireAdmin } from '@/lib/auth-server'
 import type { AdminInventory } from '@/lib/catalog-store'
 
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { error } = await requireAdmin(req)
   if (error) return error
   try {
-    const id = params.id
+    const { id } = await params
     const body = (await req.json()) as Partial<AdminInventory>
 
     // Validate bounds on stock fields
@@ -85,11 +85,26 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   }
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { error } = await requireAdmin(req)
   if (error) return error
   try {
-    const id = params.id
+    const { id } = await params
+
+    // Delete wishlists and reviews pointing to this product first
+    await db.wishlist.deleteMany({ where: { productId: id } })
+    await db.review.deleteMany({ where: { productId: id } })
+
+    // Check if there are order items for this product
+    const orderItemCount = await db.orderItem.count({ where: { productId: id } })
+    if (orderItemCount > 0) {
+      // Soft delete: hide it from the storefront by setting isActive = false
+      await db.product.update({
+        where: { id },
+        data: { isActive: false }
+      })
+      return NextResponse.json({ ok: true, softDeleted: true, message: 'Product has existing orders. Soft deleted.' })
+    }
 
     await db.product.delete({
       where: { id },

@@ -222,20 +222,46 @@ export default function CheckoutPage() {
     return new Promise((resolve, reject) => {
       const w = window as any
       if (w.Cashfree) {
+        console.log('[loadCashfreeSdk] Cashfree already exists on window')
         resolve(w.Cashfree)
         return
       }
       const existing = document.getElementById('cashfree-sdk') as HTMLScriptElement | null
       if (existing) {
-        existing.addEventListener('load', () => resolve((window as any).Cashfree))
-        existing.addEventListener('error', () => reject(new Error('Failed to load Cashfree SDK')))
+        console.log('[loadCashfreeSdk] Cashfree script tag exists, polling/listening')
+        const timer = setInterval(() => {
+          if (w.Cashfree) {
+            clearInterval(timer)
+            resolve(w.Cashfree)
+          }
+        }, 100)
+
+        existing.addEventListener('load', () => {
+          clearInterval(timer)
+          resolve((window as any).Cashfree)
+        })
+        existing.addEventListener('error', () => {
+          clearInterval(timer)
+          reject(new Error('Failed to load Cashfree SDK'))
+        })
+
+        // Safety timeout
+        setTimeout(() => {
+          clearInterval(timer)
+          if (w.Cashfree) resolve(w.Cashfree)
+          else reject(new Error('Cashfree SDK load timeout'))
+        }, 10000)
         return
       }
+      console.log('[loadCashfreeSdk] Appending new Cashfree script tag')
       const script = document.createElement('script')
       script.id = 'cashfree-sdk'
       script.src = 'https://sdk.cashfree.com/js/v3/cashfree.js'
       script.async = true
-      script.onload = () => resolve((window as any).Cashfree)
+      script.onload = () => {
+        console.log('[loadCashfreeSdk] Cashfree script tag onload event')
+        resolve((window as any).Cashfree)
+      }
       script.onerror = () => reject(new Error('Failed to load Cashfree SDK'))
       document.body.appendChild(script)
     })
