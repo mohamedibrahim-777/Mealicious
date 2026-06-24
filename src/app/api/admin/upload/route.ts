@@ -25,13 +25,22 @@ export async function POST(req: NextRequest) {
     const originalExt = path.extname(file.name) || '.png'
     const filename = `${uniqueId}${originalExt}`
     
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads')
+    const rootUploadDir = path.join(process.cwd(), 'public', 'uploads')
+    const standaloneUploadDir = path.join(process.cwd(), '.next', 'standalone', 'public', 'uploads')
     
-    // Ensure public/uploads directory exists
-    await mkdir(uploadDir, { recursive: true })
+    // 1. Write to persistent public/uploads folder
+    await mkdir(rootUploadDir, { recursive: true })
+    const rootFilePath = path.join(rootUploadDir, filename)
+    await writeFile(rootFilePath, buffer)
     
-    const filePath = path.join(uploadDir, filename)
-    await writeFile(filePath, buffer)
+    // 2. Write to standalone production folder if it exists
+    try {
+      await mkdir(standaloneUploadDir, { recursive: true })
+      const standaloneFilePath = path.join(standaloneUploadDir, filename)
+      await writeFile(standaloneFilePath, buffer)
+    } catch (e) {
+      // Ignore if we are not running in standalone production mode
+    }
     
     // Return relative public path
     return NextResponse.json({ url: `/uploads/${filename}` })
