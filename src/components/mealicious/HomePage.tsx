@@ -348,6 +348,7 @@ export default function HomePage() {
                         alt={activeBanner ? activeBanner.title : "Premium dry fruits composition"}
                         fill
                         priority
+                        unoptimized
                         sizes="(max-w-768px) 100vw, 450px"
                         className="object-cover hover:scale-105 transition-transform duration-700 ease-out"
                       />
