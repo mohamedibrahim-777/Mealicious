@@ -39,7 +39,12 @@ export function WhatsAppClient({ configured }: { configured: boolean }) {
     setLoadingCarts(false)
   }, [])
 
-  useEffect(() => { loadCarts() }, [loadCarts])
+  useEffect(() => {
+    const handle = requestAnimationFrame(() => {
+      loadCarts()
+    })
+    return () => cancelAnimationFrame(handle)
+  }, [loadCarts])
 
   async function sendBroadcast() {
     if (!message.trim()) { toast.error('Enter a message'); return }

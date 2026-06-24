@@ -177,16 +177,37 @@ export const useAppStore = create<AppStore>()(
           const data = await res.json()
           if (!res.ok) return data.error || 'Login failed'
           const u = data.user
-          set({ isLoggedIn: true, adminSessionReady: false, user: { name: u.name, email: u.email, phone: u.phone, role: u.role }, currentPage: 'home' })
-          if (u.role === 'admin' && typeof window !== 'undefined') {
-            fetch('/api/admin/auth/login', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ email, password }),
+
+          if (u.role === 'admin') {
+            // First authenticate the admin session context
+            try {
+              await fetch('/api/admin/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password }),
+              })
+            } catch (err) {
+              console.error('Admin session authentication warning:', err)
+            }
+            
+            set({
+              isLoggedIn: true,
+              adminSessionReady: true,
+              user: { name: u.name, email: u.email, phone: u.phone, role: u.role }
             })
-              .then(() => set({ adminSessionReady: true }))
-              .catch(() => set({ adminSessionReady: true }))
+            
+            if (typeof window !== 'undefined') {
+              window.location.href = '/admin/dashboard'
+            }
+            return null
           }
+
+          set({
+            isLoggedIn: true,
+            adminSessionReady: false,
+            user: { name: u.name, email: u.email, phone: u.phone, role: u.role },
+            currentPage: 'home'
+          })
           return null
         } catch {
           return 'Network error. Try again.'

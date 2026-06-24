@@ -1293,11 +1293,15 @@ function ProductDialog({
   onClose: () => void
   onSubmit: (data: Partial<Product>) => void
 }) {
-  const [form, setForm] = useState<Partial<Product>>(product ?? emptyProduct())
+  const [form, setForm] = useState<Partial<Product>>(() => product ?? emptyProduct())
+  const [prevId, setPrevId] = useState(product?.id)
+  const [prevOpen, setPrevOpen] = useState(open)
 
-  // Reset form whenever the dialog target changes
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => { setForm(product ?? emptyProduct()) }, [product?.id, open])
+  if (product?.id !== prevId || open !== prevOpen) {
+    setPrevId(product?.id)
+    setPrevOpen(open)
+    setForm(product ?? emptyProduct())
+  }
 
   const handle = (key: keyof Product, value: unknown) =>
     setForm((f) => ({ ...f, [key]: value }))
@@ -1466,11 +1470,15 @@ function OrderDialog({
   onClose: () => void
   onSubmit: (data: Partial<AdminOrder>) => void
 }) {
-  const [form, setForm] = useState<Partial<AdminOrder>>(order ?? {})
+  const [form, setForm] = useState<Partial<AdminOrder>>(() => order ?? {})
+  const [prevId, setPrevId] = useState(order?.id)
+  const [prevOpen, setPrevOpen] = useState(open)
 
-  useEffect(() => {
+  if (order?.id !== prevId || open !== prevOpen) {
+    setPrevId(order?.id)
+    setPrevOpen(open)
     setForm(order ?? {})
-  }, [order?.id, open])
+  }
 
   const handle = (key: keyof AdminOrder, value: unknown) =>
     setForm((f) => ({ ...f, [key]: value }))
@@ -1568,11 +1576,15 @@ function UserDialog({
   onClose: () => void
   onSubmit: (data: Partial<AdminUser>) => void
 }) {
-  const [form, setForm] = useState<Partial<AdminUser>>(user ?? {})
+  const [form, setForm] = useState<Partial<AdminUser>>(() => user ?? {})
+  const [prevId, setPrevId] = useState(user?.id)
+  const [prevOpen, setPrevOpen] = useState(open)
 
-  useEffect(() => {
+  if (user?.id !== prevId || open !== prevOpen) {
+    setPrevId(user?.id)
+    setPrevOpen(open)
     setForm(user ?? {})
-  }, [user?.id, open])
+  }
 
   const handle = (key: keyof AdminUser, value: unknown) =>
     setForm((f) => ({ ...f, [key]: value }))
@@ -1657,11 +1669,15 @@ function CategoryDialog({
   onClose: () => void
   onSubmit: (data: Partial<AdminCategory>) => void
 }) {
-  const [form, setForm] = useState<Partial<AdminCategory>>(category ?? { name: '', slug: '' })
+  const [form, setForm] = useState<Partial<AdminCategory>>(() => category ?? { name: '', slug: '' })
+  const [prevId, setPrevId] = useState(category?.id)
+  const [prevOpen, setPrevOpen] = useState(open)
 
-  useEffect(() => {
+  if (category?.id !== prevId || open !== prevOpen) {
+    setPrevId(category?.id)
+    setPrevOpen(open)
     setForm(category ?? { name: '', slug: '' })
-  }, [category?.id, open])
+  }
 
   const handle = (key: keyof AdminCategory, value: unknown) =>
     setForm((f) => ({ ...f, [key]: value }))
@@ -1725,11 +1741,15 @@ function CouponDialog({
   onClose: () => void
   onSubmit: (data: Partial<AdminCoupon>) => void
 }) {
-  const [form, setForm] = useState<Partial<AdminCoupon>>(coupon ?? { code: '', discount: 0, status: 'active' })
+  const [form, setForm] = useState<Partial<AdminCoupon>>(() => coupon ?? { code: '', discount: 0, status: 'active' })
+  const [prevId, setPrevId] = useState(coupon?.id)
+  const [prevOpen, setPrevOpen] = useState(open)
 
-  useEffect(() => {
+  if (coupon?.id !== prevId || open !== prevOpen) {
+    setPrevId(coupon?.id)
+    setPrevOpen(open)
     setForm(coupon ?? { code: '', discount: 0, status: 'active' })
-  }, [coupon?.id, open])
+  }
 
   const handle = (key: keyof AdminCoupon, value: unknown) =>
     setForm((f) => ({ ...f, [key]: value }))
@@ -1805,11 +1825,15 @@ function BannerDialog({
   onClose: () => void
   onSubmit: (data: Partial<AdminBanner>) => void
 }) {
-  const [form, setForm] = useState<Partial<AdminBanner>>(banner ?? { title: '', image: '', link: '' })
+  const [form, setForm] = useState<Partial<AdminBanner>>(() => banner ?? { title: '', image: '', link: '' })
+  const [prevId, setPrevId] = useState(banner?.id)
+  const [prevOpen, setPrevOpen] = useState(open)
 
-  useEffect(() => {
+  if (banner?.id !== prevId || open !== prevOpen) {
+    setPrevId(banner?.id)
+    setPrevOpen(open)
     setForm(banner ?? { title: '', image: '', link: '' })
-  }, [banner?.id, open])
+  }
 
   const handle = (key: keyof AdminBanner, value: unknown) =>
     setForm((f) => ({ ...f, [key]: value }))
@@ -1878,11 +1902,15 @@ function BlogDialog({
   onClose: () => void
   onSubmit: (data: Partial<AdminBlog>) => void
 }) {
-  const [form, setForm] = useState<Partial<AdminBlog>>(blog ?? { title: '', excerpt: '', published: false })
+  const [form, setForm] = useState<Partial<AdminBlog>>(() => blog ?? { title: '', excerpt: '', published: false })
+  const [prevId, setPrevId] = useState(blog?.id)
+  const [prevOpen, setPrevOpen] = useState(open)
 
-  useEffect(() => {
+  if (blog?.id !== prevId || open !== prevOpen) {
+    setPrevId(blog?.id)
+    setPrevOpen(open)
     setForm(blog ?? { title: '', excerpt: '', published: false })
-  }, [blog?.id, open])
+  }
 
   const handle = (key: keyof AdminBlog, value: unknown) =>
     setForm((f) => ({ ...f, [key]: value }))
@@ -1953,12 +1981,15 @@ function ReviewDialog({
   onClose: () => void
   onSubmit: (data: Partial<AdminReview>) => void
 }) {
-  const [form, setForm] = useState<Partial<AdminReview>>(review ?? { productName: '', rating: 1, status: 'pending' })
+  const [form, setForm] = useState<Partial<AdminReview>>(() => review ?? { productName: '', rating: 1, status: 'pending' })
+  const [prevId, setPrevId] = useState(review?.id)
+  const [prevOpen, setPrevOpen] = useState(open)
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => {
+  if (review?.id !== prevId || open !== prevOpen) {
+    setPrevId(review?.id)
+    setPrevOpen(open)
     setForm(review ?? { productName: '', rating: 1, status: 'pending' })
-  }, [review?.id, open])
+  }
 
   const handle = (key: keyof AdminReview, value: unknown) =>
     setForm((f) => ({ ...f, [key]: value }))
@@ -2041,11 +2072,15 @@ function InventoryDialog({
   onClose: () => void
   onSubmit: (data: Partial<AdminInventory>) => void
 }) {
-  const [form, setForm] = useState<Partial<AdminInventory>>(inventory ?? { productName: '', stock: 0, lowStockAlert: 10 })
+  const [form, setForm] = useState<Partial<AdminInventory>>(() => inventory ?? { productName: '', stock: 0, lowStockAlert: 10 })
+  const [prevId, setPrevId] = useState(inventory?.id)
+  const [prevOpen, setPrevOpen] = useState(open)
 
-  useEffect(() => {
+  if (inventory?.id !== prevId || open !== prevOpen) {
+    setPrevId(inventory?.id)
+    setPrevOpen(open)
     setForm(inventory ?? { productName: '', stock: 0, lowStockAlert: 10 })
-  }, [inventory?.id, open])
+  }
 
   const handle = (key: keyof AdminInventory, value: unknown) =>
     setForm((f) => ({ ...f, [key]: value }))

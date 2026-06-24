@@ -79,19 +79,38 @@ export default function ProductDetail() {
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
 
-  const loadReviews = useCallback(async () => {
-    if (!product?.id) return
-    try {
-      const res = await fetch(`/api/products/${product.id}/reviews`)
-      if (res.ok) {
-        const data = await res.json()
-        setProductReviews(data.reviews)
+  useEffect(() => {
+    let active = true
+    const fetchReviews = async () => {
+      if (!product?.id) return
+      try {
+        const res = await fetch(`/api/products/${product.id}/reviews`)
+        if (res.ok && active) {
+          const data = await res.json()
+          setProductReviews(data.reviews)
+        }
+      } catch {}
+      if (active) {
+        setReviewsLoaded(true)
       }
-    } catch {}
-    setReviewsLoaded(true)
+    }
+    fetchReviews()
+    return () => {
+      active = false
+    }
   }, [product?.id])
 
-  useEffect(() => { loadReviews() }, [loadReviews])
+  // Calculate dynamic variant-based price
+  const activePricing = useMemo(() => {
+    if (!product) return { price: 0, salePrice: null }
+    const selectedWeight = effectiveVariants['Weight']
+    if (selectedWeight && typeof selectedWeight === 'object' && selectedWeight) {
+      const price = (selectedWeight as any).price ?? product.price
+      const salePrice = (selectedWeight as any).salePrice !== undefined ? (selectedWeight as any).salePrice : product.salePrice
+      return { price, salePrice }
+    }
+    return { price: product.price, salePrice: product.salePrice }
+  }, [product, effectiveVariants])
 
   if (!product) {
     return (
@@ -109,10 +128,11 @@ export default function ProductDetail() {
   }
 
   const wishlisted = isInWishlist(product.id)
-  const discountPercent = product.salePrice
-    ? Math.round(((product.price - product.salePrice) / product.price) * 100)
+
+  const discountPercent = activePricing.salePrice
+    ? Math.round(((activePricing.price - activePricing.salePrice) / activePricing.price) * 100)
     : 0
-  const displayPrice = product.salePrice ?? product.price
+  const displayPrice = activePricing.salePrice ?? activePricing.price
 
   async function submitReview() {
     if (!reviewForm.name || !reviewForm.comment || !reviewForm.rating) {
@@ -152,19 +172,23 @@ export default function ProductDetail() {
   })()
 
   const variantString = Object.entries(effectiveVariants)
-    .map(([, val]) => val)
+    .map(([, val]) => typeof val === 'object' && val ? (val as any).value : val)
     .join(' / ')
 
   function handleAddToCart() {
     const firstVariant = product.variants[0]
+    const firstOptionVal = typeof firstVariant?.options[0] === 'object' && firstVariant?.options[0] 
+      ? (firstVariant?.options[0] as any).value 
+      : firstVariant?.options[0]
+
     addToCart({
       productId: product.id,
       name: product.name,
       image: product.images[0],
-      price: product.price,
-      salePrice: product.salePrice,
+      price: activePricing.price,
+      salePrice: activePricing.salePrice,
       quantity,
-      variant: variantString || firstVariant?.options[0],
+      variant: variantString || firstOptionVal,
       variantType: firstVariant?.type,
       maxStock: product.stock,
     })
@@ -391,15 +415,24 @@ export default function ProductDetail() {
               <label className="text-sm font-semibold text-foreground mb-2 block">
                 {variant.type}:{' '}
                 <span className="font-normal text-orange-400">
-                  {effectiveVariants[variant.type]}
+                  {(() => {
+                    const sel = effectiveVariants[variant.type]
+                    return typeof sel === 'object' && sel ? (sel as any).value : sel
+                  })()}
                 </span>
               </label>
               <div className="flex flex-wrap gap-2">
                 {variant.options.map((option) => {
-                  const isSelected = effectiveVariants[variant.type] === option
+                  const optVal = typeof option === 'object' && option ? (option as any).value : option
+                  const isSelected = (() => {
+                    const sel = effectiveVariants[variant.type]
+                    const selVal = typeof sel === 'object' && sel ? (sel as any).value : sel
+                    return selVal === optVal
+                  })()
+
                   return (
                     <button
-                      key={option}
+                      key={optVal}
                       onClick={() =>
                         setSelectedVariants((prev) => ({ ...prev, [variant.type]: option }))
                       }
@@ -409,7 +442,7 @@ export default function ProductDetail() {
                           : 'bg-white text-foreground border-border hover:border-blue-400 hover:text-orange-400'
                       }`}
                     >
-                      {option}
+                      {optVal}
                     </button>
                   )
                 })}

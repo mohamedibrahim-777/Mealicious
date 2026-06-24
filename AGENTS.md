@@ -26,3 +26,62 @@ cd /var/www/Mealicious && bun run build && pm2 restart mealicious
 If a human explicitly insists on changing the locked config, warn them first,
 point them to `/root/SERVER-PORTS.md`, and require them to confirm. Unlock
 procedure is documented there.
+
+---
+
+## Development Commands
+
+```bash
+bun run dev          # Start dev server on port 3000
+bun run build        # Build for production (standalone output)
+bun run start        # Run production server via bun from .next/standalone
+bun run lint         # ESLint
+bun run test         # Jest tests
+bun run test:watch   # Jest watch mode
+bun run test:coverage # Jest with coverage
+
+# Prisma DB commands
+bun run db:push      # Push schema changes without migration
+bun run db:generate  # Generate Prisma client
+bun run db:migrate   # Run dev migrations
+bun run db:reset     # Reset database (destructive)
+bun run db:seed      # Seed database
+```
+
+## Architecture Notes
+
+- **Stack:** Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4, Prisma, Bun
+- **App Structure:** `src/app/` (pages + API routes), `src/components/` (ui/mealicious/admin/), `src/lib/` (utilities)
+- **Path Alias:** `@/*` maps to `src/*`
+- **State:** Zustand (client), TanStack Query
+- **UI:** shadcn/ui components, dark mode via `class`
+
+## Important Gotchas
+
+- **TypeScript build errors are IGNORED** (`ignoreBuildErrors: true` in next.config.ts)
+- **Standalone output enabled** — build copies `.next/static` and `public` to `.next/standalone/`
+- **Production runtime is Bun**, not Node (dev uses Next.js Node server)
+- **Prisma binary targets:** include `linux-musl-openssl-3.0.x` for Alpine/Docker
+- **Database:** PostgreSQL via Prisma. See `.env.example` for required env vars
+- **Tests:** Jest with ts-jest, tests in `src/__tests__/**/*.test.ts?(x)`
+- **ESLint:** Many rules disabled intentionally (check eslint.config.mjs before enforcing)
+- **Admin panel requires:** `ADMIN_SESSION_SECRET`, `ADMIN_PASSWORD`, `ADMIN_EMAILS` (comma-separated)
+
+## Production Deployment (VPS)
+
+- **App runs via pm2** (process name: `mealicious`, port: 3010, interpreter: `bun`)
+- **Database:** Postgres container `mealicious-db` on localhost:5434
+- **Location:** `/var/www/Mealicious`
+- **Env file:** `/var/www/Mealicious/.env` (DO NOT modify DATABASE_URL)
+- **Build script uses `cp`** — on Windows, replace with `xcopy` or use WSL/Git Bash
+
+## Docker Deployment
+
+```bash
+docker-compose up -d    # Start app + db
+docker-compose down     # Stop all
+docker-compose logs -f  # View logs
+```
+
+- **docker-entrypoint.sh** runs `prisma db push` and seed on container start
+- **Seed is idempotent** (uses upserts)

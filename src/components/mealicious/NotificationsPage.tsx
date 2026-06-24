@@ -21,18 +21,20 @@ function urlBase64ToUint8Array(base64: string): Uint8Array {
 
 export default function NotificationsPage() {
   const { user, navigate } = useAppStore()
-  const [supported, setSupported] = useState(false)
+  const [supported, setSupported] = useState(() => {
+    if (typeof window === 'undefined') return false
+    return 'serviceWorker' in navigator && 'PushManager' in window && !!VAPID_PUBLIC
+  })
   const [subscribed, setSubscribed] = useState(false)
   const [busy, setBusy] = useState(false)
 
   useEffect(() => {
     if (typeof window === 'undefined') return
-    if (!('serviceWorker' in navigator) || !('PushManager' in window) || !VAPID_PUBLIC) return
-    setSupported(true)
+    if (!supported) return
     navigator.serviceWorker.register('/sw.js').then(reg =>
       reg.pushManager.getSubscription().then(sub => setSubscribed(!!sub))
     ).catch(() => {})
-  }, [])
+  }, [supported])
 
   async function toggle(next: boolean) {
     setBusy(true)

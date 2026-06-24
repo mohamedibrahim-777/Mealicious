@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -9,8 +9,15 @@ import { Switch } from '@/components/ui/switch'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { toast } from 'sonner'
+import { Plus, Trash2 } from 'lucide-react'
 
 interface Category { id: string; name: string; slug: string }
+
+interface WeightOption {
+  value: string
+  price: number
+  salePrice: number | null
+}
 
 interface ProductData {
   id?: string
@@ -50,8 +57,51 @@ const EMPTY: ProductData = {
 }
 
 export function ProductForm({ open, onClose, onSaved, categories, initial }: Props) {
-  const [form, setForm] = useState<ProductData>({ ...EMPTY, ...initial })
+  const [form, setForm] = useState<ProductData>(() => ({ ...EMPTY, ...initial }))
   const [saving, setSaving] = useState(false)
+
+  const [weightOptions, setWeightOptions] = useState<WeightOption[]>(() => {
+    try {
+      const parsed = typeof initial?.variants === 'string' 
+        ? JSON.parse(initial.variants) 
+        : (initial?.variants || [])
+      
+      const weightVar = parsed.find((v: any) => v.type === 'Weight')
+      if (weightVar) {
+        return weightVar.options.map((o: any) => {
+          if (typeof o === 'object' && o) {
+            return {
+              value: o.value || '',
+              price: Number(o.price) || 0,
+              salePrice: o.salePrice != null ? Number(o.salePrice) : null
+            }
+          }
+          return {
+            value: String(o),
+            price: Number(initial?.price) || 0,
+            salePrice: initial?.salePrice != null ? Number(initial.salePrice) : null
+          }
+        })
+      }
+    } catch (err) {
+      console.error('Error parsing initial variants:', err)
+    }
+    return []
+  })
+
+  const [flavorString, setFlavorString] = useState<string>(() => {
+    try {
+      const parsed = typeof initial?.variants === 'string' 
+        ? JSON.parse(initial.variants) 
+        : (initial?.variants || [])
+      const flavorVar = parsed.find((v: any) => v.type === 'Flavor')
+      if (flavorVar) {
+        return flavorVar.options.map((o: any) => typeof o === 'object' ? o.value : String(o)).join(', ')
+      }
+    } catch {}
+    return ''
+  })
+
   const isEdit = !!form.id
 
   function set(key: keyof ProductData, value: unknown) {
@@ -64,18 +114,60 @@ export function ProductForm({ open, onClose, onSaved, categories, initial }: Pro
     })
   }
 
+  // Weight Option handlers
+  function addWeightOption() {
+    setWeightOptions(prev => [
+      ...prev,
+      { value: '', price: Number(form.price) || 0, salePrice: form.salePrice ? Number(form.salePrice) : null }
+    ])
+  }
+
+  function updateWeightOption(index: number, key: keyof WeightOption, val: any) {
+    setWeightOptions(prev => prev.map((opt, i) => {
+      if (i !== index) return opt
+      if (key === 'value') return { ...opt, value: val }
+      if (key === 'salePrice') return { ...opt, salePrice: val === '' ? null : Number(val) }
+      return { ...opt, price: Number(val) || 0 }
+    }))
+  }
+
+  function removeWeightOption(index: number) {
+    setWeightOptions(prev => prev.filter((_, i) => i !== index))
+  }
+
   async function handleSave() {
     setSaving(true)
     try {
+      const finalVariants: any[] = []
+      if (weightOptions.length > 0) {
+        finalVariants.push({
+          type: 'Weight',
+          options: weightOptions.map(o => ({
+            value: o.value,
+            price: Number(o.price) || 0,
+            salePrice: o.salePrice != null ? Number(o.salePrice) : null
+          }))
+        })
+      }
+      const flavors = flavorString.split(',').map(s => s.trim()).filter(Boolean)
+      if (flavors.length > 0) {
+        finalVariants.push({
+          type: 'Flavor',
+          options: flavors
+        })
+      }
+
       const payload = {
         ...form,
         price: Number(form.price),
         salePrice: form.salePrice ? Number(form.salePrice) : null,
         stock: Number(form.stock),
         lowStock: Number(form.lowStock),
-        images: JSON.stringify(form.images.split(',').map(s => s.trim()).filter(Boolean)),
-        tags: JSON.stringify(form.tags.split(',').map(s => s.trim()).filter(Boolean)),
+        images: form.images.split(',').map(s => s.trim()).filter(Boolean),
+        tags: form.tags.split(',').map(s => s.trim()).filter(Boolean),
+        variants: finalVariants,
       }
+
       const url = isEdit ? `/api/admin/products/${form.id}` : '/api/admin/products'
       const method = isEdit ? 'PATCH' : 'POST'
       const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
@@ -129,6 +221,76 @@ export function ProductForm({ open, onClose, onSaved, categories, initial }: Pro
               <Input value={form.sku} onChange={e => set('sku', e.target.value)} />
             </div>
           </div>
+
+          {/* Weight Variants & Dynamic Pricing */}
+          <div className="border border-stone-200 rounded-xl p-4 bg-stone-50/50 space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <Label className="text-sm font-bold text-stone-800">Weight Options & Pricing</Label>
+                <p className="text-[10px] text-stone-500 font-medium">Add weights (e.g. 500g) with their specific prices. This overrides the default product price.</p>
+              </div>
+              <Button type="button" size="sm" variant="outline" className="h-8 border-stone-300 text-stone-700 font-semibold" onClick={addWeightOption}>
+                <Plus className="h-3.5 w-3.5 mr-1" /> Add Weight
+              </Button>
+            </div>
+            
+            {weightOptions.length > 0 ? (
+              <div className="space-y-2 max-h-[200px] overflow-y-auto pr-1">
+                {weightOptions.map((opt, idx) => (
+                  <div key={idx} className="flex items-center gap-2 bg-white p-2.5 rounded-lg border border-stone-200 shadow-sm">
+                    <div className="flex-1">
+                      <Input
+                        placeholder="e.g. 500g"
+                        value={opt.value}
+                        onChange={e => updateWeightOption(idx, 'value', e.target.value)}
+                        className="h-8 text-xs"
+                      />
+                    </div>
+                    <div className="w-24">
+                      <Input
+                        type="number"
+                        placeholder="Price"
+                        value={opt.price || ''}
+                        onChange={e => updateWeightOption(idx, 'price', e.target.value)}
+                        className="h-8 text-xs"
+                      />
+                    </div>
+                    <div className="w-24">
+                      <Input
+                        type="number"
+                        placeholder="Sale (opt)"
+                        value={opt.salePrice ?? ''}
+                        onChange={e => updateWeightOption(idx, 'salePrice', e.target.value)}
+                        className="h-8 text-xs"
+                      />
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50"
+                      onClick={() => removeWeightOption(idx)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-xs text-stone-400 italic text-center py-4">No weight variants added. Default product price will be used.</p>
+            )}
+          </div>
+
+          {/* Flavor Options */}
+          <div className="space-y-1.5">
+            <Label className="text-xs font-bold text-stone-700">Flavor Options (comma-separated)</Label>
+            <Input
+              placeholder="e.g. Plain Roasted, Salted, Peri Peri"
+              value={flavorString}
+              onChange={e => setFlavorString(e.target.value)}
+            />
+          </div>
+
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <Label>Stock</Label>

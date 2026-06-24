@@ -42,8 +42,7 @@ export async function verifyFirebaseToken(authHeader: string | null): Promise<Au
 
 export async function requireAdmin(req: Request) {
   // Try admin-session cookie first (most reliable for browser requests)
-  const nextReq = req instanceof NextRequest ? req : new NextRequest(req)
-  const session = await getSessionFromRequest(nextReq as NextRequest)
+  const session = await getSessionFromRequest(req)
   if (session && ADMIN_EMAILS.includes(session.email.toLowerCase())) {
     return {
       user: { uid: 'session-admin', email: session.email, isAdmin: true } as AuthUser,

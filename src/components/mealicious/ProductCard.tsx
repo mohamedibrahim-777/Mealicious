@@ -22,11 +22,29 @@ export default function ProductCard({ product }: ProductCardProps) {
   const [imgError, setImgError] = useState(false)
   const wishlisted = isInWishlist(product.id)
 
-  const discountPercent = product.salePrice
-    ? Math.round(((product.price - product.salePrice) / product.price) * 100)
+  // Calculate pricing based on first variant if it contains weight values with prices
+  const activePricing = (() => {
+    const firstVariant = product.variants?.[0]
+    if (firstVariant && firstVariant.options?.[0] && typeof firstVariant.options[0] === 'object') {
+      const opt = firstVariant.options[0] as any
+      return {
+        price: opt.price ?? product.price,
+        salePrice: opt.salePrice !== undefined ? opt.salePrice : product.salePrice,
+        variantVal: opt.value
+      }
+    }
+    return {
+      price: product.price,
+      salePrice: product.salePrice,
+      variantVal: firstVariant?.options?.[0]
+    }
+  })()
+
+  const discountPercent = activePricing.salePrice
+    ? Math.round(((activePricing.price - activePricing.salePrice) / activePricing.price) * 100)
     : 0
 
-  const displayPrice = product.salePrice ?? product.price
+  const displayPrice = activePricing.salePrice ?? activePricing.price
 
   function handleCardClick() {
     navigate('product', { id: product.id })
@@ -34,15 +52,15 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   function handleAddToCart(e: React.MouseEvent) {
     e.stopPropagation()
-    const firstVariant = product.variants[0]
+    const firstVariant = product.variants?.[0]
     addToCart({
       productId: product.id,
       name: product.name,
       image: product.images[0],
-      price: product.price,
-      salePrice: product.salePrice,
+      price: activePricing.price,
+      salePrice: activePricing.salePrice,
       quantity: 1,
-      variant: firstVariant?.options[0],
+      variant: activePricing.variantVal,
       variantType: firstVariant?.type,
       maxStock: product.stock,
     })

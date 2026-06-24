@@ -16,8 +16,52 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (body.trackingUrl !== undefined) data.trackingUrl = body.trackingUrl
   if (body.shippingProvider !== undefined) data.shippingProvider = body.shippingProvider
 
-  const existing = await db.order.findUnique({ where: { orderNumber: id }, include: { user: true } })
-  const updated = await db.order.update({ where: { orderNumber: id }, data })
+  // Try to find by orderNumber first, fall back to id, including items for stock updates
+  let existing = await db.order.findUnique({ where: { orderNumber: id }, include: { user: true, items: true } })
+  if (!existing) {
+    existing = await db.order.findUnique({ where: { id }, include: { user: true, items: true } })
+  }
+  if (!existing) {
+    return NextResponse.json({ error: 'Order not found' }, { status: 404 })
+  }
+
+  // Automatic payment update on delivery (simplifies admin workflow & ensures revenue updates)
+  if (data.status === 'delivered') {
+    data.paymentStatus = 'paid'
+  }
+
+  // Handle stock restoration on cancellation
+  if (data.status === 'cancelled' && existing.status !== 'cancelled') {
+    for (const item of existing.items) {
+      await db.product.update({
+        where: { id: item.productId },
+        data: {
+          stock: {
+            increment: item.quantity
+          }
+        }
+      }).catch(err => console.error(`Failed to restore stock for product ${item.productId}:`, err))
+    }
+  }
+
+  // Handle stock reduction if re-activated from cancelled to confirmed/processing/etc
+  if (existing.status === 'cancelled' && data.status && data.status !== 'cancelled') {
+    for (const item of existing.items) {
+      await db.product.update({
+        where: { id: item.productId },
+        data: {
+          stock: {
+            decrement: item.quantity
+          }
+        }
+      }).catch(err => console.error(`Failed to re-decrement stock for product ${item.productId}:`, err))
+    }
+  }
+
+  const updated = await db.order.update({
+    where: { id: existing.id },
+    data
+  })
 
   // WhatsApp delivery alerts (fire-and-forget)
   if (existing && body.status && body.status !== existing.status) {
@@ -55,9 +99,15 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
   const { error } = await requireAdmin(req)
   if (error) return error
   const { id } = await params
-  // Cascade: delete order items first
-  const o = await db.order.findUnique({ where: { orderNumber: id }, include: { items: true } })
+  
+  // Try to find by orderNumber first, fall back to id
+  let o = await db.order.findUnique({ where: { orderNumber: id }, include: { items: true } })
+  if (!o) {
+    o = await db.order.findUnique({ where: { id }, include: { items: true } })
+  }
   if (!o) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+  
+  // Cascade: delete order items first
   await db.orderItem.deleteMany({ where: { orderId: o.id } })
   await db.order.delete({ where: { id: o.id } })
   return NextResponse.json({ ok: true })

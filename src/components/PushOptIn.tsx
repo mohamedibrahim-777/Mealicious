@@ -18,18 +18,20 @@ function urlBase64ToUint8Array(base64: string): Uint8Array {
 
 export function PushOptIn({ variant = 'floating' }: { variant?: 'floating' | 'header' }) {
   const user = useAppStore(s => s.user)
-  const [supported, setSupported] = useState(false)
+  const [supported, setSupported] = useState(() => {
+    if (typeof window === 'undefined') return false
+    return 'serviceWorker' in navigator && 'PushManager' in window && !!VAPID_PUBLIC
+  })
   const [subscribed, setSubscribed] = useState(false)
   const [busy, setBusy] = useState(false)
 
   useEffect(() => {
     if (typeof window === 'undefined') return
-    if (!('serviceWorker' in navigator) || !('PushManager' in window) || !VAPID_PUBLIC) return
-    setSupported(true)
+    if (!supported) return
     navigator.serviceWorker.register('/sw.js').then(reg =>
       reg.pushManager.getSubscription().then(sub => setSubscribed(!!sub))
     ).catch(() => {})
-  }, [])
+  }, [supported])
 
   async function subscribe() {
     setBusy(true)

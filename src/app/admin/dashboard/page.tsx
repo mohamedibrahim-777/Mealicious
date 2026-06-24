@@ -2,11 +2,9 @@ export const dynamic = 'force-dynamic'
 
 import { db } from '@/lib/db'
 import { AdminHeader } from '@/components/admin/AdminHeader'
-import { StatsCard } from '@/components/admin/StatsCard'
 import { RevenueChart } from '@/components/admin/RevenueChart'
 import { OrdersDonut } from '@/components/admin/OrdersDonut'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { IndianRupee, Package, ShoppingCart, Users, AlertTriangle } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { subDays, format } from 'date-fns'
 
@@ -67,20 +65,6 @@ export default async function DashboardPage() {
     <div>
       <AdminHeader title="Dashboard" />
       <div className="p-6 space-y-6">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatsCard title="Total Revenue" value={`₹${data.revenue.toLocaleString('en-IN')}`} icon={IndianRupee} />
-          <StatsCard title="Total Orders" value={data.orderCount} icon={ShoppingCart} iconColor="text-blue-500" />
-          <StatsCard title="Products" value={data.productCount} icon={Package} iconColor="text-purple-500" />
-          <StatsCard title="Customers" value={data.userCount} icon={Users} iconColor="text-green-500" />
-        </div>
-
-        {data.lowStock > 0 && (
-          <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-md text-red-700 text-sm">
-            <AlertTriangle className="h-4 w-4" />
-            {data.lowStock} product{data.lowStock > 1 ? 's' : ''} below low-stock threshold
-          </div>
-        )}
-
         <div className="grid lg:grid-cols-2 gap-6">
           <Card>
             <CardHeader><CardTitle className="text-sm font-medium">Revenue (30 days)</CardTitle></CardHeader>

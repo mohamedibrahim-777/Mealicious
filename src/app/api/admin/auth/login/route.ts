@@ -7,13 +7,6 @@ const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || '')
   .toLowerCase().split(',').map(e => e.trim()).filter(Boolean)
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || ''
 
-if (!ADMIN_PASSWORD) {
-  throw new Error('ADMIN_PASSWORD env var must be set')
-}
-if (ADMIN_EMAILS.length === 0) {
-  throw new Error('ADMIN_EMAILS env var must be set')
-}
-
 function safeEqual(a: string, b: string): boolean {
   try {
     const ab = Buffer.from(a)
@@ -30,6 +23,9 @@ function safeEqual(a: string, b: string): boolean {
 }
 
 export async function POST(req: NextRequest) {
+  if (!ADMIN_PASSWORD || ADMIN_EMAILS.length === 0) {
+    return NextResponse.json({ error: 'Server configuration error' }, { status: 500 })
+  }
   const limited = limitByIp(req, 'admin-login', 8, 15 * 60 * 1000)
   if (limited) return limited
 

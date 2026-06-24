@@ -139,44 +139,46 @@ export default function HomePage() {
   return (
     <div className="flex flex-col">
       {/* ──────── 1. Hero Section ──────── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-orange-400 via-orange-400 to-orange-400">
-        {/* Decorative circles */}
-        <div className="absolute -top-32 -right-32 h-96 w-96 rounded-full bg-orange-400/20 blur-3xl" />
-        <div className="absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-blue-400/15 blur-3xl" />
+      <section className="relative overflow-hidden bg-gradient-to-br from-stone-900 via-stone-950 to-stone-900 border-b border-white/5">
+        {/* Glow ambient blurs */}
+        <div className="absolute top-0 right-0 h-96 w-96 rounded-full bg-amber-500/10 blur-[100px]" />
+        <div className="absolute bottom-0 left-0 h-96 w-96 rounded-full bg-orange-600/10 blur-[100px]" />
 
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28">
-          <div className="grid lg:grid-cols-2 gap-10 items-center">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Left — text */}
             <motion.div
-              initial={{ opacity: 0, x: -40 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.7, ease: 'easeOut' }}
-              className="text-center lg:text-left"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              className="text-center lg:text-left space-y-6"
             >
-              <Badge className="bg-orange-400/40 text-blue-100 border-blue-400/30 mb-4 text-sm px-3 py-1 inline-flex items-center gap-1.5">
-                <Leaf className="h-3.5 w-3.5" /> 100% Natural & Premium Quality
+              <Badge className="bg-amber-500/10 text-amber-400 border border-amber-500/20 mb-2 text-sm px-3 py-1 inline-flex items-center gap-1.5 rounded-full">
+                <Leaf className="h-3.5 w-3.5" /> 100% Organic & Handpicked
               </Badge>
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-extrabold text-white leading-tight tracking-tight">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-tight tracking-tight">
                 Premium Dry Fruits
                 <br />
-                &amp; Healthy Snacks
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500">
+                  &amp; Healthy Snacks
+                </span>
               </h1>
-              <p className="mt-4 sm:mt-6 text-base sm:text-lg text-blue-100 max-w-lg mx-auto lg:mx-0">
-                Handpicked from the finest farms. Delivered fresh to your doorstep.
+              <p className="text-base sm:text-lg text-stone-400 max-w-lg mx-auto lg:mx-0 leading-relaxed">
+                Experience nature's premium harvest. Indulge in clean, nutrient-dense snacking sourced from elite farms.
               </p>
-              <div className="mt-8 flex flex-wrap gap-3 justify-center lg:justify-start">
+              <div className="flex flex-wrap gap-4 justify-center lg:justify-start pt-4">
                 <Button
                   size="lg"
-                  className="bg-white text-orange-400 hover:bg-blue-50 font-semibold shadow-lg"
+                  className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-stone-950 font-bold shadow-lg shadow-amber-500/20 transition-all rounded-xl px-8"
                   onClick={() => navigate('shop')}
                 >
-                  Shop Now
-                  <ArrowRight className="ml-1 h-4 w-4" />
+                  Shop Collection
+                  <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
                 <Button
                   size="lg"
                   variant="outline"
-                  className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-orange-500 font-semibold"
+                  className="bg-white/5 border border-white/10 text-white hover:bg-white/10 hover:border-white/20 font-semibold rounded-xl px-8 transition-all"
                   onClick={() => navigate('shop', { category: 'combo-packs' })}
                 >
                   Explore Combos
@@ -184,35 +186,59 @@ export default function HomePage() {
               </div>
             </motion.div>
 
-            {/* Right — decorative image / pattern */}
+            {/* Right — Hero Image */}
             <motion.div
-              initial={{ opacity: 0, x: 40 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.7, delay: 0.2, ease: 'easeOut' }}
-              className="hidden lg:flex justify-center items-center"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+              className="hidden lg:block relative"
             >
-              <div className="relative w-80 h-80 xl:w-96 xl:h-96">
-                {/* Background circle */}
-                <div className="absolute inset-0 rounded-full bg-orange-400/30 blur-xl" />
-                <div className="absolute inset-4 rounded-full bg-blue-400/20 flex items-center justify-center">
-                  <div className="grid grid-cols-2 gap-4 p-6">
-                    {[
-                      { Icon: Nut, label: 'Cashews' },
-                      { Icon: Nut, label: 'Almonds' },
-                      { Icon: Grape, label: 'Berries' },
-                      { Icon: Soup, label: 'Trail Mix' },
-                    ].map(({ Icon, label }) => (
-                      <div
-                        key={label}
-                        className="flex flex-col items-center gap-1 rounded-2xl bg-white/15 backdrop-blur-sm p-4"
-                      >
-                        <Icon className="h-9 w-9 text-white" />
-                        <span className="text-xs text-blue-100 font-medium">
-                          {label}
-                        </span>
-                      </div>
-                    ))}
+              <div className="relative w-full h-[450px] flex justify-center items-center">
+                {/* Backdrop ambient blur glow */}
+                <div className="absolute -inset-10 rounded-full bg-amber-500/10 blur-3xl opacity-70 animate-pulse" />
+                
+                {/* Float Card 1: Organic Badge */}
+                <motion.div 
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.6, duration: 0.6 }}
+                  className="absolute top-8 left-0 z-10 flex items-center gap-3 bg-stone-950/80 backdrop-blur-md px-5 py-3 rounded-2xl shadow-xl border border-white/5"
+                >
+                  <div className="h-10 w-10 bg-emerald-500/10 rounded-full flex items-center justify-center text-emerald-400">
+                    <Leaf className="h-5 w-5" />
                   </div>
+                  <div>
+                    <p className="text-xs text-stone-400 font-medium">Sourced</p>
+                    <p className="text-sm font-bold text-white">100% Organic</p>
+                  </div>
+                </motion.div>
+
+                {/* Float Card 2: Happy Customers */}
+                <motion.div 
+                  initial={{ y: -20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.8, duration: 0.6 }}
+                  className="absolute bottom-8 right-0 z-10 flex items-center gap-3 bg-stone-950/80 backdrop-blur-md px-5 py-3 rounded-2xl shadow-xl border border-white/5"
+                >
+                  <div className="h-10 w-10 bg-amber-500/10 rounded-full flex items-center justify-center text-amber-400">
+                    <Star className="h-5 w-5 fill-amber-400 text-amber-400" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-stone-400 font-medium">Ratings</p>
+                    <p className="text-sm font-bold text-white">4.9/5 (10k+ Reviews)</p>
+                  </div>
+                </motion.div>
+
+                {/* Main Hero Product Image */}
+                <div className="relative w-[380px] h-[380px] xl:w-[420px] xl:h-[420px] rounded-3xl overflow-hidden shadow-2xl border border-white/10 bg-gradient-to-tr from-stone-900 to-stone-950">
+                  <Image
+                    src="/images/banners/hero-banner.png"
+                    alt="Premium dry fruits composition"
+                    fill
+                    priority
+                    sizes="(max-w-768px) 100vw, 450px"
+                    className="object-cover hover:scale-105 transition-transform duration-700 ease-out"
+                  />
                 </div>
               </div>
             </motion.div>

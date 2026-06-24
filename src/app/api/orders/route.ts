@@ -70,34 +70,61 @@ export async function POST(req: NextRequest) {
       cashfreeOrderId ||
       `ML-${Date.now().toString(36).toUpperCase()}${Math.random().toString(36).slice(2, 6).toUpperCase()}`
 
-    const order = await db.order.create({
-      data: {
-        orderNumber,
-        userId: user.id,
-        status: 'confirmed',
-        subtotal: totals.subtotal,
-        shipping: totals.shipping + totals.codFee,
-        discount: totals.discount,
-        tax: totals.gst,
-        total: totals.total,
-        paymentMethod: paymentMethod ?? null,
-        paymentStatus: 'pending',
-        shippingAddr: JSON.stringify(shippingAddr ?? {}),
-        billingAddr: billingAddr ? JSON.stringify(billingAddr) : null,
-        couponCode: totals.appliedCoupon,
-        items: {
-          create: priced.map((p) => ({
-            productId: p.productId,
-            name: p.name,
-            image: p.image,
-            price: p.unitPrice,
-            quantity: p.quantity,
-            variant: p.variant,
-            subtotal: p.lineSubtotal,
-          })),
+    // Perform order creation and stock reduction in a transaction to prevent overselling
+    const order = await db.$transaction(async (tx) => {
+      // 1. Verify and decrement stock
+      for (const item of priced) {
+        const prod = await tx.product.findUnique({
+          where: { id: item.productId },
+          select: { id: true, name: true, stock: true }
+        })
+        if (!prod) {
+          throw new Error(`Product "${item.name}" not found.`)
+        }
+        if (prod.stock < item.quantity) {
+          throw new Error(`Insufficient stock for "${prod.name}". Only ${prod.stock} left in stock.`)
+        }
+
+        await tx.product.update({
+          where: { id: item.productId },
+          data: {
+            stock: {
+              decrement: item.quantity
+            }
+          }
+        })
+      }
+
+      // 2. Create the order
+      return await tx.order.create({
+        data: {
+          orderNumber,
+          userId: user.id,
+          status: 'confirmed',
+          subtotal: totals.subtotal,
+          shipping: totals.shipping + totals.codFee,
+          discount: totals.discount,
+          tax: totals.gst,
+          total: totals.total,
+          paymentMethod: paymentMethod ?? null,
+          paymentStatus: 'pending',
+          shippingAddr: JSON.stringify(shippingAddr ?? {}),
+          billingAddr: billingAddr ? JSON.stringify(billingAddr) : null,
+          couponCode: totals.appliedCoupon,
+          items: {
+            create: priced.map((p) => ({
+              productId: p.productId,
+              name: p.name,
+              image: p.image,
+              price: p.unitPrice,
+              quantity: p.quantity,
+              variant: p.variant,
+              subtotal: p.lineSubtotal,
+            })),
+          },
         },
-      },
-      include: { items: true },
+        include: { items: true },
+      })
     })
 
     // NOTE: referral reward is NOT credited at order creation — it is gated on

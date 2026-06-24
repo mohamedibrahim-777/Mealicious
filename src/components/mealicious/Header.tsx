@@ -73,7 +73,10 @@ export default function Header() {
 
   // Sync local search state with store
   useEffect(() => {
-    setLocalSearch(searchQuery)
+    const handle = requestAnimationFrame(() => {
+      setLocalSearch(searchQuery)
+    })
+    return () => cancelAnimationFrame(handle)
   }, [searchQuery])
 
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0)
@@ -111,6 +114,11 @@ export default function Header() {
 
   return (
     <>
+      {/* Announcement Bar */}
+      <div className="bg-stone-900 text-white text-xs py-2 px-4 text-center font-medium select-none tracking-wide">
+        🎉 Free shipping on orders above ₹599! | Use code <span className="text-amber-400 font-bold">HEALTHY10</span> for 10% off
+      </div>
+
       {/* Main Header */}
       <header
         className={`sticky top-0 z-40 w-full transition-all duration-300 ${

@@ -97,6 +97,7 @@ export function ProductsClient({ products, categories }: { products: Product[]; 
       </div>
 
       <ProductForm
+        key={editing?.id ?? 'new'}
         open={formOpen}
         onClose={() => { setFormOpen(false); setEditing(undefined) }}
         onSaved={() => startTransition(() => router.refresh())}
