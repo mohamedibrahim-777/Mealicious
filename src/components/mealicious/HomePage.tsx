@@ -1,8 +1,8 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import Image from 'next/image'
-import { motion, useInView } from 'framer-motion'
+import { motion, useInView, AnimatePresence } from 'framer-motion'
 import {
   Leaf,
   ShieldCheck,
@@ -136,6 +136,102 @@ export default function HomePage() {
   const bestSellers = products.filter((p) => p.bestSeller)
   const newArrivals = products.filter((p) => p.isNew)
 
+  interface PublicBanner {
+    id: string
+    title: string
+    subtitle?: string
+    image: string
+    link?: string
+  }
+
+  const [banners, setBanners] = useState<PublicBanner[]>([])
+  const [currentBannerIndex, setCurrentBannerIndex] = useState(0)
+
+  useEffect(() => {
+    fetch('/api/banners')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data.banners) && data.banners.length > 0) {
+          setBanners(data.banners)
+        }
+      })
+      .catch(err => console.error('Error loading home banners:', err))
+  }, [])
+
+  useEffect(() => {
+    if (banners.length <= 1) return
+    const timer = setInterval(() => {
+      setCurrentBannerIndex(prev => (prev + 1) % banners.length)
+    }, 6000)
+    return () => clearInterval(timer)
+  }, [banners])
+
+  const hasBanners = banners.length > 0
+  const activeBanner = hasBanners ? banners[currentBannerIndex] : null
+
+  const heroTitle = activeBanner ? activeBanner.title : 'Premium Dry Fruits & Healthy Snacks'
+  const heroSubtitle = activeBanner ? activeBanner.subtitle : "Experience nature's premium harvest. Indulge in clean, nutrient-dense snacking sourced from elite farms."
+  const heroLink = activeBanner ? activeBanner.link : null
+
+  const handleBannerClick = () => {
+    if (!heroLink) {
+      navigate('shop')
+      return
+    }
+    const cleanLink = heroLink.replace(/^\//, '').toLowerCase().trim()
+    if (cleanLink === 'shop') {
+      navigate('shop')
+    } else if (cleanLink.startsWith('shop?category=')) {
+      const cat = cleanLink.split('=')[1]
+      navigate('shop', { category: cat })
+    } else if (cleanLink === 'about') {
+      navigate('about')
+    } else if (cleanLink === 'contact') {
+      navigate('contact')
+    } else if (cleanLink === 'blog') {
+      navigate('blog')
+    } else {
+      if (heroLink.startsWith('http://') || heroLink.startsWith('https://')) {
+        window.open(heroLink, '_blank')
+      } else {
+        navigate('shop')
+      }
+    }
+  }
+
+  const renderTitle = () => {
+    if (!activeBanner) {
+      return (
+        <>
+          Premium Dry Fruits
+          <br />
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500">
+            &amp; Healthy Snacks
+          </span>
+        </>
+      )
+    }
+    const words = heroTitle.split(' ')
+    if (words.length <= 2) {
+      return (
+        <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500">
+          {heroTitle}
+        </span>
+      )
+    }
+    const mainText = words.slice(0, -2).join(' ')
+    const gradientText = words.slice(-2).join(' ')
+    return (
+      <>
+        {mainText}{' '}
+        <br className="hidden sm:inline" />
+        <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500">
+          {gradientText}
+        </span>
+      </>
+    )
+  }
+
   return (
     <div className="flex flex-col">
       {/* ──────── 1. Hero Section ──────── */}
@@ -156,23 +252,19 @@ export default function HomePage() {
               <Badge className="bg-amber-500/10 text-amber-400 border border-amber-500/20 mb-2 text-sm px-3 py-1 inline-flex items-center gap-1.5 rounded-full">
                 <Leaf className="h-3.5 w-3.5" /> 100% Organic & Handpicked
               </Badge>
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-tight tracking-tight">
-                Premium Dry Fruits
-                <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500">
-                  &amp; Healthy Snacks
-                </span>
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-tight tracking-tight min-h-[120px] sm:min-h-[150px] md:min-h-auto">
+                {renderTitle()}
               </h1>
-              <p className="text-base sm:text-lg text-stone-400 max-w-lg mx-auto lg:mx-0 leading-relaxed">
-                Experience nature's premium harvest. Indulge in clean, nutrient-dense snacking sourced from elite farms.
+              <p className="text-base sm:text-lg text-stone-400 max-w-lg mx-auto lg:mx-0 leading-relaxed min-h-[60px] md:min-h-auto">
+                {heroSubtitle}
               </p>
               <div className="flex flex-wrap gap-4 justify-center lg:justify-start pt-4">
                 <Button
                   size="lg"
                   className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-stone-950 font-bold shadow-lg shadow-amber-500/20 transition-all rounded-xl px-8"
-                  onClick={() => navigate('shop')}
+                  onClick={handleBannerClick}
                 >
-                  Shop Collection
+                  {activeBanner ? 'Shop Now' : 'Shop Collection'}
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
                 <Button
@@ -229,16 +321,41 @@ export default function HomePage() {
                   </div>
                 </motion.div>
 
-                {/* Main Hero Product Image */}
+                {/* Main Hero Product Image / Carousel */}
                 <div className="relative w-[380px] h-[380px] xl:w-[420px] xl:h-[420px] rounded-3xl overflow-hidden shadow-2xl border border-white/10 bg-gradient-to-tr from-stone-900 to-stone-950">
-                  <Image
-                    src="/images/banners/hero-banner.png"
-                    alt="Premium dry fruits composition"
-                    fill
-                    priority
-                    sizes="(max-w-768px) 100vw, 450px"
-                    className="object-cover hover:scale-105 transition-transform duration-700 ease-out"
-                  />
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={currentBannerIndex}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.5 }}
+                      className="absolute inset-0 w-full h-full"
+                    >
+                      <Image
+                        src={activeBanner && activeBanner.image ? activeBanner.image : "/images/banners/hero-banner.png"}
+                        alt={activeBanner ? activeBanner.title : "Premium dry fruits composition"}
+                        fill
+                        priority
+                        sizes="(max-w-768px) 100vw, 450px"
+                        className="object-cover hover:scale-105 transition-transform duration-700 ease-out"
+                      />
+                    </motion.div>
+                  </AnimatePresence>
+
+                  {/* Dot Indicators */}
+                  {banners.length > 1 && (
+                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-2 bg-stone-950/40 backdrop-blur-sm px-3 py-1.5 rounded-full">
+                      {banners.map((_, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => setCurrentBannerIndex(idx)}
+                          className={`h-2 w-2 rounded-full transition-all ${idx === currentBannerIndex ? 'bg-amber-400 w-4' : 'bg-white/40 hover:bg-white/60'}`}
+                          aria-label={`Go to slide ${idx + 1}`}
+                        />
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             </motion.div>
