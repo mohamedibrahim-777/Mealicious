@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge'
 import { ProductForm } from '@/components/admin/ProductForm'
 import { toast } from 'sonner'
 import { Plus, Pencil, Trash2, Search } from 'lucide-react'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 import { adminFetch } from '@/lib/admin-fetch'
 
@@ -39,6 +40,19 @@ export function ProductsClient({ products, categories }: { products: Product[]; 
       startTransition(() => router.refresh())
     } catch (e: unknown) {
       toast.error(e instanceof Error ? e.message : 'Failed to delete')
+    }
+  }
+
+  async function updateActive(id: string, active: boolean) {
+    try {
+      await adminFetch(`/api/admin/products/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ isActive: active }),
+      })
+      toast.success('Status updated')
+      startTransition(() => router.refresh())
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : 'Failed to update status')
     }
   }
 
@@ -87,7 +101,18 @@ export function ProductsClient({ products, categories }: { products: Product[]; 
                   <span className={p.stock < p.lowStock ? 'text-red-600 font-medium' : ''}>{p.stock}</span>
                 </td>
                 <td className="px-4 py-3">
-                  <Badge variant={p.isActive ? 'default' : 'secondary'}>{p.isActive ? 'Active' : 'Inactive'}</Badge>
+                  <Select
+                    value={p.isActive ? 'active' : 'inactive'}
+                    onValueChange={(val) => updateActive(p.id, val === 'active')}
+                  >
+                    <SelectTrigger className="h-7 text-xs w-28">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="active" className="text-xs">Active</SelectItem>
+                      <SelectItem value="inactive" className="text-xs">Inactive</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </td>
                 <td className="px-4 py-3 text-right space-x-1">
                   <Button size="icon" variant="ghost" onClick={() => openEdit(p)}><Pencil className="h-4 w-4" /></Button>
