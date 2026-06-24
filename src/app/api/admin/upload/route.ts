@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdmin } from '@/lib/auth-server'
 import { writeFile, mkdir } from 'fs/promises'
+import { existsSync } from 'fs'
 import path from 'path'
 
 export const dynamic = 'force-dynamic'
@@ -25,8 +26,22 @@ export async function POST(req: NextRequest) {
     const originalExt = path.extname(file.name) || '.png'
     const filename = `${uniqueId}${originalExt}`
     
-    const rootUploadDir = path.join(process.cwd(), 'public', 'uploads')
-    const standaloneUploadDir = path.join(process.cwd(), '.next', 'standalone', 'public', 'uploads')
+    const cwd = process.cwd()
+    let rootDir = cwd
+    let standaloneDir = ''
+
+    if (cwd.endsWith('standalone')) {
+      rootDir = path.dirname(path.dirname(cwd)) // Up two levels
+      standaloneDir = cwd
+    } else {
+      rootDir = cwd
+      const checkPath = path.join(cwd, '.next', 'standalone')
+      if (existsSync(checkPath)) {
+        standaloneDir = checkPath
+      }
+    }
+
+    const rootUploadDir = path.join(rootDir, 'public', 'uploads')
     
     // 1. Write to persistent public/uploads folder
     await mkdir(rootUploadDir, { recursive: true })
@@ -34,12 +49,15 @@ export async function POST(req: NextRequest) {
     await writeFile(rootFilePath, buffer)
     
     // 2. Write to standalone production folder if it exists
-    try {
-      await mkdir(standaloneUploadDir, { recursive: true })
-      const standaloneFilePath = path.join(standaloneUploadDir, filename)
-      await writeFile(standaloneFilePath, buffer)
-    } catch (e) {
-      // Ignore if we are not running in standalone production mode
+    if (standaloneDir) {
+      const standaloneUploadDir = path.join(standaloneDir, 'public', 'uploads')
+      try {
+        await mkdir(standaloneUploadDir, { recursive: true })
+        const standaloneFilePath = path.join(standaloneUploadDir, filename)
+        await writeFile(standaloneFilePath, buffer)
+      } catch (e) {
+        // Ignore standalone write errors
+      }
     }
     
     // Return relative public path
