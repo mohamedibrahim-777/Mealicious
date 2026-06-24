@@ -10,6 +10,7 @@ import {
   Truck,
   Star,
   ArrowRight,
+  ChevronLeft,
   ChevronRight,
   Send,
   Nut,
@@ -158,13 +159,23 @@ export default function HomePage() {
       .catch(err => console.error('Error loading home banners:', err))
   }, [])
 
+  const nextSlide = () => {
+    if (banners.length <= 1) return
+    setCurrentBannerIndex(prev => (prev + 1) % banners.length)
+  }
+
+  const prevSlide = () => {
+    if (banners.length <= 1) return
+    setCurrentBannerIndex(prev => (prev - 1 + banners.length) % banners.length)
+  }
+
   useEffect(() => {
     if (banners.length <= 1) return
     const timer = setInterval(() => {
       setCurrentBannerIndex(prev => (prev + 1) % banners.length)
-    }, 6000)
+    }, 5000)
     return () => clearInterval(timer)
-  }, [banners])
+  }, [banners, currentBannerIndex])
 
   const hasBanners = banners.length > 0
   const activeBanner = hasBanners ? banners[currentBannerIndex] : null
@@ -322,7 +333,7 @@ export default function HomePage() {
                 </motion.div>
 
                 {/* Main Hero Product Image / Carousel */}
-                <div className="relative w-[380px] h-[380px] xl:w-[420px] xl:h-[420px] rounded-3xl overflow-hidden shadow-2xl border border-white/10 bg-gradient-to-tr from-stone-900 to-stone-950">
+                <div className="relative w-[380px] h-[380px] xl:w-[420px] xl:h-[420px] rounded-3xl overflow-hidden shadow-2xl border border-white/10 bg-gradient-to-tr from-stone-900 to-stone-950 group">
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={currentBannerIndex}
@@ -342,6 +353,26 @@ export default function HomePage() {
                       />
                     </motion.div>
                   </AnimatePresence>
+
+                  {/* Carousel Left/Right controls */}
+                  {banners.length > 1 && (
+                    <>
+                      <button
+                        onClick={prevSlide}
+                        className="absolute left-4 top-1/2 -translate-y-1/2 z-20 h-10 w-10 flex items-center justify-center rounded-full bg-stone-950/60 hover:bg-stone-950/80 text-white backdrop-blur-sm border border-white/10 hover:border-white/20 transition-all opacity-0 group-hover:opacity-100"
+                        aria-label="Previous slide"
+                      >
+                        <ChevronLeft className="h-6 w-6 text-white" />
+                      </button>
+                      <button
+                        onClick={nextSlide}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 z-20 h-10 w-10 flex items-center justify-center rounded-full bg-stone-950/60 hover:bg-stone-950/80 text-white backdrop-blur-sm border border-white/10 hover:border-white/20 transition-all opacity-0 group-hover:opacity-100"
+                        aria-label="Next slide"
+                      >
+                        <ChevronRight className="h-6 w-6 text-white" />
+                      </button>
+                    </>
+                  )}
 
                   {/* Dot Indicators */}
                   {banners.length > 1 && (
