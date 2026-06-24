@@ -64,3 +64,44 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Failed to create review' }, { status: 500 })
   }
 }
+
+export async function PATCH(req: NextRequest) {
+  const { error } = await requireAdmin(req)
+  if (error) return error
+
+  try {
+    const { id, approved } = await req.json()
+    if (!id) {
+      return NextResponse.json({ error: 'Review ID is required' }, { status: 400 })
+    }
+
+    const review = await db.review.update({
+      where: { id },
+      data: { approved: !!approved },
+      include: { product: true, user: true }
+    })
+
+    return NextResponse.json(transformReview(review))
+  } catch (err) {
+    console.error('Error updating review:', err)
+    return NextResponse.json({ error: 'Failed to update review' }, { status: 500 })
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  const { error } = await requireAdmin(req)
+  if (error) return error
+
+  try {
+    const { id } = await req.json()
+    if (!id) {
+      return NextResponse.json({ error: 'Review ID is required' }, { status: 400 })
+    }
+
+    await db.review.delete({ where: { id } })
+    return NextResponse.json({ success: true })
+  } catch (err) {
+    console.error('Error deleting review:', err)
+    return NextResponse.json({ error: 'Failed to delete review' }, { status: 500 })
+  }
+}
