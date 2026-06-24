@@ -23,6 +23,7 @@ export function BannersClient({ banners }: { banners: Banner[] }) {
   const [editing, setEditing] = useState<string | null>(null)
   const [form, setForm] = useState<FormState>(EMPTY)
   const [saving, setSaving] = useState(false)
+  const [uploading, setUploading] = useState(false)
 
   function set(key: keyof FormState, value: unknown) {
     if (key === 'sortOrder') {
@@ -31,6 +32,32 @@ export function BannersClient({ banners }: { banners: Banner[] }) {
       setForm(prev => ({ ...prev, [key]: value }))
     }
   }
+
+  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploading(true)
+    const formData = new FormData()
+    formData.append('file', file)
+    try {
+      const res = await fetch('/api/admin/upload', {
+        method: 'POST',
+        body: formData,
+      })
+      if (!res.ok) {
+        const data = await res.json()
+        throw new Error(data.error || 'Upload failed')
+      }
+      const data = await res.json()
+      set('image', data.url)
+      toast.success('Image uploaded successfully!')
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to upload image')
+    } finally {
+      setUploading(false)
+    }
+  }
+
   function openNew() { setForm(EMPTY); setEditing(null); setOpen(true) }
   function openEdit(b: Banner) { setForm({ title: b.title, subtitle: b.subtitle, image: b.image, link: b.link, sortOrder: b.sortOrder, isActive: b.isActive }); setEditing(b.id); setOpen(true) }
 
@@ -111,7 +138,24 @@ export function BannersClient({ banners }: { banners: Banner[] }) {
           <div className="grid gap-4 py-2">
             <div className="space-y-1.5"><Label>Title</Label><Input value={form.title} onChange={e => set('title', e.target.value)} /></div>
             <div className="space-y-1.5"><Label>Subtitle</Label><Input value={form.subtitle} onChange={e => set('subtitle', e.target.value)} /></div>
-            <div className="space-y-1.5"><Label>Image URL</Label><Input value={form.image} onChange={e => set('image', e.target.value)} placeholder="https://..." /></div>
+            <div className="space-y-1.5">
+              <Label>Image URL / Upload File</Label>
+              <div className="flex gap-2">
+                <Input value={form.image} onChange={e => set('image', e.target.value)} placeholder="https://..." className="flex-1" />
+                <div className="relative shrink-0">
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    disabled={uploading}
+                    className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10"
+                  />
+                  <Button variant="outline" type="button" disabled={uploading}>
+                    {uploading ? 'Uploading…' : 'Upload'}
+                  </Button>
+                </div>
+              </div>
+            </div>
             <div className="space-y-1.5"><Label>Link URL</Label><Input value={form.link} onChange={e => set('link', e.target.value)} placeholder="/shop or https://..." /></div>
             <div className="space-y-1.5"><Label>Sort Order</Label><Input type="number" value={form.sortOrder} onChange={e => set('sortOrder', e.target.value)} /></div>
             <div className="flex items-center justify-between border rounded-md px-3 py-2"><Label>Active</Label><Switch checked={form.isActive} onCheckedChange={v => set('isActive', v)} /></div>
