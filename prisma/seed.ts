@@ -117,6 +117,74 @@ async function main() {
   })
   console.log(`Admin user id=${admin.id}`)
 
+  console.log('Seeding product reviews and updating rating counts...')
+  const reviewerNames = [
+    'Aarav Sharma', 'Priya Patel', 'Amit Khan', 'Anjali Mehta', 'Rajesh Verma',
+    'Siddharth Rao', 'Neha Gupta', 'Vikram Singh', 'Deepa Nair', 'Suresh Iyer'
+  ]
+
+  const reviewComments = [
+    { rating: 5, title: 'Superb Quality', comment: 'Absolutely premium quality. The freshness is unmatched. Will buy again!' },
+    { rating: 5, title: 'Highly Recommended', comment: 'Extremely fresh and delicious. Very clean packaging. Highly recommend!' },
+    { rating: 5, title: 'Amazing Taste', comment: 'The flavor is incredible. Best dry fruits I have ordered online.' },
+    { rating: 4, title: 'Very Good Product', comment: 'Great taste and texture. Delivery was slightly delayed, but product is excellent.' },
+    { rating: 4, title: 'Satisfied', comment: 'Good quality and value for money. Healthy snacking option.' },
+    { rating: 5, title: 'Perfect Pack', comment: 'Crispy, crunchy, and tastes natural. 10/10.' }
+  ]
+
+  // Clear existing reviews first
+  await prisma.review.deleteMany()
+
+  const dbProducts = await prisma.product.findMany()
+  for (const p of dbProducts) {
+    const reviewQty = 2 + (p.name.length % 3)
+    const reviewsToInsert = []
+
+    for (let i = 0; i < reviewQty; i++) {
+      const nameIdx = (p.name.charCodeAt(0) + i * 7) % reviewerNames.length
+      const commentIdx = (p.name.charCodeAt(p.name.length - 1) + i * 13) % reviewComments.length
+
+      const reviewer = reviewerNames[nameIdx]
+      const reviewDetail = reviewComments[commentIdx]
+
+      const date = new Date()
+      date.setDate(date.getDate() - (i * 10 + 2))
+
+      reviewsToInsert.push({
+        productId: p.id,
+        guestName: reviewer,
+        guestEmail: `${reviewer.toLowerCase().replace(/ /g, '.')}@example.com`,
+        rating: reviewDetail.rating,
+        title: reviewDetail.title,
+        comment: reviewDetail.comment,
+        approved: true,
+        createdAt: date,
+      })
+    }
+
+    await prisma.review.createMany({
+      data: reviewsToInsert
+    })
+
+    // Update product rating and reviewCount aggregates
+    const aggregate = await prisma.review.aggregate({
+      where: { productId: p.id, approved: true },
+      _avg: { rating: true },
+      _count: { id: true }
+    })
+
+    const avgRating = aggregate._avg.rating ? parseFloat(aggregate._avg.rating.toFixed(1)) : 0
+    const count = aggregate._count.id ?? 0
+
+    await prisma.product.update({
+      where: { id: p.id },
+      data: {
+        rating: avgRating,
+        reviewCount: count
+      }
+    })
+  }
+
   console.log('Seed complete.')
 }
 
@@ -126,3 +194,4 @@ main()
     process.exit(1)
   })
   .finally(() => prisma.$disconnect())
+

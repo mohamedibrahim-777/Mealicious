@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { requireAdmin } from '@/lib/auth-server'
+import { recalculateProductReviews } from '@/lib/reviews-helper'
 
 function transformReview(review: any) {
   return {
@@ -58,6 +59,9 @@ export async function POST(req: NextRequest) {
       include: { product: true, user: true },
     })
 
+    // Recalculate product rating/reviews count
+    await recalculateProductReviews(product.id)
+
     return NextResponse.json(transformReview(review))
   } catch (error) {
     console.error('Error creating review:', error)
@@ -81,6 +85,9 @@ export async function PATCH(req: NextRequest) {
       include: { product: true, user: true }
     })
 
+    // Recalculate product rating/reviews count
+    await recalculateProductReviews(review.productId)
+
     return NextResponse.json(transformReview(review))
   } catch (err) {
     console.error('Error updating review:', err)
@@ -98,10 +105,17 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: 'Review ID is required' }, { status: 400 })
     }
 
-    await db.review.delete({ where: { id } })
+    const review = await db.review.findUnique({ where: { id } })
+    if (review) {
+      await db.review.delete({ where: { id } })
+      // Recalculate product rating/reviews count
+      await recalculateProductReviews(review.productId)
+    }
+
     return NextResponse.json({ success: true })
   } catch (err) {
     console.error('Error deleting review:', err)
     return NextResponse.json({ error: 'Failed to delete review' }, { status: 500 })
   }
 }
+

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { limitByIp } from '@/lib/rate-limit'
+import { recalculateProductReviews } from '@/lib/reviews-helper'
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -52,5 +53,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     },
   })
 
+  // Recalculate product reviews statistics (even if default is not approved)
+  await recalculateProductReviews(id)
+
   return NextResponse.json({ ok: true, id: review.id, message: 'Review submitted for moderation' }, { status: 201 })
 }
+
