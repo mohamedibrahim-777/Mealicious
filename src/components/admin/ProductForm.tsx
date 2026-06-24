@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { toast } from 'sonner'
 import { adminFetch } from '@/lib/admin-fetch'
+import { Plus, Trash2 } from 'lucide-react'
 
 interface Category { id: string; name: string; slug: string }
 
