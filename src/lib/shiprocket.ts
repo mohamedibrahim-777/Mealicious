@@ -1,3 +1,43 @@
+import fs from 'fs'
+import path from 'path'
+
+function initEnv() {
+  const targets = [
+    process.cwd(),
+    path.join(process.cwd(), '..'),
+    path.join(process.cwd(), '..', '..'),
+  ]
+  for (const dir of targets) {
+    const envPath = path.join(dir, '.env')
+    if (fs.existsSync(envPath)) {
+      try {
+        const content = fs.readFileSync(envPath, 'utf-8')
+        content.split('\n').forEach(line => {
+          const trimmed = line.trim()
+          if (trimmed && !trimmed.startsWith('#') && trimmed.includes('=')) {
+            const idx = trimmed.indexOf('=')
+            const key = trimmed.substring(0, idx).trim()
+            const val = trimmed.substring(idx + 1).trim().replace(/^['"]|['"]$/g, '')
+            if (key) {
+              // Always load/overwrite SHIPROCKET variables to ensure they are fresh from .env
+              if (key.startsWith('SHIPROCKET_') || !(key in process.env)) {
+                process.env[key] = val
+              }
+            }
+          }
+        })
+        console.log(`[Shiprocket Env] Loaded environment from: ${envPath}`)
+        break
+      } catch (e) {
+        console.error(`[Shiprocket Env] Failed to read/parse ${envPath}:`, e)
+      }
+    }
+  }
+}
+
+// Run environment loader immediately
+initEnv()
+
 const BASE = 'https://apiv2.shiprocket.in/v1/external'
 
 let _token: string | null = null
@@ -11,16 +51,31 @@ export interface ShiprocketToken {
 async function getToken(): Promise<string> {
   if (_token && Date.now() < _tokenExpiry) return _token
 
+  const email = process.env.SHIPROCKET_EMAIL
+  const password = process.env.SHIPROCKET_PASSWORD
+
+  if (!email || !password) {
+    throw new Error(`Shiprocket credentials missing. Please set SHIPROCKET_EMAIL and SHIPROCKET_PASSWORD in your env. (Email status: ${email ? 'set' : 'missing'}, Password status: ${password ? 'set' : 'missing'})`)
+  }
+
+  console.log(`[Shiprocket] Attempting auth login for email: ${email}`)
+
   const res = await fetch(`${BASE}/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      email: process.env.SHIPROCKET_EMAIL,
-      password: process.env.SHIPROCKET_PASSWORD,
-    }),
+    body: JSON.stringify({ email, password }),
   })
-  if (!res.ok) throw new Error(`Shiprocket auth failed: ${res.status}`)
+  
+  if (!res.ok) {
+    const errorText = await res.text().catch(() => '')
+    throw new Error(`Shiprocket auth failed: status ${res.status} - ${errorText}`)
+  }
+  
   const data = await res.json()
+  if (!data.token) {
+    throw new Error(`Shiprocket auth response missing token: ${JSON.stringify(data)}`)
+  }
+
   _token = data.token
   _tokenExpiry = Date.now() + 9 * 24 * 60 * 60 * 1000 // 9 days (token valid 10 days)
   return _token!
