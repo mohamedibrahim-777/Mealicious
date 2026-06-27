@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdmin } from '@/lib/auth-server'
+import { db } from '@/lib/db'
 import fs from 'fs'
 import path from 'path'
 
@@ -7,6 +8,28 @@ export async function GET(req: NextRequest) {
   try {
     const { error } = await requireAdmin(req)
     if (error) return error
+
+    const url = new URL(req.url)
+    const orderNumber = url.searchParams.get('orderNumber')
+
+    let orderData = null
+    if (orderNumber) {
+      const order = await db.order.findUnique({
+        where: { orderNumber },
+        select: { shippingAddr: true, user: { select: { name: true, email: true, phone: true } } }
+      })
+      if (order) {
+        let parsedAddr = null
+        try { parsedAddr = JSON.parse(order.shippingAddr) } catch {}
+        orderData = {
+          rawShippingAddr: order.shippingAddr,
+          parsedAddr,
+          user: order.user
+        }
+      } else {
+        orderData = { error: 'Order not found' }
+      }
+    }
 
     const email = process.env.SHIPROCKET_EMAIL || ''
     const password = process.env.SHIPROCKET_PASSWORD || ''
@@ -47,6 +70,7 @@ export async function GET(req: NextRequest) {
         pickupName: pickupName || 'NOT_SET',
       },
       testAuthResult,
+      orderData,
     })
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 })

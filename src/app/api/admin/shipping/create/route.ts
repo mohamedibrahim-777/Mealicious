@@ -19,27 +19,47 @@ export async function POST(req: NextRequest) {
     if (!order) return NextResponse.json({ error: 'Order not found' }, { status: 404 })
 
     let addr: Record<string, string> = {}
-    try { addr = JSON.parse(order.shippingAddr) } catch {}
+    let isJson = true
+    try { 
+      addr = JSON.parse(order.shippingAddr) 
+    } catch {
+      isJson = false
+    }
 
     // Sanitizations for Shiprocket constraints
-    let billingName = String(addr.fullName || order.user?.name || 'Customer').trim()
+    let billingName = String(addr.fullName || addr.name || order.user?.name || 'Customer').trim()
     if (billingName.length < 3) billingName = 'Customer Name'
 
-    let billingAddress = [addr.address1, addr.address2].filter(Boolean).join(', ').trim()
-    if (billingAddress.length < 10) {
-      billingAddress = `${billingAddress}, ${addr.city || ''}, ${addr.state || ''}`.trim()
-    }
-    if (billingAddress.length < 10) {
-      billingAddress = `${billingAddress} Main Street`.trim()
-    }
-
     let billingCity = String(addr.city || 'City').trim()
-    if (!billingCity) billingCity = 'City'
+    if (!billingCity || billingCity.toLowerCase() === 'city') billingCity = 'City'
 
     let billingState = String(addr.state || 'State').trim()
-    if (!billingState) billingState = 'State'
+    if (!billingState || billingState.toLowerCase() === 'state') billingState = 'State'
+
+    let billingAddress = ''
+    if (isJson) {
+      const primaryAddr = addr.address1 || addr.address || ''
+      const secondaryAddr = addr.address2 || ''
+      billingAddress = [primaryAddr, secondaryAddr].filter(Boolean).join(', ').trim()
+    } else {
+      billingAddress = String(order.shippingAddr || '').trim()
+    }
+
+    // Clean up leading commas/spaces
+    billingAddress = billingAddress.replace(/^[\s,]+/, '').trim()
+
+    if (billingAddress.length < 10) {
+      billingAddress = `Main Street, ${billingAddress}`.trim()
+    }
+    if (billingAddress.length < 10) {
+      billingAddress = `Address Line 1, Main Street, ${billingCity}, ${billingState}`.trim()
+    }
 
     let billingPincode = String(addr.pincode || '').replace(/\D/g, '')
+    if (billingPincode.length !== 6 && !isJson) {
+      const pinMatch = String(order.shippingAddr).match(/\b\d{6}\b/)
+      if (pinMatch) billingPincode = pinMatch[0]
+    }
     if (billingPincode.length !== 6) {
       billingPincode = '110001' // Default pin if invalid
     }
