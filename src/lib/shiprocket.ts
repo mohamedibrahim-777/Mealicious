@@ -27,7 +27,6 @@ function initEnv() {
           }
         })
         console.log(`[Shiprocket Env] Loaded environment from: ${envPath}`)
-        break
       } catch (e) {
         console.error(`[Shiprocket Env] Failed to read/parse ${envPath}:`, e)
       }
@@ -171,7 +170,15 @@ export async function createShiprocketOrder(params: CreateOrderParams) {
       shipping_state: params.billingState,
       shipping_email: params.billingEmail,
       shipping_phone: params.billingPhone,
-      order_items: params.orderItems,
+      order_items: params.orderItems.map(item => ({
+        name: item.name,
+        sku: item.sku,
+        units: item.units,
+        selling_price: item.sellingPrice,
+        discount: item.discount,
+        tax: item.tax,
+        hsn: item.hsn,
+      })),
       payment_method: params.paymentMethod,
       sub_total: params.subTotal,
       length: params.length,
