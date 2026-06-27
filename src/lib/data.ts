@@ -797,7 +797,7 @@ export const faqData = [
     category: 'Orders & Shipping',
     questions: [
       { q: 'How long does delivery take?', a: 'We deliver across India within 3-7 business days. Metro cities usually receive orders within 2-4 days. You will receive tracking details via email and WhatsApp once your order is shipped.' },
-      { q: 'Do you offer free shipping?', a: 'Yes! We offer free shipping on all orders above ₹599. For orders below ₹599, a flat shipping fee of ₹49 applies.' },
+      { q: 'Do you offer free shipping?', a: 'Yes! We offer free shipping on all orders above ₹499. For orders below ₹499, a flat shipping fee of ₹49 applies.' },
       { q: 'Can I track my order?', a: 'Absolutely! Once your order is shipped, you will receive a tracking number via email and WhatsApp. You can also track your order on our Track Order page.' },
       { q: 'Do you deliver internationally?', a: 'Currently, we deliver only within India. International shipping will be available soon!' },
     ],
@@ -815,8 +815,8 @@ export const faqData = [
     category: 'Payments & Returns',
     questions: [
       { q: 'What payment methods do you accept?', a: 'We accept all major payment methods including UPI (Google Pay, PhonePe, Paytm), Credit/Debit Cards, Net Banking, and Cash on Delivery (COD). All online payments are secured by Cashfree.' },
-      { q: 'Is COD available?', a: 'Yes, Cash on Delivery is available for orders up to ₹5,000. A nominal COD fee of ₹50 applies.' },
-      { q: 'What is your return policy?', a: 'We offer a 7-day return policy for all products. If you receive a damaged or defective product, we will replace it or provide a full refund. Please contact our support team within 7 days of delivery.' },
+      { q: 'Is COD available?', a: 'Yes, Cash on Delivery is available for orders up to ₹5,000. A nominal COD fee of ₹49 applies.' },
+      { q: 'What is your return policy?', a: 'In the interest of food safety and FSSAI guidelines, we do not accept returns on food products. If you receive a wrong, damaged, or incomplete order, please contact us within 24 hours of delivery for a replacement or refund.' },
       { q: 'How do I get a refund?', a: 'Refunds are processed within 5-7 business days. For prepaid orders, the refund is credited to your original payment method. For COD orders, we will transfer the refund to your bank account.' },
     ],
   },
@@ -825,7 +825,7 @@ export const faqData = [
     questions: [
       { q: 'How do I create an account?', a: 'Click on the "Login/Register" button in the top navigation bar. You can sign up with your email address or phone number. It takes less than 30 seconds!' },
       { q: 'I forgot my password. What do I do?', a: 'Click on "Forgot Password" on the login page. Enter your registered email, and we will send you a password reset link.' },
-      { q: 'How can I contact customer support?', a: 'You can reach us through: Email: support@mealicious.store, or use the contact form on our website. We are available 10 AM - 8 PM IST, Monday to Saturday.' },
+      { q: 'How can I contact customer support?', a: 'You can reach us through: Email: support@mealicious.in, or use the contact form on our website. We are available 10 AM - 8 PM IST, Monday to Saturday.' },
     ],
   },
 ]

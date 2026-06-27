@@ -527,7 +527,7 @@ export default function ProductDetail() {
               <Truck className="h-5 w-5 text-orange-400 shrink-0" />
               <div>
                 <p className="text-xs font-semibold text-foreground">Free Delivery</p>
-                <p className="text-[11px] text-muted-foreground">On orders ₹599+</p>
+                <p className="text-[11px] text-muted-foreground">On orders ₹499+</p>
               </div>
             </div>
             <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
@@ -540,8 +540,8 @@ export default function ProductDetail() {
             <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
               <Shield className="h-5 w-5 text-orange-400 shrink-0" />
               <div>
-                <p className="text-xs font-semibold text-foreground">7-Day Returns</p>
-                <p className="text-[11px] text-muted-foreground">Easy returns</p>
+                <p className="text-xs font-semibold text-foreground">Food Safety</p>
+                <p className="text-[11px] text-muted-foreground">No return policy</p>
               </div>
             </div>
           </div>

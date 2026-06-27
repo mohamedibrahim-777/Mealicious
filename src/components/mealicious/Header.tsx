@@ -116,7 +116,7 @@ export default function Header() {
     <>
       {/* Announcement Bar */}
       <div className="bg-stone-900 text-white text-xs py-2 px-4 text-center font-medium select-none tracking-wide">
-        🎉 Free shipping on orders above ₹599! | Use code <span className="text-amber-400 font-bold">HEALTHY10</span> for 10% off
+        🎉 Free shipping on orders above ₹499! | Get 10% EXTRA discount on all Prepaid Orders!
       </div>
 
       {/* Main Header */}

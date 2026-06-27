@@ -69,12 +69,30 @@ export function ShippingBox({ productPrice, productWeight = 0.5, declaredValue =
         setError('No shipping options available for this area')
       }
     } catch (e) {
-      const shippingCost = productPrice >= 599 ? 0 : 49
+      const shippingCost = productPrice >= 499 ? 0 : 49
       setFallbackRate({ rate: shippingCost, label: 'Standard Delivery' })
       toast.info('Using standard shipping rate')
     } finally {
       setLoading(false)
     }
+  }
+
+  const getEtdDate = (days: number, etdStr?: string) => {
+    if (etdStr) {
+      try {
+        const d = new Date(etdStr)
+        if (!isNaN(d.getTime())) {
+          return d.toLocaleDateString('en-IN', {
+            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+          })
+        }
+      } catch {}
+    }
+    const d = new Date()
+    d.setDate(d.getDate() + (days || 4))
+    return d.toLocaleDateString('en-IN', {
+      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+    })
   }
 
   const bestRate = rates.length > 0 ? rates[0] : fallbackRate
@@ -122,17 +140,13 @@ export function ShippingBox({ productPrice, productWeight = 0.5, declaredValue =
               <div key={idx} className="bg-white border border-gray-200 rounded p-3 flex justify-between items-center">
                 <div>
                   <p className="font-medium text-gray-900">{rate.courierName}</p>
-                  <div className="flex gap-4 text-sm text-gray-600 mt-1">
-                    <span className="flex items-center gap-1">
-                      <Calendar className="h-4 w-4" />
-                      {rate.estimatedDays} days
+                  <div className="flex flex-col gap-1 text-sm text-gray-600 mt-1">
+                    <span className="flex items-center gap-1.5 text-blue-600 font-medium">
+                      <Calendar className="h-4 w-4 shrink-0" />
+                      Expected Delivery: {getEtdDate(rate.estimatedDays, rate.etd)}
                     </span>
-                    {rate.cod && <span className="text-green-600">COD Available</span>}
+                    {rate.cod && <span className="text-green-600 font-medium">COD Available</span>}
                   </div>
-                </div>
-                <div className="text-right">
-                  <p className="font-bold text-lg text-gray-900">₹{rate.rate}</p>
-                  {idx === 0 && <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Best</span>}
                 </div>
               </div>
             ))}
@@ -144,17 +158,14 @@ export function ShippingBox({ productPrice, productWeight = 0.5, declaredValue =
           <div className="bg-white border border-gray-200 rounded p-3 flex justify-between items-center">
             <div>
               <p className="font-medium text-gray-900">{fallbackRate.label}</p>
-              <div className="flex gap-4 text-sm text-gray-600 mt-1">
-                <span className="flex items-center gap-1">
-                  <Calendar className="h-4 w-4" />
-                  3-5 days
+              <div className="flex flex-col gap-1 text-sm text-gray-600 mt-1">
+                <span className="flex items-center gap-1.5 text-blue-600 font-medium">
+                  <Calendar className="h-4 w-4 shrink-0" />
+                  Expected Delivery: {getEtdDate(4)}
                 </span>
-                <span className="text-green-600">COD Available</span>
+                <span className="text-green-600 font-medium">COD Available</span>
               </div>
             </div>
-            <p className="font-bold text-lg text-gray-900">
-              {fallbackRate.rate === 0 ? 'FREE' : `₹${fallbackRate.rate}`}
-            </p>
           </div>
         )}
 

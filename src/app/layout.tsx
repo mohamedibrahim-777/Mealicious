@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   },
   description: "Shop premium quality cashews, almonds, trail mix, dried fruits, flavored nuts & healthy snacks. 100% natural, FSSAI certified. Free shipping on orders above ₹599.",
   keywords: ["dry fruits", "healthy snacks", "cashews", "almonds", "trail mix", "premium nuts", "organic", "Mealicious", "Indian snacks", "health food"],
-  authors: [{ name: "MEALICIOUS VENTURES PRIVATE LIMITED" }],
+  authors: [{ name: "Mealicious Ventures Private Limited" }],
   alternates: {
     canonical: "/",
   },
@@ -60,7 +60,14 @@ const ORG_JSONLD = {
   name: "Mealicious Store",
   url: SITE_URL,
   description: "Premium dry fruits and healthy snacks. 100% natural, FSSAI certified.",
-  address: { "@type": "PostalAddress", addressCountry: "IN" },
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: "1/108, Elappankadu, Malankadu, Uthamasolapuram",
+    addressLocality: "Salem",
+    addressRegion: "Tamil Nadu",
+    postalCode: "636010",
+    addressCountry: "IN"
+  },
   sameAs: [] as string[],
 };
 

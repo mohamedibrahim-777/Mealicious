@@ -91,7 +91,7 @@ const stats = [
   { label: 'Happy Customers', value: '10,000+' },
   { label: 'Products', value: '50+' },
   { label: 'Natural', value: '100%' },
-  { label: 'Free Shipping', value: '₹599+' },
+  { label: 'Free Shipping', value: '₹499+' },
 ]
 
 /* ─────────────────────── why choose us items ─────────────────────── */

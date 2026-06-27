@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
     // Shiprocket not configured — return flat rate fallback
     return NextResponse.json({
       rates: [],
-      fallback: { rate: declaredValue >= 599 ? 0 : 49, label: 'Standard Delivery' },
+      fallback: { rate: declaredValue >= 499 ? 0 : 49, label: 'Standard Delivery' },
     })
   }
 
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
     // Graceful fallback on any API error
     return NextResponse.json({
       rates: [],
-      fallback: { rate: declaredValue >= 599 ? 0 : 49, label: 'Standard Delivery' },
+      fallback: { rate: declaredValue >= 499 ? 0 : 49, label: 'Standard Delivery' },
     })
   }
 }

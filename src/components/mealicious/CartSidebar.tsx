@@ -42,7 +42,7 @@ export default function CartSidebar() {
     0
   )
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0)
-  const shipping = subtotal >= 599 ? 0 : 49
+  const shipping = subtotal >= 499 ? 0 : 49
   const discount = (() => {
     if (!appliedCoupon) return 0
     if (appliedCoupon === 'IBUU50') return Math.min(49, subtotal)
@@ -332,7 +332,7 @@ export default function CartSidebar() {
                 )}
                 {shipping > 0 && (
                   <p className="text-xs text-gray-400">
-                    Add ₹{599 - subtotal} more for free shipping
+                    Add ₹{499 - subtotal} more for free shipping
                   </p>
                 )}
               </div>

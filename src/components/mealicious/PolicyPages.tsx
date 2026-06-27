@@ -8,6 +8,9 @@ import {
   FileText,
   RotateCcw,
   Home,
+  AlertCircle,
+  Mail,
+  CheckCircle2,
 } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -78,15 +81,15 @@ function TableOfContents({
   return (
     <Card className="sticky top-24">
       <CardContent className="p-5 space-y-3">
-        <h3 className="font-semibold text-foreground text-sm">Table of Contents</h3>
+        <h3 className="font-semibold text-foreground text-sm font-serif">Table of Contents</h3>
         <nav className="space-y-1">
           {items.map((item) => (
             <button
               key={item.id}
               onClick={() => handleClick(item.id)}
-              className={`block text-xs sm:text-sm text-left w-full py-1 px-2 rounded transition-colors ${
+              className={`block text-xs sm:text-sm text-left w-full py-1.5 px-2 rounded transition-colors ${
                 activeId === item.id
-                  ? 'bg-blue-50 text-orange-400 font-medium'
+                  ? 'bg-amber-50 text-orange-500 font-medium dark:bg-amber-950/20'
                   : 'text-muted-foreground hover:bg-muted hover:text-foreground'
               }`}
             >
@@ -104,14 +107,17 @@ function TableOfContents({
 /* ══════════════════════════════════════════════════════════════════ */
 
 const privacySections = [
-  { id: 'privacy-intro', label: 'Introduction' },
-  { id: 'privacy-collection', label: 'Data Collection' },
-  { id: 'privacy-usage', label: 'Data Usage' },
-  { id: 'privacy-cookies', label: 'Cookies & Tracking' },
-  { id: 'privacy-third', label: 'Third-Party Sharing' },
-  { id: 'privacy-rights', label: 'Your Rights' },
-  { id: 'privacy-security', label: 'Data Security' },
-  { id: 'privacy-contact', label: 'Contact Us' },
+  { id: 'privacy-intro', label: '1. Introduction' },
+  { id: 'privacy-collection', label: '1.1 Information We Collect' },
+  { id: 'privacy-usage', label: '1.2 How We Use Information' },
+  { id: 'privacy-sharing', label: '1.3 Sharing of Information' },
+  { id: 'privacy-cookies', label: '1.4 Cookies Policy' },
+  { id: 'privacy-retention', label: '1.5 Data Retention' },
+  { id: 'privacy-rights', label: '1.6 Your Rights' },
+  { id: 'privacy-security', label: '1.7 Data Security' },
+  { id: 'privacy-third', label: '1.8 Third-Party Links' },
+  { id: 'privacy-changes', label: '1.9 Changes to This Policy' },
+  { id: 'privacy-contact', label: '1.10 Contact Us' },
 ]
 
 export function PrivacyPolicyPage() {
@@ -120,8 +126,8 @@ export function PrivacyPolicyPage() {
   return (
     <div className="flex flex-col">
       {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-orange-400 via-orange-400 to-orange-400">
-        <div className="absolute -top-32 -right-32 h-96 w-96 rounded-full bg-orange-400/20 blur-3xl" />
+      <section className="relative overflow-hidden bg-gradient-to-br from-amber-500 via-orange-500 to-amber-600">
+        <div className="absolute -top-32 -right-32 h-96 w-96 rounded-full bg-white/10 blur-3xl" />
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -129,11 +135,11 @@ export function PrivacyPolicyPage() {
             transition={{ duration: 0.7, ease: 'easeOut' }}
             className="text-center max-w-3xl mx-auto"
           >
-            <ShieldCheck className="h-12 w-12 text-blue-200 mx-auto mb-4" />
+            <ShieldCheck className="h-12 w-12 text-amber-100 mx-auto mb-4" />
             <h1 className="text-3xl sm:text-4xl font-extrabold text-white leading-tight tracking-tight font-serif">
               Privacy Policy
             </h1>
-            <p className="mt-3 text-blue-100">Last updated: March 1, 2025</p>
+            <p className="mt-3 text-amber-50">Last updated: June 2025</p>
           </motion.div>
         </div>
       </section>
@@ -154,129 +160,138 @@ export function PrivacyPolicyPage() {
               <FadeInWhenVisible>
                 <div className="prose prose-sm sm:prose max-w-none space-y-8">
                   <div id="privacy-intro">
-                    <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3">1. Introduction</h2>
+                    <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3 font-serif">1. Introduction</h2>
                     <p className="text-muted-foreground leading-relaxed">
-                      MEALICIOUS VENTURES PRIVATE LIMITED (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;) is committed to protecting
-                      the privacy and security of your personal information. This Privacy Policy describes how we
-                      collect, use, disclose, and protect information when you visit our website mealicious.store
-                      (&quot;Site&quot;), use our mobile application, or interact with our services. By accessing or using
-                      our services, you agree to the practices described in this Privacy Policy.
+                      Mealicious Ventures Private Limited (&quot;Mealicious&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;) is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website <a href="https://www.mealicious.in" className="text-orange-500 font-medium hover:underline">www.mealicious.in</a> or purchase our products.
                     </p>
                   </div>
 
                   <Separator />
 
                   <div id="privacy-collection">
-                    <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3">2. Data Collection</h2>
-                    <p className="text-muted-foreground leading-relaxed mb-4">
-                      We collect information that you provide directly to us, including:
-                    </p>
-                    <ul className="list-disc pl-5 space-y-2 text-muted-foreground">
-                      <li><strong className="text-foreground">Account Information:</strong> Name, email address, phone number, and password when you create an account.</li>
-                      <li><strong className="text-foreground">Order Information:</strong> Shipping address, billing address, payment details, and order history when you make a purchase.</li>
-                      <li><strong className="text-foreground">Communication Data:</strong> Information you provide when contacting our customer support team, including chat messages, emails, and feedback.</li>
-                      <li><strong className="text-foreground">Device & Usage Data:</strong> IP address, browser type, operating system, referring URLs, access times, pages viewed, and links clicked.</li>
-                      <li><strong className="text-foreground">Location Data:</strong> Approximate location based on your IP address for delivery estimation and localized content.</li>
-                    </ul>
+                    <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3 font-serif">1.1 Information We Collect</h2>
+                    <div className="space-y-4 text-muted-foreground">
+                      <div>
+                        <h4 className="font-semibold text-foreground text-sm">Personal Information</h4>
+                        <ul className="list-disc pl-5 mt-1 space-y-1">
+                          <li>Full name and contact details (phone number, email address)</li>
+                          <li>Delivery address and billing address</li>
+                          <li>Payment information (processed securely via third-party payment gateways)</li>
+                          <li>Order history and purchase preferences</li>
+                          <li>Account login credentials (if you create an account)</li>
+                        </ul>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-foreground text-sm">Automatically Collected Information</h4>
+                        <ul className="list-disc pl-5 mt-1 space-y-1">
+                          <li>IP address, browser type, and device information</li>
+                          <li>Pages visited, time spent, and navigation patterns on our website</li>
+                          <li>Cookies and similar tracking technologies</li>
+                          <li>Referring website or source of visit</li>
+                        </ul>
+                      </div>
+                    </div>
                   </div>
 
                   <Separator />
 
                   <div id="privacy-usage">
-                    <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3">3. Data Usage</h2>
-                    <p className="text-muted-foreground leading-relaxed mb-4">
-                      We use the information we collect for the following purposes:
+                    <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3 font-serif">1.2 How We Use Your Information</h2>
+                    <ul className="list-disc pl-5 space-y-2 text-muted-foreground">
+                      <li>To process and fulfil your orders</li>
+                      <li>To send order confirmations, invoices, and shipping updates</li>
+                      <li>To respond to customer support queries and complaints</li>
+                      <li>To improve our website, products, and services</li>
+                      <li>To send promotional offers, newsletters, and updates (with your consent)</li>
+                      <li>To comply with applicable legal and regulatory obligations</li>
+                      <li>To prevent fraud, unauthorised transactions, and other illegal activities</li>
+                    </ul>
+                  </div>
+
+                  <Separator />
+
+                  <div id="privacy-sharing">
+                    <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3 font-serif">1.3 Sharing of Information</h2>
+                    <p className="text-muted-foreground leading-relaxed mb-3">
+                      We do not sell, trade, or rent your personal information to third parties. We may share your data with:
                     </p>
                     <ul className="list-disc pl-5 space-y-2 text-muted-foreground">
-                      <li>To process and fulfill your orders, including shipping and delivery</li>
-                      <li>To communicate with you about your orders, account, and customer support inquiries</li>
-                      <li>To personalize your shopping experience and recommend products</li>
-                      <li>To send promotional communications, newsletters, and marketing offers (with your consent)</li>
-                      <li>To improve our website, products, and services through analytics and research</li>
-                      <li>To detect, prevent, and address fraud, security breaches, and other illegal activities</li>
-                      <li>To comply with legal obligations and enforce our terms and conditions</li>
+                      <li>Logistics and delivery partners (for order fulfilment)</li>
+                      <li>Payment gateway providers (for secure transaction processing)</li>
+                      <li>Technology and cloud service providers (for website and data hosting)</li>
+                      <li>Government authorities (when required by law or court order)</li>
                     </ul>
                   </div>
 
                   <Separator />
 
                   <div id="privacy-cookies">
-                    <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3">4. Cookies &amp; Tracking</h2>
-                    <p className="text-muted-foreground leading-relaxed mb-4">
-                      We use cookies, web beacons, and similar tracking technologies to enhance your browsing
-                      experience and collect information about how you use our Site. Types of cookies we use include:
+                    <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3 font-serif">1.4 Cookies Policy</h2>
+                    <p className="text-muted-foreground leading-relaxed">
+                      We use cookies to enhance your browsing experience. Cookies are small data files stored on your device. You may disable cookies through your browser settings; however, doing so may affect certain website functionalities.
                     </p>
+                  </div>
+
+                  <Separator />
+
+                  <div id="privacy-retention">
+                    <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3 font-serif">1.5 Data Retention</h2>
+                    <p className="text-muted-foreground leading-relaxed">
+                      We retain your personal data for as long as necessary to fulfil the purposes outlined in this policy or as required by applicable laws. Order-related data is retained for a minimum of 7 years for GST and accounting compliance.
+                    </p>
+                  </div>
+
+                  <Separator />
+
+                  <div id="privacy-rights">
+                    <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3 font-serif">1.6 Your Rights</h2>
                     <ul className="list-disc pl-5 space-y-2 text-muted-foreground">
-                      <li><strong className="text-foreground">Essential Cookies:</strong> Required for the Site to function properly (e.g., shopping cart, login session)</li>
-                      <li><strong className="text-foreground">Analytics Cookies:</strong> Help us understand how visitors interact with our Site (e.g., Google Analytics)</li>
-                      <li><strong className="text-foreground">Advertising Cookies:</strong> Used to deliver relevant advertisements and track campaign performance</li>
-                      <li><strong className="text-foreground">Preference Cookies:</strong> Remember your settings and preferences for a personalized experience</li>
+                      <li>Right to access the personal data we hold about you</li>
+                      <li>Right to correct inaccurate or incomplete information</li>
+                      <li>Right to request deletion of your personal data (subject to legal obligations)</li>
+                      <li>Right to withdraw consent for marketing communications at any time</li>
+                      <li>Right to lodge a complaint with the relevant data protection authority</li>
                     </ul>
-                    <p className="text-muted-foreground leading-relaxed mt-4">
-                      You can control cookie preferences through your browser settings. Disabling certain cookies
-                      may affect the functionality of our Site.
+                  </div>
+
+                  <Separator />
+
+                  <div id="privacy-security">
+                    <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3 font-serif">1.7 Data Security</h2>
+                    <p className="text-muted-foreground leading-relaxed">
+                      We implement industry-standard security measures including SSL encryption, secure servers, and access controls to protect your personal information. However, no method of transmission over the internet is 100% secure, and we cannot guarantee absolute security.
                     </p>
                   </div>
 
                   <Separator />
 
                   <div id="privacy-third">
-                    <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3">5. Third-Party Sharing</h2>
-                    <p className="text-muted-foreground leading-relaxed mb-4">
-                      We do not sell your personal information. We may share your information with:
-                    </p>
-                    <ul className="list-disc pl-5 space-y-2 text-muted-foreground">
-                      <li><strong className="text-foreground">Service Providers:</strong> Logistics partners for delivery, payment processors (Cashfree), and analytics providers</li>
-                      <li><strong className="text-foreground">Legal Requirements:</strong> When required by law, court order, or government regulation</li>
-                      <li><strong className="text-foreground">Business Transfers:</strong> In connection with a merger, acquisition, or sale of assets</li>
-                      <li><strong className="text-foreground">With Your Consent:</strong> When you have given us explicit permission to share your information</li>
-                    </ul>
-                  </div>
-
-                  <Separator />
-
-                  <div id="privacy-rights">
-                    <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3">6. Your Rights</h2>
-                    <p className="text-muted-foreground leading-relaxed mb-4">
-                      Under applicable data protection laws, you have the following rights:
-                    </p>
-                    <ul className="list-disc pl-5 space-y-2 text-muted-foreground">
-                      <li><strong className="text-foreground">Access:</strong> Request a copy of the personal data we hold about you</li>
-                      <li><strong className="text-foreground">Correction:</strong> Request correction of inaccurate or incomplete personal data</li>
-                      <li><strong className="text-foreground">Deletion:</strong> Request deletion of your personal data, subject to legal obligations</li>
-                      <li><strong className="text-foreground">Opt-Out:</strong> Unsubscribe from marketing communications at any time</li>
-                      <li><strong className="text-foreground">Data Portability:</strong> Request your data in a structured, machine-readable format</li>
-                    </ul>
-                    <p className="text-muted-foreground leading-relaxed mt-4">
-                      To exercise any of these rights, please contact us at privacy@mealicious.store.
-                    </p>
-                  </div>
-
-                  <Separator />
-
-                  <div id="privacy-security">
-                    <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3">7. Data Security</h2>
+                    <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3 font-serif">1.8 Third-Party Links</h2>
                     <p className="text-muted-foreground leading-relaxed">
-                      We implement appropriate technical and organizational security measures to protect your
-                      personal information against unauthorized access, alteration, disclosure, or destruction.
-                      These measures include encryption (SSL/TLS), secure server infrastructure, access controls,
-                      and regular security audits. However, no method of transmission over the Internet is 100%
-                      secure, and we cannot guarantee absolute security.
+                      Our website may contain links to third-party websites. We are not responsible for the privacy practices of such sites and encourage you to review their respective privacy policies.
+                    </p>
+                  </div>
+
+                  <Separator />
+
+                  <div id="privacy-changes">
+                    <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3 font-serif">1.9 Changes to This Policy</h2>
+                    <p className="text-muted-foreground leading-relaxed">
+                      We reserve the right to update this Privacy Policy at any time. Changes will be posted on our website with a revised effective date. Continued use of our services after changes constitutes acceptance of the updated policy.
                     </p>
                   </div>
 
                   <Separator />
 
                   <div id="privacy-contact">
-                    <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3">8. Contact Us</h2>
+                    <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3 font-serif">1.10 Contact Us</h2>
                     <p className="text-muted-foreground leading-relaxed">
-                      If you have any questions or concerns about this Privacy Policy, please contact us:
+                      For privacy-related queries or requests:
                     </p>
-                    <div className="mt-3 space-y-1 text-sm text-muted-foreground">
-                      <p><strong className="text-foreground">MEALICIOUS VENTURES PRIVATE LIMITED</strong></p>
-                      <p>Email: privacy@mealicious.store</p>
-                      <p>Phone: +91-9876543210</p>
-                      <p>Address: 123 Health Street, Mumbai, Maharashtra 400001, India</p>
+                    <div className="mt-3 space-y-1.5 text-sm text-muted-foreground">
+                      <p><strong className="text-foreground">Mealicious Ventures Private Limited</strong></p>
+                      <p>Email: <span className="text-orange-500 font-medium">support@mealicious.in</span></p>
+                      <p>Address: 1/108, Elappankadu, Malankadu, Uthamasolapuram, Salem - 636010, Tamil Nadu, India</p>
                     </div>
                   </div>
                 </div>
@@ -294,14 +309,15 @@ export function PrivacyPolicyPage() {
 /* ══════════════════════════════════════════════════════════════════ */
 
 const termsSections = [
-  { id: 'terms-intro', label: 'Introduction' },
-  { id: 'terms-usage', label: 'Site Usage' },
-  { id: 'terms-orders', label: 'Orders & Pricing' },
-  { id: 'terms-ip', label: 'Intellectual Property' },
-  { id: 'terms-liability', label: 'Limitation of Liability' },
-  { id: 'terms-indemnity', label: 'Indemnification' },
-  { id: 'terms-governing', label: 'Governing Law' },
-  { id: 'terms-changes', label: 'Changes to Terms' },
+  { id: 'terms-intro', label: '2. Acceptance of Terms' },
+  { id: 'terms-pricing', label: '2.2 Products and Pricing' },
+  { id: 'terms-orders', label: '2.3 Orders and Payment' },
+  { id: 'terms-ip', label: '2.4 Intellectual Property' },
+  { id: 'terms-conduct', label: '2.5 User Conduct' },
+  { id: 'terms-liability', label: '2.6 Limitation of Liability' },
+  { id: 'terms-governing', label: '2.7 Governing Law & Jurisdiction' },
+  { id: 'terms-amendments', label: '2.8 Amendments' },
+  { id: 'terms-contact', label: '2.9 Contact for Legal Queries' },
 ]
 
 export function TermsPage() {
@@ -310,8 +326,8 @@ export function TermsPage() {
   return (
     <div className="flex flex-col">
       {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-orange-400 via-orange-400 to-orange-400">
-        <div className="absolute -top-32 -right-32 h-96 w-96 rounded-full bg-orange-400/20 blur-3xl" />
+      <section className="relative overflow-hidden bg-gradient-to-br from-amber-500 via-orange-500 to-amber-600">
+        <div className="absolute -top-32 -right-32 h-96 w-96 rounded-full bg-white/10 blur-3xl" />
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -319,11 +335,11 @@ export function TermsPage() {
             transition={{ duration: 0.7, ease: 'easeOut' }}
             className="text-center max-w-3xl mx-auto"
           >
-            <FileText className="h-12 w-12 text-blue-200 mx-auto mb-4" />
+            <FileText className="h-12 w-12 text-amber-100 mx-auto mb-4" />
             <h1 className="text-3xl sm:text-4xl font-extrabold text-white leading-tight tracking-tight font-serif">
               Terms &amp; Conditions
             </h1>
-            <p className="mt-3 text-blue-100">Last updated: March 1, 2025</p>
+            <p className="mt-3 text-amber-50">Last updated: June 2025</p>
           </motion.div>
         </div>
       </section>
@@ -344,109 +360,109 @@ export function TermsPage() {
               <FadeInWhenVisible>
                 <div className="prose prose-sm sm:prose max-w-none space-y-8">
                   <div id="terms-intro">
-                    <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3">1. Introduction</h2>
+                    <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3 font-serif">2. Acceptance of Terms</h2>
                     <p className="text-muted-foreground leading-relaxed">
-                      These Terms and Conditions (&quot;Terms&quot;) govern your use of the mealicious.store website
-                      and the services provided by MEALICIOUS VENTURES PRIVATE LIMITED (&quot;Company,&quot; &quot;we,&quot; &quot;our,&quot;
-                      or &quot;us&quot;). By accessing or using our website, you agree to be bound by these Terms.
-                      If you do not agree with any part of these Terms, you should not use our website or services.
+                      Welcome to Mealicious. By accessing our website (<a href="https://www.mealicious.in" className="text-orange-500 font-medium hover:underline">www.mealicious.in</a>) or placing an order, you agree to be bound by these Terms and Conditions. Please read them carefully before using our services.
+                    </p>
+                    <p className="text-muted-foreground leading-relaxed mt-3">
+                      By using our website or purchasing our products, you confirm that you are at least 18 years of age (or have parental consent) and legally capable of entering into a binding contract. If you do not agree to these terms, please do not use our services.
                     </p>
                   </div>
 
                   <Separator />
 
-                  <div id="terms-usage">
-                    <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3">2. Site Usage</h2>
-                    <p className="text-muted-foreground leading-relaxed mb-4">
-                      By using our website, you agree to:
-                    </p>
+                  <div id="terms-pricing">
+                    <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3 font-serif">2.2 Products and Pricing</h2>
                     <ul className="list-disc pl-5 space-y-2 text-muted-foreground">
-                      <li>Use the website only for lawful purposes and in accordance with these Terms</li>
-                      <li>Provide accurate, current, and complete information when creating an account or placing an order</li>
-                      <li>Maintain the confidentiality of your account credentials</li>
-                      <li>Not engage in any activity that could damage, disable, or impair the website&apos;s operation</li>
-                      <li>Not use automated systems (bots, scrapers) to access the website without prior written consent</li>
-                      <li>Not attempt to gain unauthorized access to any portion of the website or its related systems</li>
+                      <li>All products listed on our website are subject to availability.</li>
+                      <li>Prices are listed in Indian Rupees (INR) and are inclusive of applicable taxes (GST) unless stated otherwise.</li>
+                      <li>We reserve the right to change product prices, descriptions, or availability at any time without prior notice.</li>
+                      <li>Product images are for illustrative purposes only. Actual product packaging may vary slightly.</li>
+                      <li>Promotional prices are valid only for the specified period and cannot be combined with other offers unless explicitly stated.</li>
                     </ul>
                   </div>
 
                   <Separator />
 
                   <div id="terms-orders">
-                    <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3">3. Orders &amp; Pricing</h2>
-                    <p className="text-muted-foreground leading-relaxed mb-4">
-                      By placing an order on our website, you agree to the following:
-                    </p>
+                    <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3 font-serif">2.3 Orders and Payment</h2>
                     <ul className="list-disc pl-5 space-y-2 text-muted-foreground">
-                      <li><strong className="text-foreground">Order Acceptance:</strong> All orders are subject to acceptance and availability. We reserve the right to cancel any order due to stock unavailability, pricing errors, or suspected fraud.</li>
-                      <li><strong className="text-foreground">Pricing:</strong> All prices are listed in Indian Rupees (₹) and are inclusive of applicable taxes unless stated otherwise. Prices may change without prior notice.</li>
-                      <li><strong className="text-foreground">Payment:</strong> Payment must be made at the time of order placement through our accepted payment methods (UPI, Credit/Debit Cards, Net Banking, COD).</li>
-                      <li><strong className="text-foreground">Shipping:</strong> Free shipping is available on orders above ₹599. A flat shipping fee of ₹49 applies for orders below ₹599. Delivery timelines are estimates and may vary.</li>
-                      <li><strong className="text-foreground">COD Orders:</strong> Cash on Delivery is available for orders up to ₹5,000 with a nominal COD fee of ₹50.</li>
+                      <li>Orders are confirmed only upon successful payment processing.</li>
+                      <li>We accept payments via UPI, credit/debit cards, net banking, and other payment methods available at checkout.</li>
+                      <li>In the event of payment failure, please retry or contact your bank before placing a new order.</li>
+                      <li>We reserve the right to cancel any order in case of pricing errors, stock unavailability, or suspected fraudulent activity.</li>
+                      <li>An order confirmation email and/or SMS will be sent upon successful placement of order.</li>
                     </ul>
                   </div>
 
                   <Separator />
 
                   <div id="terms-ip">
-                    <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3">4. Intellectual Property</h2>
+                    <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3 font-serif">2.4 Intellectual Property</h2>
                     <p className="text-muted-foreground leading-relaxed">
-                      All content on this website, including text, graphics, logos, images, product descriptions,
-                      and software, is the property of MEALICIOUS VENTURES PRIVATE LIMITED and is protected by
-                      Indian and international copyright, trademark, and intellectual property laws. You may not
-                      reproduce, distribute, modify, create derivative works from, or commercially exploit any
-                      content from our website without our express written permission.
+                      All content on our website—including logos, brand name, product images, text, graphics, and design—is the exclusive property of Mealicious Ventures Private Limited and is protected under applicable intellectual property laws. Unauthorised reproduction, distribution, or commercial use of any content is strictly prohibited.
                     </p>
                   </div>
 
                   <Separator />
 
-                  <div id="terms-liability">
-                    <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3">5. Limitation of Liability</h2>
-                    <p className="text-muted-foreground leading-relaxed mb-4">
-                      To the fullest extent permitted by law:
-                    </p>
+                  <div id="terms-conduct">
+                    <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3 font-serif">2.5 User Conduct</h2>
+                    <p className="text-muted-foreground leading-relaxed mb-3">You agree not to:</p>
                     <ul className="list-disc pl-5 space-y-2 text-muted-foreground">
-                      <li>Our website and services are provided on an &quot;as is&quot; and &quot;as available&quot; basis without warranties of any kind</li>
-                      <li>We shall not be liable for any indirect, incidental, special, consequential, or punitive damages</li>
-                      <li>Our total liability for any claim arising from your use of our website or services shall not exceed the amount you paid for the specific product or service giving rise to the claim</li>
-                      <li>We are not responsible for any delays or failures in performance resulting from causes beyond our reasonable control</li>
+                      <li>Use our website for any unlawful or fraudulent purpose</li>
+                      <li>Attempt to gain unauthorised access to any part of our website or systems</li>
+                      <li>Post or transmit any offensive, defamatory, or harmful content</li>
+                      <li>Use automated tools or bots to access or scrape our website</li>
+                      <li>Impersonate any person or entity or misrepresent your affiliation</li>
                     </ul>
                   </div>
 
                   <Separator />
 
-                  <div id="terms-indemnity">
-                    <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3">6. Indemnification</h2>
-                    <p className="text-muted-foreground leading-relaxed">
-                      You agree to indemnify, defend, and hold harmless MEALICIOUS VENTURES PRIVATE LIMITED,
-                      its officers, directors, employees, agents, and affiliates from any claims, damages,
-                      losses, liabilities, and expenses (including legal fees) arising from your use of the
-                      website, violation of these Terms, or infringement of any third-party rights.
+                  <div id="terms-liability">
+                    <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3 font-serif">2.6 Limitation of Liability</h2>
+                    <p className="text-muted-foreground leading-relaxed mb-3">
+                      To the maximum extent permitted by applicable law, Mealicious shall not be liable for:
+                    </p>
+                    <ul className="list-disc pl-5 space-y-2 text-muted-foreground">
+                      <li>Any indirect, incidental, special, or consequential damages arising from use of our products or services</li>
+                      <li>Loss of data, revenue, or profits</li>
+                      <li>Delays or failures caused by events beyond our reasonable control (force majeure)</li>
+                    </ul>
+                    <p className="text-muted-foreground mt-3">
+                      Our total liability in any case shall not exceed the amount paid by you for the specific product or order in question.
                     </p>
                   </div>
 
                   <Separator />
 
                   <div id="terms-governing">
-                    <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3">7. Governing Law</h2>
+                    <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3 font-serif">2.7 Governing Law and Jurisdiction</h2>
                     <p className="text-muted-foreground leading-relaxed">
-                      These Terms shall be governed by and construed in accordance with the laws of India.
-                      Any disputes arising out of or in connection with these Terms shall be subject to the
-                      exclusive jurisdiction of the courts in Mumbai, Maharashtra, India.
+                      These Terms and Conditions are governed by the laws of India. Any disputes arising shall be subject to the exclusive jurisdiction of the courts at Salem, Tamil Nadu, India.
                     </p>
                   </div>
 
                   <Separator />
 
-                  <div id="terms-changes">
-                    <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3">8. Changes to Terms</h2>
+                  <div id="terms-amendments">
+                    <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3 font-serif">2.8 Amendments</h2>
                     <p className="text-muted-foreground leading-relaxed">
-                      We reserve the right to modify or update these Terms at any time without prior notice.
-                      Changes will be effective immediately upon posting on the website. Your continued use
-                      of the website after any changes constitutes your acceptance of the new Terms.
-                      We encourage you to review these Terms periodically.
+                      We reserve the right to modify these Terms and Conditions at any time. Updates will be published on our website. Continued use of our services after any modification constitutes your acceptance of the revised terms.
                     </p>
+                  </div>
+
+                  <Separator />
+
+                  <div id="terms-contact">
+                    <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3 font-serif">2.9 Contact for Legal Queries</h2>
+                    <div className="mt-3 space-y-1.5 text-sm text-muted-foreground">
+                      <p><strong className="text-foreground">Mealicious Ventures Private Limited</strong></p>
+                      <p>Email: <span className="text-orange-500 font-medium">support@mealicious.in</span></p>
+                      <p>CIN: U10799TZ2025PTC037179</p>
+                      <p>Address: 1/108, Elappankadu, Malankadu, Uthamasolapuram, Salem - 636010, Tamil Nadu, India</p>
+                    </div>
                   </div>
                 </div>
               </FadeInWhenVisible>
@@ -463,12 +479,11 @@ export function TermsPage() {
 /* ══════════════════════════════════════════════════════════════════ */
 
 const refundSections = [
-  { id: 'refund-overview', label: 'Return Policy Overview' },
-  { id: 'refund-eligibility', label: 'Eligibility' },
-  { id: 'refund-process', label: 'Refund Process' },
-  { id: 'refund-exchange', label: 'Exchange Policy' },
-  { id: 'refund-non-returnable', label: 'Non-Returnable Items' },
-  { id: 'refund-contact', label: 'Contact for Returns' },
+  { id: 'refund-no-return', label: '4.1 No Return Policy' },
+  { id: 'refund-eligible', label: '4.2 Eligible Cases' },
+  { id: 'refund-process', label: '4.3 Refund Process' },
+  { id: 'refund-non-eligible', label: '4.4 Non-Eligible Cases' },
+  { id: 'refund-cancellation', label: '4.5 Cancellation Policy' },
 ]
 
 export function RefundPolicyPage() {
@@ -478,8 +493,8 @@ export function RefundPolicyPage() {
   return (
     <div className="flex flex-col">
       {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-orange-400 via-orange-400 to-orange-400">
-        <div className="absolute -top-32 -right-32 h-96 w-96 rounded-full bg-orange-400/20 blur-3xl" />
+      <section className="relative overflow-hidden bg-gradient-to-br from-amber-500 via-orange-500 to-amber-600">
+        <div className="absolute -top-32 -right-32 h-96 w-96 rounded-full bg-white/10 blur-3xl" />
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -487,11 +502,11 @@ export function RefundPolicyPage() {
             transition={{ duration: 0.7, ease: 'easeOut' }}
             className="text-center max-w-3xl mx-auto"
           >
-            <RotateCcw className="h-12 w-12 text-blue-200 mx-auto mb-4" />
+            <RotateCcw className="h-12 w-12 text-amber-100 mx-auto mb-4" />
             <h1 className="text-3xl sm:text-4xl font-extrabold text-white leading-tight tracking-tight font-serif">
               Refund &amp; Return Policy
             </h1>
-            <p className="mt-3 text-blue-100">Last updated: March 1, 2025</p>
+            <p className="mt-3 text-amber-50">Last updated: June 2025</p>
           </motion.div>
         </div>
       </section>
@@ -511,155 +526,103 @@ export function RefundPolicyPage() {
             <div className="lg:col-span-3">
               <FadeInWhenVisible>
                 <div className="prose prose-sm sm:prose max-w-none space-y-8">
-                  <div id="refund-overview">
-                    <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3">1. Return Policy Overview</h2>
+                  <div id="refund-no-return">
+                    <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3 font-serif">4.1 No Return Policy for Food Products</h2>
+                    <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 rounded-lg p-4 mb-4 text-amber-800 dark:text-amber-300 text-sm font-semibold flex gap-2">
+                      <AlertCircle className="w-5 h-5 shrink-0" />
+                      <p>IMPORTANT NOTICE: As per FSSAI regulations and standard food industry practices, we DO NOT accept returns on any food products once delivered. This policy is in place to maintain the highest standards of food safety and hygiene for all our customers.</p>
+                    </div>
                     <p className="text-muted-foreground leading-relaxed">
-                      At MEALICIOUS VENTURES PRIVATE LIMITED, we take pride in the quality of our products.
-                      If you are not completely satisfied with your purchase, we offer a <strong className="text-foreground">7-day return policy</strong> from
-                      the date of delivery. This policy applies to all products purchased through our website
-                      mealicious.store.
+                      In the interest of food safety and hygiene, Mealicious strictly does not accept returns of any food products under any circumstances once they have been delivered. This applies to all products in our range including:
                     </p>
-                    <Card className="mt-4 bg-blue-50 border-blue-200">
-                      <CardContent className="p-4 flex items-start gap-3">
-                        <RotateCcw className="h-5 w-5 text-orange-400 shrink-0 mt-0.5" />
-                        <div>
-                          <p className="font-semibold text-orange-400 text-sm">7-Day Easy Returns</p>
-                          <p className="text-xs text-orange-400 mt-0.5">
-                            Return any product within 7 days of delivery if you&apos;re not satisfied.
-                          </p>
-                        </div>
-                      </CardContent>
-                    </Card>
+                    <ul className="list-disc pl-5 mt-2 space-y-1 text-muted-foreground">
+                      <li>Premium Flavoured Makhana (Cheese, Magic Masala, Peri Peri)</li>
+                      <li>Healthy Chips (Ragi Chips, Mixed Vegetable Chips, Beetroot Chips)</li>
+                      <li>Premium Dry Fruits (Almonds, Cashews, Mixed Dry Fruits, Flavoured Cashews)</li>
+                    </ul>
+                    <p className="text-muted-foreground leading-relaxed mt-3">
+                      This no-return policy is in strict compliance with FSSAI food safety standards and the Food Safety and Standards Act, 2006.
+                    </p>
                   </div>
 
                   <Separator />
 
-                  <div id="refund-eligibility">
-                    <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3">2. Eligibility</h2>
+                  <div id="refund-eligible">
+                    <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3 font-serif">4.2 Eligible Cases for Refund</h2>
                     <p className="text-muted-foreground leading-relaxed mb-4">
-                      To be eligible for a return, the following conditions must be met:
+                      While returns are not accepted, refunds or replacements may be considered in the following limited circumstances:
                     </p>
-                    <ul className="list-disc pl-5 space-y-2 text-muted-foreground">
-                      <li>The return request must be initiated within 7 days of delivery</li>
-                      <li>The product must be in its original packaging, unused, and in the same condition as received</li>
-                      <li>The product seal must not be broken (for sealed food products)</li>
-                      <li>A valid proof of purchase (order number or invoice) must be provided</li>
-                      <li>Products received in a damaged or defective condition are eligible for return regardless of the above conditions</li>
-                    </ul>
+                    <div className="space-y-4">
+                      <div>
+                        <h4 className="font-semibold text-foreground text-sm">4.2.1 Wrong Product Delivered</h4>
+                        <p className="text-xs text-muted-foreground">If you receive a product that is different from what you ordered, please contact us within 24 hours of delivery with your order number and a photograph of the product received. We will arrange for a replacement or refund after verification.</p>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-foreground text-sm">4.2.2 Damaged Product</h4>
+                        <p className="text-xs text-muted-foreground">If the product is damaged in transit (manufacturing seal broken, package crushed or torn), please notify us within 24 hours of delivery with photographic evidence. We will process a replacement or refund after review.</p>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-foreground text-sm">4.2.3 Missing Items</h4>
+                        <p className="text-xs text-muted-foreground">If your order is incomplete or items are missing, please report within 24 hours of receiving the package with your order details. We will verify and dispatch the missing items or issue a refund for the missing products.</p>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-foreground text-sm">4.2.4 Order Not Delivered</h4>
+                        <p className="text-xs text-muted-foreground">If your order has not been delivered within the expected delivery window and the tracking status is not updated, please contact us. We will investigate with the logistics partner and resolve within 5–7 business days.</p>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-foreground text-sm">4.2.5 Payment Debited but Order Not Confirmed</h4>
+                        <p className="text-xs text-muted-foreground">If payment has been deducted but you did not receive an order confirmation, please contact us with payment proof. We will verify and either confirm the order or initiate a full refund within 5–7 business days.</p>
+                      </div>
+                    </div>
                   </div>
 
                   <Separator />
 
                   <div id="refund-process">
-                    <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3">3. Refund Process</h2>
-                    <p className="text-muted-foreground leading-relaxed mb-4">
-                      Once your return request is approved, the refund will be processed as follows:
-                    </p>
-                    <div className="space-y-4">
-                      <div className="flex items-start gap-3">
-                        <div className="rounded-full bg-blue-100 p-1.5 mt-0.5">
-                          <span className="text-xs font-bold text-orange-400">1</span>
-                        </div>
-                        <div>
-                          <p className="font-medium text-foreground text-sm">Initiate Return</p>
-                          <p className="text-xs text-muted-foreground">Contact our support team via email, phone, or WhatsApp to initiate a return request.</p>
-                        </div>
-                      </div>
-                      <div className="flex items-start gap-3">
-                        <div className="rounded-full bg-blue-100 p-1.5 mt-0.5">
-                          <span className="text-xs font-bold text-orange-400">2</span>
-                        </div>
-                        <div>
-                          <p className="font-medium text-foreground text-sm">Review &amp; Approval</p>
-                          <p className="text-xs text-muted-foreground">Our team will review your request within 24-48 hours and confirm eligibility.</p>
-                        </div>
-                      </div>
-                      <div className="flex items-start gap-3">
-                        <div className="rounded-full bg-blue-100 p-1.5 mt-0.5">
-                          <span className="text-xs font-bold text-orange-400">3</span>
-                        </div>
-                        <div>
-                          <p className="font-medium text-foreground text-sm">Pickup / Self-Ship</p>
-                          <p className="text-xs text-muted-foreground">We will arrange a pickup or provide shipping instructions for returning the product.</p>
-                        </div>
-                      </div>
-                      <div className="flex items-start gap-3">
-                        <div className="rounded-full bg-blue-100 p-1.5 mt-0.5">
-                          <span className="text-xs font-bold text-orange-400">4</span>
-                        </div>
-                        <div>
-                          <p className="font-medium text-foreground text-sm">Refund Issued</p>
-                          <p className="text-xs text-muted-foreground">Refunds are processed within 5-7 business days after receiving and inspecting the returned product.</p>
-                        </div>
-                      </div>
+                    <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3 font-serif">4.3 Refund Process</h2>
+                    <div className="space-y-3 text-muted-foreground text-sm">
+                      <p>1. Contact our support team at <span className="text-orange-500 font-medium">support@mealicious.in</span> within 24 hours of delivery (for delivery-related issues) or within 7 business days for payment issues.</p>
+                      <p>2. Provide your order number, registered mobile number, and relevant photographs or documentation.</p>
+                      <p>3. Our team will review your case within 2–3 business days.</p>
+                      <p>4. If approved, refunds will be credited to the original payment method within 5–7 business days after approval.</p>
+                      <p>5. You will be notified via email/SMS at every stage of the refund process.</p>
                     </div>
-
-                    <Card className="mt-6">
-                      <CardContent className="p-4 space-y-2">
-                        <h4 className="font-semibold text-sm text-foreground">Refund Methods:</h4>
-                        <ul className="list-disc pl-5 text-xs text-muted-foreground space-y-1">
-                          <li><strong className="text-foreground">Prepaid Orders:</strong> Refund credited to the original payment method (5-7 business days)</li>
-                          <li><strong className="text-foreground">COD Orders:</strong> Refund transferred to your bank account via NEFT/IMPS (5-7 business days)</li>
-                          <li><strong className="text-foreground">Wallet:</strong> Refund can be credited to your Mealicious wallet for instant reuse</li>
-                        </ul>
-                      </CardContent>
-                    </Card>
                   </div>
 
                   <Separator />
 
-                  <div id="refund-exchange">
-                    <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3">4. Exchange Policy</h2>
-                    <p className="text-muted-foreground leading-relaxed mb-4">
-                      We currently offer exchanges under the following conditions:
-                    </p>
+                  <div id="refund-non-eligible">
+                    <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3 font-serif">4.4 Non-Eligible Cases</h2>
                     <ul className="list-disc pl-5 space-y-2 text-muted-foreground">
-                      <li>Exchanges are available for products of equal or greater value</li>
-                      <li>If the exchanged product costs more, the price difference must be paid</li>
-                      <li>If the exchanged product costs less, the difference will be refunded</li>
-                      <li>Exchange requests must be made within 7 days of delivery</li>
-                      <li>Exchanges are subject to product availability</li>
-                      <li>Damaged or wrong product deliveries are eligible for free exchange with free shipping</li>
+                      <li>Change of mind or personal preference after delivery</li>
+                      <li>Products that have been partially consumed or tampered with</li>
+                      <li>Claims made after 24 hours from the time of delivery (for product condition complaints)</li>
+                      <li>Discounts, promotional items, or combo packs where terms explicitly state non-refundable</li>
+                      <li>Delays in delivery caused by logistics partners, natural calamities, or events beyond our control</li>
                     </ul>
                   </div>
 
                   <Separator />
 
-                  <div id="refund-non-returnable">
-                    <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3">5. Non-Returnable Items</h2>
-                    <p className="text-muted-foreground leading-relaxed mb-4">
-                      The following items are not eligible for return or exchange:
+                  <div id="refund-cancellation">
+                    <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3 font-serif">4.5 Cancellation Policy</h2>
+                    <p className="text-muted-foreground leading-relaxed">
+                      Orders can be cancelled only before they are dispatched from our warehouse. Once dispatched, orders cannot be cancelled. To cancel an order, please contact us immediately at <span className="text-orange-500 font-medium">support@mealicious.in</span> with your order number. Approved cancellations will receive a full refund within 5–7 business days.
                     </p>
-                    <ul className="list-disc pl-5 space-y-2 text-muted-foreground">
-                      <li>Products with broken seals or opened packaging (unless damaged upon delivery)</li>
-                      <li>Products returned after the 7-day return window</li>
-                      <li>Products not in their original condition or packaging</li>
-                      <li>Gift cards and promotional items</li>
-                      <li>Products purchased during clearance or final sale events (unless defective)</li>
-                    </ul>
-                  </div>
-
-                  <Separator />
-
-                  <div id="refund-contact">
-                    <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3">6. Contact for Returns</h2>
-                    <p className="text-muted-foreground leading-relaxed mb-4">
-                      To initiate a return, exchange, or for any refund-related queries, please contact us:
-                    </p>
-                    <Card>
-                      <CardContent className="p-5 space-y-3">
-                        <div className="space-y-2 text-sm">
-                          <p><strong className="text-foreground">MEALICIOUS VENTURES PRIVATE LIMITED</strong></p>
-                          <p className="text-muted-foreground">Email: <span className="text-orange-400">support@mealicious.store</span></p>
-                          <p className="text-muted-foreground">Hours: Monday - Saturday, 10 AM - 8 PM IST</p>
-                          <p className="text-muted-foreground">Address: 123 Health Street, Mumbai, Maharashtra 400001, India</p>
+                    <Card className="mt-6 border-amber-200/50 bg-stone-50/50 dark:bg-stone-900/10">
+                      <CardContent className="p-6 space-y-3 text-sm">
+                        <div className="flex items-center gap-2">
+                          <CheckCircle2 className="h-5 w-5 text-amber-500" />
+                          <p className="font-semibold text-stone-900 dark:text-stone-100">Mealicious Ventures Private Limited</p>
                         </div>
-                        <Button
-                          className="bg-orange-400 hover:bg-orange-400 text-white mt-2"
-                          onClick={() => navigate('contact')}
-                        >
-                          Contact Support
-                        </Button>
+                        <Separator />
+                        <div className="space-y-1.5 text-xs text-muted-foreground">
+                          <p>Email: <span className="text-orange-500">support@mealicious.in</span></p>
+                          <p>FSSAI: 22426193000120</p>
+                          <p>GSTIN: 33AAUCM2609Q1ZT</p>
+                          <p>CIN: U10799TZ2025PTC037179</p>
+                          <p>Address: 1/108, Elappankadu, Malankadu, Uthamasolapuram, Salem - 636010, Tamil Nadu, India</p>
+                        </div>
                       </CardContent>
                     </Card>
                   </div>

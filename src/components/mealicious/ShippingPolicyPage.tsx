@@ -45,7 +45,7 @@ export default function ShippingPolicyPage() {
             <span className="text-sm">Shipping Policy</span>
           </div>
           <h1 className="text-3xl md:text-4xl font-bold">Shipping Policy</h1>
-          <p className="text-blue-100 mt-2">Last updated: January 2025</p>
+          <p className="text-blue-100 mt-2">Last updated: June 2025</p>
         </div>
       </div>
 
@@ -136,21 +136,21 @@ export default function ShippingPolicyPage() {
                   <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
                     <PartyPopper className="h-6 w-6 text-orange-400 shrink-0" />
                     <div>
-                      <p className="font-semibold text-orange-400">Free Shipping on Orders Above ₹599</p>
-                      <p className="text-sm text-orange-400">No shipping fee on any order above ₹599</p>
+                      <p className="font-semibold text-orange-400">Free Shipping on Orders Above ₹499</p>
+                      <p className="text-sm text-orange-400">No shipping fee on any order above ₹499</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                     <Package className="h-6 w-6 text-gray-600 shrink-0" />
                     <div>
-                      <p className="font-semibold">Flat ₹49 for Orders Below ₹599</p>
+                      <p className="font-semibold">Flat ₹49 for Orders Below ₹499</p>
                       <p className="text-sm text-gray-500">Nominal fee for smaller orders</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                     <Banknote className="h-6 w-6 text-gray-600 shrink-0" />
                     <div>
-                      <p className="font-semibold">COD Fee: ₹50</p>
+                      <p className="font-semibold">COD Fee: ₹49</p>
                       <p className="text-sm text-gray-500">Additional fee for Cash on Delivery orders</p>
                     </div>
                   </div>
@@ -192,7 +192,7 @@ export default function ShippingPolicyPage() {
               <section id="damaged">
                 <h2 className="text-xl font-bold mb-4">Damaged in Transit</h2>
                 <p className="text-gray-600 leading-relaxed">
-                  If your order arrives damaged, please contact us within 48 hours of delivery with photos of the damaged packaging and products. We will arrange a replacement or full refund. Email us at <span className="text-orange-400 font-medium">support@mealicious.store</span>.
+                  If your order arrives damaged, please contact us within 24 hours of delivery with photos of the damaged packaging and products. We will arrange a replacement or full refund. Email us at <span className="text-orange-400 font-medium">support@mealicious.in</span>.
                 </p>
               </section>
 
@@ -204,7 +204,7 @@ export default function ShippingPolicyPage() {
                   <h2 className="text-xl font-bold">Shipping Queries</h2>
                 </div>
                 <div className="bg-gray-50 rounded-lg p-4 space-y-2">
-                  <p className="text-gray-600 flex items-center gap-2"><Mail className="h-4 w-4" /> Email: <span className="text-orange-400">support@mealicious.store</span></p>
+                  <p className="text-gray-600 flex items-center gap-2"><Mail className="h-4 w-4" /> Email: <span className="text-orange-400">support@mealicious.in</span></p>
                   <p className="text-gray-600 flex items-center gap-2"><Clock className="h-4 w-4" /> Support Hours: 10 AM - 8 PM IST, Monday to Saturday</p>
                 </div>
                 <div className="mt-4">

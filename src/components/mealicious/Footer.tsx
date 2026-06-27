@@ -5,7 +5,7 @@ import { toast } from 'sonner'
 import { useAppStore } from '@/lib/store'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Leaf, Mail, MapPin, Facebook, Instagram, Twitter, Youtube } from 'lucide-react'
+import { Leaf, Mail, MapPin, Instagram, Youtube, MessageCircle } from 'lucide-react'
 
 export default function Footer() {
   const navigate = useAppStore((s) => s.navigate)
@@ -58,10 +58,9 @@ export default function Footer() {
   ]
 
   const socialLinks = [
-    { icon: Facebook, label: 'Facebook', href: 'https://www.facebook.com/' },
-    { icon: Instagram, label: 'Instagram', href: 'https://www.instagram.com/' },
-    { icon: Twitter, label: 'Twitter', href: 'https://twitter.com/' },
-    { icon: Youtube, label: 'YouTube', href: 'https://www.youtube.com/' },
+    { icon: MessageCircle, label: 'WhatsApp', href: 'https://api.whatsapp.com/send/?phone=916379858978&text&type=phone_number&app_absent=0' },
+    { icon: Instagram, label: 'Instagram', href: 'https://www.instagram.com/mealicious.store?igsh=MXJ3aTM3bG1rOHYxYg==' },
+    { icon: Youtube, label: 'YouTube', href: 'https://www.youtube.com/@mealiciousstore' },
   ]
 
   return (
@@ -175,17 +174,28 @@ export default function Footer() {
             <ul className="space-y-3">
               <li className="flex items-start gap-3">
                 <Mail className="mt-0.5 h-4 w-4 shrink-0 text-orange-400" />
-                <span className="text-sm text-gray-400">support@mealicious.store</span>
+                <span className="text-sm text-gray-400">support@mealicious.in</span>
               </li>
               <li className="flex items-start gap-3">
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-orange-400" />
                 <span className="text-sm text-gray-400">
-                  Mealicious Ventures Pvt. Ltd.,
+                  Mealicious Ventures Private Limited,
                   <br />
-                  Mumbai, India
+                  1/108, Elappankadu, Malankadu,
+                  <br />
+                  Uthamasolapuram, Salem - 636010,
+                  <br />
+                  Tamil Nadu, India
                 </span>
               </li>
             </ul>
+
+            {/* Compliance Info */}
+            <div className="mt-5 text-xs text-gray-500 space-y-1 font-mono">
+              <p>FSSAI: 22426193000120</p>
+              <p>GST: 33AAUCM2609Q1ZT</p>
+              <p>CIN: U10799TZ2025PTC037179</p>
+            </div>
 
             {/* Payment Icons */}
             <div className="mt-6">

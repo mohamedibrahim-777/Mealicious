@@ -48,23 +48,24 @@ export function GstInvoiceDoc({
   invoiceNumber, invoiceDate, seller, buyer, items,
   subtotal, shipping, discount, taxAmount, isInterState, total, paymentMethod,
 }: InvoiceProps) {
-  const taxLabel = isInterState ? 'IGST (18%)' : 'CGST (9%) + SGST (9%)'
-
   return (
     <Document>
       <Page size="A4" style={styles.page}>
         <View style={styles.header}>
           <Text style={styles.title}>TAX INVOICE</Text>
-          <Text style={{ fontSize: 10, color: '#6b7280' }}>GSTIN: {seller.gstin}</Text>
+          <Text style={{ fontSize: 9, color: '#6b7280' }}>GSTIN: 33AAUCM2609Q1ZT</Text>
         </View>
 
         <View style={{ flexDirection: 'row', marginBottom: 16 }}>
-          <View style={{ flex: 1 }}>
+          <View style={{ flex: 1, paddingRight: 10 }}>
             <Text style={styles.sectionTitle}>Seller</Text>
-            <Text style={{ fontWeight: 'bold' }}>{seller.name}</Text>
-            <Text style={{ color: '#6b7280', marginTop: 2 }}>{seller.address}</Text>
-            <Text style={{ color: '#6b7280' }}>State: {seller.state}</Text>
-            <Text style={{ color: '#6b7280' }}>GSTIN: {seller.gstin}</Text>
+            <Text style={{ fontWeight: 'bold', fontSize: 9 }}>Mealicious Ventures Private Limited</Text>
+            <Text style={{ color: '#6b7280', marginTop: 3, lineHeight: 1.3 }}>
+              1/108, Elappankadu, Malankadu, Uthamasolapuram, Salem - 636010, Tamil Nadu, India
+            </Text>
+            <Text style={{ color: '#6b7280', marginTop: 3 }}>GSTIN: 33AAUCM2609Q1ZT</Text>
+            <Text style={{ color: '#6b7280' }}>CIN: U10799TZ2025PTC037179</Text>
+            <Text style={{ color: '#6b7280' }}>FSSAI: 22426193000120</Text>
           </View>
           <View style={{ flex: 1 }}>
             <Text style={styles.sectionTitle}>Bill To</Text>
@@ -87,7 +88,7 @@ export function GstInvoiceDoc({
             <Text style={styles.col2}>HSN</Text>
             <Text style={styles.col2}>Qty</Text>
             <Text style={styles.col3}>Unit Price</Text>
-            <Text style={styles.col4}>Taxable Value</Text>
+            <Text style={styles.col4}>Amount</Text>
           </View>
           {items.map((item, i) => (
             <View key={i} style={styles.tableRow}>
@@ -105,7 +106,6 @@ export function GstInvoiceDoc({
             { label: 'Subtotal', value: subtotal },
             { label: 'Shipping', value: shipping },
             ...(discount > 0 ? [{ label: 'Discount', value: -discount }] : []),
-            { label: taxLabel, value: taxAmount },
           ].map(({ label, value }, i) => (
             <View key={i} style={styles.totalsRow}>
               <Text style={styles.totalsLabel}>{label}</Text>
@@ -120,7 +120,7 @@ export function GstInvoiceDoc({
 
         <View style={styles.footer}>
           <Text>This is a computer-generated invoice and does not require a signature.</Text>
-          <Text style={{ marginTop: 4 }}>Thank you for shopping with {seller.name}!</Text>
+          <Text style={{ marginTop: 4 }}>Thank you for shopping with Mealicious Ventures Private Limited!</Text>
         </View>
       </Page>
     </Document>

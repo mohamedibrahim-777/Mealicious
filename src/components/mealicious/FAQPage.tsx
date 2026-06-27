@@ -172,13 +172,13 @@ export default function FAQPage() {
                                 <Badge variant="secondary" className="bg-blue-50 text-orange-400 shrink-0">
                                   <Truck className="h-3.5 w-3.5" />
                                 </Badge>
-                                <span className="text-muted-foreground">Free shipping above ₹599</span>
+                                <span className="text-muted-foreground">Free shipping above ₹499</span>
                               </div>
                               <div className="flex items-center gap-3 text-sm">
                                 <Badge variant="secondary" className="bg-blue-50 text-orange-400 shrink-0">
                                   <RefreshCw className="h-3.5 w-3.5" />
                                 </Badge>
-                                <span className="text-muted-foreground">7-day easy returns</span>
+                                <span className="text-muted-foreground">No returns on food products</span>
                               </div>
                               <div className="flex items-center gap-3 text-sm">
                                 <Badge variant="secondary" className="bg-blue-50 text-orange-400 shrink-0">

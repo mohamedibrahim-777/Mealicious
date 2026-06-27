@@ -37,9 +37,6 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ orde
     taxableValue: item.price * item.quantity,
   }))
 
-  const taxableBase = order.subtotal - order.discount + order.shipping
-  const taxAmount = Math.round(taxableBase * 0.18 * 100) / 100
-
   const doc = createElement(GstInvoiceDoc, {
     invoiceNumber: order.orderNumber,
     invoiceDate: format(new Date(order.createdAt), 'dd MMM yyyy'),
@@ -54,7 +51,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ orde
     subtotal: order.subtotal,
     shipping: order.shipping,
     discount: order.discount,
-    taxAmount,
+    taxAmount: 0,
     isInterState,
     total: order.total,
     paymentMethod: order.paymentMethod ?? 'N/A',

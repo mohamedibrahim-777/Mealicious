@@ -120,25 +120,29 @@ export default function CheckoutPage() {
     (sum, item) => sum + (item.salePrice ?? item.price) * item.quantity,
     0
   )
-  const shippingBase = subtotal >= 599 ? 0 : 49
-  const codFee = paymentMethod === 'cod' ? 50 : 0
+  const shippingBase = subtotal >= 499 ? 0 : 49
+  const codFee = paymentMethod === 'cod' ? 49 : 0
   const shippingTotal = shippingBase + codFee
 
   // Coupon discount
-  let discount = 0
+  let couponDiscount = 0
   if (appliedCoupon && COUPON_CODES[appliedCoupon]) {
     const coupon = COUPON_CODES[appliedCoupon]
     if (subtotal >= coupon.minOrder) {
-      discount =
+      couponDiscount =
         coupon.type === 'percent'
           ? Math.round((subtotal * coupon.discount) / 100)
           : coupon.discount
-      if (coupon.maxDiscount != null) discount = Math.min(discount, coupon.maxDiscount)
+      if (coupon.maxDiscount != null) couponDiscount = Math.min(couponDiscount, coupon.maxDiscount)
     }
   }
 
+  // Prepaid discount: 10% on prepaid orders
+  const prepaidDiscount = paymentMethod === 'online' ? Math.round((subtotal - couponDiscount) * 0.10) : 0
+  const discount = couponDiscount + prepaidDiscount
+
   const afterDiscount = subtotal - discount
-  const gst = Math.round(afterDiscount * 0.18)
+  const gst = 0
   const total = afterDiscount + shippingTotal + gst
 
   // Empty cart redirect - derived state
@@ -915,17 +919,19 @@ export default function CheckoutPage() {
                       </div>
                     )}
 
-                    {discount > 0 && (
+                    {couponDiscount > 0 && (
                       <div className="flex justify-between text-sm">
-                        <span className="text-gray-500">Discount</span>
-                        <span className="font-medium text-orange-400">-{formatPrice(discount)}</span>
+                        <span className="text-gray-500">Coupon Discount</span>
+                        <span className="font-medium text-orange-400">-{formatPrice(couponDiscount)}</span>
                       </div>
                     )}
 
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">GST (18%)</span>
-                      <span className="font-medium">{formatPrice(gst)}</span>
-                    </div>
+                    {prepaidDiscount > 0 && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-500">Prepaid Discount (10%)</span>
+                        <span className="font-medium text-orange-400">-{formatPrice(prepaidDiscount)}</span>
+                      </div>
+                    )}
                   </div>
 
                   <Separator />
@@ -938,16 +944,16 @@ export default function CheckoutPage() {
                   </div>
 
                   {/* Free shipping message */}
-                  {subtotal < 599 && (
+                  {subtotal < 499 && (
                     <div className="bg-orange-50 border border-orange-200 rounded-lg px-3 py-2 flex items-start gap-2">
                       <Truck className="w-4 h-4 text-orange-400 mt-0.5 shrink-0" />
                       <p className="text-xs text-orange-400">
-                        Add {formatPrice(599 - subtotal)} more for <strong>FREE shipping</strong>!
+                        Add {formatPrice(499 - subtotal)} more for <strong>FREE shipping</strong>!
                       </p>
                     </div>
                   )}
 
-                  {subtotal >= 599 && (
+                  {subtotal >= 499 && (
                     <div className="bg-blue-50 border border-blue-200 rounded-lg px-3 py-2 flex items-center gap-2">
                       <Truck className="w-4 h-4 text-orange-400 shrink-0" />
                       <p className="text-xs text-orange-400 font-medium">
@@ -986,7 +992,7 @@ export default function CheckoutPage() {
                 </div>
                 <div className="text-center p-3 bg-white rounded-xl border border-gray-100">
                   <Truck className="w-5 h-5 text-orange-400 mx-auto mb-1" />
-                  <p className="text-[10px] text-gray-500 leading-tight">Free Shipping<br />₹599+</p>
+                  <p className="text-[10px] text-gray-500 leading-tight">Free Shipping<br />₹499+</p>
                 </div>
                 <div className="text-center p-3 bg-white rounded-xl border border-gray-100">
                   <Check className="w-5 h-5 text-orange-400 mx-auto mb-1" />

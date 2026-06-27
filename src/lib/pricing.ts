@@ -85,8 +85,8 @@ export function computeTotals(
   opts: { couponCode?: string | null; paymentMethod?: 'cod' | 'online' | string | null } = {},
 ): Totals {
   const subtotal = items.reduce((s, it) => s + it.lineSubtotal, 0)
-  const shipping = subtotal >= 599 ? 0 : (subtotal > 0 ? 49 : 0)
-  const codFee = opts.paymentMethod === 'cod' ? 50 : 0
+  const shipping = subtotal >= 499 ? 0 : (subtotal > 0 ? 49 : 0)
+  const codFee = opts.paymentMethod === 'cod' ? 49 : 0
 
   let discount = 0
   let appliedCoupon: string | null = null
@@ -109,8 +109,12 @@ export function computeTotals(
     }
   }
 
+  // Apply 10% prepaid discount on online orders
+  const prepaidDiscount = opts.paymentMethod === 'online' ? Math.round((subtotal - discount) * 0.10) : 0
+  discount += prepaidDiscount
+
   const afterDiscount = subtotal - discount
-  const gst = Math.round(afterDiscount * 0.18)
+  const gst = 0
   const total = afterDiscount + shipping + codFee + gst
 
   return { items, subtotal, discount, appliedCoupon, couponError, shipping, codFee, gst, total }

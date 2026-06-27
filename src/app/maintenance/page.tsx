@@ -156,7 +156,7 @@ export default function MaintenancePage() {
       {/* Footer Support Info */}
       <div className="z-10 mt-8 text-center text-xs text-stone-600 font-semibold space-y-1">
         <p>Need urgent assistance with an existing order?</p>
-        <p>Contact us at <a href="mailto:support@mealicious.store" className="text-stone-500 hover:text-stone-400 underline transition-colors">support@mealicious.store</a></p>
+        <p>Contact us at <a href="mailto:support@mealicious.in" className="text-stone-500 hover:text-stone-400 underline transition-colors">support@mealicious.in</a></p>
       </div>
     </div>
   )

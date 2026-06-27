@@ -9,9 +9,8 @@ import {
   Clock,
   Send,
   Instagram,
-  Twitter,
-  Facebook,
   Youtube,
+  MessageCircle,
 } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -60,7 +59,7 @@ const contactInfo = [
   {
     icon: Mail,
     title: 'Email Us',
-    detail: 'support@mealicious.store',
+    detail: 'support@mealicious.in',
     subDetail: 'We reply within 24 hours',
     color: 'text-orange-400',
     bg: 'bg-blue-50',
@@ -68,8 +67,8 @@ const contactInfo = [
   {
     icon: MapPin,
     title: 'Visit Us',
-    detail: 'MEALICIOUS VENTURES PRIVATE LIMITED',
-    subDetail: '123 Health Street, Mumbai, Maharashtra 400001, India',
+    detail: 'Mealicious Ventures Private Limited',
+    subDetail: '1/108, Elappankadu, Malankadu, Uthamasolapuram, Salem - 636010, Tamil Nadu, India',
     color: 'text-orange-400',
     bg: 'bg-blue-50',
   },
@@ -84,10 +83,9 @@ const contactInfo = [
 ]
 
 const socialLinks = [
-  { icon: Instagram, label: 'Instagram', href: 'https://www.instagram.com/' },
-  { icon: Twitter, label: 'Twitter', href: 'https://twitter.com/' },
-  { icon: Facebook, label: 'Facebook', href: 'https://www.facebook.com/' },
-  { icon: Youtube, label: 'YouTube', href: 'https://www.youtube.com/' },
+  { icon: MessageCircle, label: 'WhatsApp', href: 'https://api.whatsapp.com/send/?phone=916379858978&text&type=phone_number&app_absent=0' },
+  { icon: Instagram, label: 'Instagram', href: 'https://www.instagram.com/mealicious.store?igsh=MXJ3aTM3bG1rOHYxYg==' },
+  { icon: Youtube, label: 'YouTube', href: 'https://www.youtube.com/@mealiciousstore' },
 ]
 
 /* ═══════════════════════ CONTACT PAGE ═══════════════════════ */
@@ -317,7 +315,7 @@ export default function ContactPage() {
             <div className="text-center mb-8">
               <h2 className="text-2xl sm:text-3xl font-bold text-foreground">Our Location</h2>
               <p className="mt-2 text-muted-foreground">
-                Find us at our headquarters in Mumbai
+                Find us at our headquarters in Salem, Tamil Nadu
               </p>
             </div>
           </FadeInWhenVisible>
@@ -329,9 +327,9 @@ export default function ContactPage() {
                   <div className="rounded-full bg-blue-200/60 p-4 mx-auto w-fit">
                     <MapPin className="h-10 w-10 text-orange-400" />
                   </div>
-                  <h3 className="text-lg font-bold text-orange-400">MEALICIOUS VENTURES PRIVATE LIMITED</h3>
+                  <h3 className="text-lg font-bold text-orange-400">Mealicious Ventures Private Limited</h3>
                   <p className="text-orange-400 text-sm max-w-sm mx-auto">
-                    123 Health Street, Mumbai, Maharashtra 400001, India
+                    1/108, Elappankadu, Malankadu, Uthamasolapuram, Salem - 636010, Tamil Nadu, India
                   </p>
                   <Separator className="max-w-xs mx-auto bg-blue-200" />
                   <p className="text-xs text-muted-foreground">
