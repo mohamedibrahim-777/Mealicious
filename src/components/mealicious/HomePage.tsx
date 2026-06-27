@@ -263,7 +263,7 @@ export default function HomePage() {
               <Badge className="bg-amber-500/10 text-amber-400 border border-amber-500/20 mb-2 text-sm px-3 py-1 inline-flex items-center gap-1.5 rounded-full">
                 <Leaf className="h-3.5 w-3.5" /> 100% Organic & Handpicked
               </Badge>
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-tight tracking-tight min-h-[120px] sm:min-h-[150px] md:min-h-auto">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-tight tracking-tight min-h-[120px] sm:min-h-[150px] md:min-h-auto font-serif">
                 {renderTitle()}
               </h1>
               <p className="text-base sm:text-lg text-stone-400 max-w-lg mx-auto lg:mx-0 leading-relaxed min-h-[60px] md:min-h-auto">
@@ -418,7 +418,7 @@ export default function HomePage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <FadeInWhenVisible>
             <div className="text-center mb-10">
-              <h2 className="text-2xl sm:text-3xl font-bold text-foreground">
+              <h2 className="text-3xl sm:text-4xl font-bold text-foreground font-serif">
                 Shop by Category
               </h2>
               <p className="mt-2 text-muted-foreground">
@@ -468,7 +468,7 @@ export default function HomePage() {
           <FadeInWhenVisible>
             <div className="flex items-center justify-between mb-10">
               <div>
-                <h2 className="text-2xl sm:text-3xl font-bold text-foreground">
+                <h2 className="text-3xl sm:text-4xl font-bold text-foreground font-serif">
                   Featured Products
                 </h2>
                 <p className="mt-1 text-muted-foreground text-sm">
@@ -502,7 +502,7 @@ export default function HomePage() {
           <FadeInWhenVisible>
             <div className="flex items-center justify-between mb-10">
               <div>
-                <h2 className="text-2xl sm:text-3xl font-bold text-foreground">
+                <h2 className="text-3xl sm:text-4xl font-bold text-foreground font-serif">
                   Best Sellers
                 </h2>
                 <p className="mt-1 text-muted-foreground text-sm">
@@ -541,7 +541,7 @@ export default function HomePage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <FadeInWhenVisible>
             <div className="text-center mb-10">
-              <h2 className="text-2xl sm:text-3xl font-bold text-foreground">
+              <h2 className="text-3xl sm:text-4xl font-bold text-foreground font-serif">
                 Why Choose Mealicious?
               </h2>
               <p className="mt-2 text-muted-foreground">
@@ -583,7 +583,7 @@ export default function HomePage() {
           <FadeInWhenVisible>
             <div className="flex items-center justify-between mb-10">
               <div>
-                <h2 className="text-2xl sm:text-3xl font-bold text-foreground">
+                <h2 className="text-3xl sm:text-4xl font-bold text-foreground font-serif">
                   New Arrivals
                 </h2>
                 <p className="mt-1 text-muted-foreground text-sm">
@@ -616,7 +616,7 @@ export default function HomePage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <FadeInWhenVisible>
             <div className="text-center mb-10">
-              <h2 className="text-2xl sm:text-3xl font-bold text-foreground">
+              <h2 className="text-3xl sm:text-4xl font-bold text-foreground font-serif">
                 What Our Customers Say
               </h2>
               <p className="mt-2 text-muted-foreground">
@@ -679,7 +679,7 @@ export default function HomePage() {
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-14 sm:py-20">
           <FadeInWhenVisible>
             <div className="text-center max-w-xl mx-auto space-y-4">
-              <h2 className="text-2xl sm:text-3xl font-bold text-white">
+              <h2 className="text-3xl sm:text-4xl font-bold text-white font-serif">
                 Join the Mealicious Family
               </h2>
               <p className="text-blue-100">

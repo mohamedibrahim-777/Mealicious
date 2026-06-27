@@ -356,7 +356,7 @@ export default function ProductDetail() {
           </Badge>
 
           {/* Product Name */}
-          <h1 className="text-2xl sm:text-3xl font-bold text-foreground leading-tight mb-3">
+          <h1 className="text-3xl sm:text-4xl font-serif font-extrabold text-foreground leading-tight mb-3">
             {product.name}
           </h1>
 
@@ -816,7 +816,7 @@ export default function ProductDetail() {
           >
             <Separator className="mb-10" />
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-foreground">
+              <h2 className="text-2xl sm:text-3xl font-serif font-bold text-foreground">
                 You May Also Like
               </h2>
               <p className="text-muted-foreground text-sm mt-1">

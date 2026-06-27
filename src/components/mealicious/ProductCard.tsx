@@ -130,7 +130,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         </Badge>
 
         {/* Name */}
-        <h3 className="font-semibold text-sm leading-tight line-clamp-2 min-h-[2.5rem]">
+        <h3 className="font-serif text-sm sm:text-base font-bold leading-tight line-clamp-2 min-h-[2.5rem] text-stone-900 dark:text-stone-100">
           {product.name}
         </h3>
 

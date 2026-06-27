@@ -51,7 +51,7 @@ export default function WishlistPage() {
                 <Heart className="h-7 w-7 text-white fill-white/30" />
               </div>
               <div>
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white tracking-tight">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white tracking-tight font-serif">
                   My Wishlist
                 </h1>
                 <p className="mt-1 text-blue-100 text-sm sm:text-base">

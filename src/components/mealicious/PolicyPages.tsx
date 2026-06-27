@@ -130,7 +130,7 @@ export function PrivacyPolicyPage() {
             className="text-center max-w-3xl mx-auto"
           >
             <ShieldCheck className="h-12 w-12 text-blue-200 mx-auto mb-4" />
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-white leading-tight tracking-tight">
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-white leading-tight tracking-tight font-serif">
               Privacy Policy
             </h1>
             <p className="mt-3 text-blue-100">Last updated: March 1, 2025</p>
@@ -320,7 +320,7 @@ export function TermsPage() {
             className="text-center max-w-3xl mx-auto"
           >
             <FileText className="h-12 w-12 text-blue-200 mx-auto mb-4" />
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-white leading-tight tracking-tight">
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-white leading-tight tracking-tight font-serif">
               Terms &amp; Conditions
             </h1>
             <p className="mt-3 text-blue-100">Last updated: March 1, 2025</p>
@@ -488,7 +488,7 @@ export function RefundPolicyPage() {
             className="text-center max-w-3xl mx-auto"
           >
             <RotateCcw className="h-12 w-12 text-blue-200 mx-auto mb-4" />
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-white leading-tight tracking-tight">
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-white leading-tight tracking-tight font-serif">
               Refund &amp; Return Policy
             </h1>
             <p className="mt-3 text-blue-100">Last updated: March 1, 2025</p>

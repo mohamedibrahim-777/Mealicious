@@ -711,7 +711,7 @@ export default function ShopPage() {
           {/* Title and count */}
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
+              <h1 className="text-3xl sm:text-4xl font-serif font-extrabold text-foreground">
                 Shop Premium Dry Fruits & Snacks
               </h1>
               <p className="text-muted-foreground text-sm mt-1">

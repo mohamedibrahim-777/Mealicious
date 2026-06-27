@@ -68,7 +68,7 @@ export default function TrackOrderPage() {
         <div className="absolute -top-32 -right-32 h-96 w-96 rounded-full bg-orange-400/20 blur-3xl" />
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} className="text-center max-w-3xl mx-auto">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight tracking-tight">Track Your Order</h1>
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight tracking-tight font-serif">Track Your Order</h1>
             <p className="mt-4 text-base sm:text-lg text-blue-100 max-w-2xl mx-auto">Enter your order number to check live delivery status.</p>
           </motion.div>
         </div>

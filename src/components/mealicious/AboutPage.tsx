@@ -136,7 +136,7 @@ export default function AboutPage() {
             transition={{ duration: 0.7, ease: 'easeOut' }}
             className="text-center max-w-3xl mx-auto"
           >
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight tracking-tight">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight tracking-tight font-serif">
               About Mealicious Store
             </h1>
             <p className="mt-4 sm:mt-6 text-base sm:text-lg text-blue-100 max-w-2xl mx-auto">

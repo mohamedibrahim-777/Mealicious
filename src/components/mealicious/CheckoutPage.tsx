@@ -440,8 +440,8 @@ export default function CheckoutPage() {
 
         {/* Page Title */}
         <div className="mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Checkout</h1>
-          <p className="text-gray-500 mt-1">Complete your order details below</p>
+          <h1 className="text-2xl sm:text-3xl font-serif font-bold text-stone-900 dark:text-stone-100">Checkout</h1>
+          <p className="text-stone-500 mt-1">Complete your order details below</p>
         </div>
 
         {/* Two Column Layout */}
