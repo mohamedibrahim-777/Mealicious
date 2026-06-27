@@ -49,6 +49,7 @@ export async function GET(req: NextRequest) {
 
     // Try a test login to Shiprocket
     let testAuthResult = ''
+    let pickupLocationsResult = null
     try {
       const res = await fetch('https://apiv2.shiprocket.in/v1/external/auth/login', {
         method: 'POST',
@@ -57,6 +58,20 @@ export async function GET(req: NextRequest) {
       })
       const text = await res.text()
       testAuthResult = `Status: ${res.status} - Response: ${text}`
+      
+      try {
+        const loginData = JSON.parse(text)
+        if (loginData.token) {
+          const pickupRes = await fetch('https://apiv2.shiprocket.in/v1/external/settings/company/pickup', {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${loginData.token}`
+            }
+          })
+          pickupLocationsResult = await pickupRes.json()
+        }
+      } catch {}
     } catch (e: any) {
       testAuthResult = `Fetch failed: ${e.message}`
     }
@@ -70,6 +85,7 @@ export async function GET(req: NextRequest) {
         pickupName: pickupName || 'NOT_SET',
       },
       testAuthResult,
+      pickupLocationsResult,
       orderData,
     })
   } catch (err: any) {
