@@ -150,8 +150,8 @@ export default function ShippingPolicyPage() {
                   <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                     <Banknote className="h-6 w-6 text-gray-600 shrink-0" />
                     <div>
-                      <p className="font-semibold">COD Fee: ₹49</p>
-                      <p className="text-sm text-gray-500">Additional fee for Cash on Delivery orders</p>
+                      <p className="font-semibold">COD Fee: FREE</p>
+                      <p className="text-sm text-gray-500">No additional charges for Cash on Delivery</p>
                     </div>
                   </div>
                 </div>

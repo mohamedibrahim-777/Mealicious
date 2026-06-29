@@ -815,7 +815,7 @@ export const faqData = [
     category: 'Payments & Returns',
     questions: [
       { q: 'What payment methods do you accept?', a: 'We accept all major payment methods including UPI (Google Pay, PhonePe, Paytm), Credit/Debit Cards, Net Banking, and Cash on Delivery (COD). All online payments are secured by Cashfree.' },
-      { q: 'Is COD available?', a: 'Yes, Cash on Delivery is available for orders up to ₹5,000. A nominal COD fee of ₹49 applies.' },
+      { q: 'Is COD available?', a: 'Yes, Cash on Delivery is available for orders up to ₹5,000 with no additional charges.' },
       { q: 'What is your return policy?', a: 'In the interest of food safety and FSSAI guidelines, we do not accept returns on food products. If you receive a wrong, damaged, or incomplete order, please contact us within 24 hours of delivery for a replacement or refund.' },
       { q: 'How do I get a refund?', a: 'Refunds are processed within 5-7 business days. For prepaid orders, the refund is credited to your original payment method. For COD orders, we will transfer the refund to your bank account.' },
     ],

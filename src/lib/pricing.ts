@@ -86,7 +86,7 @@ export function computeTotals(
 ): Totals {
   const subtotal = items.reduce((s, it) => s + it.lineSubtotal, 0)
   const shipping = subtotal >= 499 ? 0 : (subtotal > 0 ? 49 : 0)
-  const codFee = opts.paymentMethod === 'cod' ? 49 : 0
+  const codFee = 0
 
   let discount = 0
   let appliedCoupon: string | null = null

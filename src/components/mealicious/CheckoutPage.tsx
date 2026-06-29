@@ -121,7 +121,7 @@ export default function CheckoutPage() {
     0
   )
   const shippingBase = subtotal >= 499 ? 0 : 49
-  const codFee = paymentMethod === 'cod' ? 49 : 0
+  const codFee = 0
   const shippingTotal = shippingBase + codFee
 
   // Coupon discount
