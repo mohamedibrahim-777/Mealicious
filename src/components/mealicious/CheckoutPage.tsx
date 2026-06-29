@@ -707,9 +707,9 @@ export default function CheckoutPage() {
                       <div className="mt-2 flex items-center gap-1.5">
                         <Badge
                           variant="secondary"
-                          className="bg-orange-100 text-orange-400 border-0 text-xs"
+                          className="bg-green-100 text-green-800 border-0 text-xs font-semibold"
                         >
-                          +₹50 COD fee
+                          FREE
                         </Badge>
                       </div>
                     </div>
