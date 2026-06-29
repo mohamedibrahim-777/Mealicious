@@ -112,6 +112,23 @@ export function ProductForm({ open, onClose, onSaved, categories, initial }: Pro
     return ''
   })
 
+  const [nutrition, setNutrition] = useState(() => {
+    try {
+      const parsed = typeof initial?.nutrition === 'string' && initial.nutrition
+        ? JSON.parse(initial.nutrition)
+        : (initial?.nutrition || {})
+      return {
+        calories: parsed.calories || '',
+        protein: parsed.protein || '',
+        fat: parsed.fat || '',
+        carbs: parsed.carbs || '',
+        fiber: parsed.fiber || '',
+      }
+    } catch {
+      return { calories: '', protein: '', fat: '', carbs: '', fiber: '' }
+    }
+  })
+
   const isEdit = !!form.id
 
   function set(key: keyof ProductData, value: unknown) {
@@ -184,6 +201,7 @@ export function ProductForm({ open, onClose, onSaved, categories, initial }: Pro
         images: imagesVal,
         tags: tagsVal,
         variants: finalVariants,
+        nutrition: nutrition,
       }
 
       const url = isEdit ? `/api/admin/products/${form.id}` : '/api/admin/products'
@@ -334,6 +352,61 @@ export function ProductForm({ open, onClose, onSaved, categories, initial }: Pro
           <div className="space-y-1.5">
             <Label>Tags (comma-separated)</Label>
             <Input value={form.tags} onChange={e => set('tags', e.target.value)} />
+          </div>
+
+          {/* Nutritional Values */}
+          <div className="border border-stone-200 rounded-xl p-4 bg-stone-50/50 space-y-4">
+            <div>
+              <Label className="text-sm font-bold text-stone-800">Nutritional Values (per 100g)</Label>
+              <p className="text-[10px] text-stone-500 font-medium">Add approximate nutritional values for this product.</p>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+              <div className="space-y-1">
+                <Label className="text-xs text-stone-600">Calories</Label>
+                <Input
+                  className="h-8 text-xs"
+                  placeholder="e.g. 340 kcal"
+                  value={nutrition.calories}
+                  onChange={e => setNutrition(prev => ({ ...prev, calories: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs text-stone-600">Protein</Label>
+                <Input
+                  className="h-8 text-xs"
+                  placeholder="e.g. 15g"
+                  value={nutrition.protein}
+                  onChange={e => setNutrition(prev => ({ ...prev, protein: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs text-stone-600">Total Fat</Label>
+                <Input
+                  className="h-8 text-xs"
+                  placeholder="e.g. 8g"
+                  value={nutrition.fat}
+                  onChange={e => setNutrition(prev => ({ ...prev, fat: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs text-stone-600">Carbs</Label>
+                <Input
+                  className="h-8 text-xs"
+                  placeholder="e.g. 60g"
+                  value={nutrition.carbs}
+                  onChange={e => setNutrition(prev => ({ ...prev, carbs: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs text-stone-600">Fiber</Label>
+                <Input
+                  className="h-8 text-xs"
+                  placeholder="e.g. 5g"
+                  value={nutrition.fiber}
+                  onChange={e => setNutrition(prev => ({ ...prev, fiber: e.target.value }))}
+                />
+              </div>
+            </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
             {(['featured', 'bestSeller', 'isNew', 'isActive'] as const).map(key => (
