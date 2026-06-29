@@ -8,15 +8,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 })
     }
 
-    const ZAI = (await import('z-ai-web-dev-sdk')).default
-    let zai;
-    if (process.env.ZAI_BASE_URL && process.env.ZAI_API_KEY) {
-      zai = new ZAI({
-        baseUrl: process.env.ZAI_BASE_URL,
-        apiKey: process.env.ZAI_API_KEY,
-      });
-    } else {
-      zai = await ZAI.create()
+    const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY
+    if (!apiKey) {
+      return NextResponse.json(
+        { error: 'Gemini API Key is not configured. Please set GEMINI_API_KEY in your .env file.' },
+        { status: 500 }
+      )
     }
 
     const systemPrompt = `You are Mealie, the friendly AI assistant for Mealicious Store (MEALICIOUS VENTURES PRIVATE LIMITED), a premium health snacks and dry fruits e-commerce brand based in India.
@@ -32,28 +29,46 @@ Your role:
 - Never make up product prices or specific details you're unsure about
 - Respond in the same language the customer uses (English or Hindi)`
 
-    const messages = [
-      { role: 'assistant' as const, content: systemPrompt },
+    // Format chat history for Gemini API
+    const contents = [
       ...history.map((h: { role: string; content: string }) => ({
-        role: h.role === 'user' ? 'user' as const : 'assistant' as const,
-        content: h.content,
+        role: h.role === 'user' ? 'user' : 'model',
+        parts: [{ text: h.content }],
       })),
-      { role: 'user' as const, content: message },
+      { role: 'user', parts: [{ text: message }] },
     ]
 
-    const trimmedMessages = messages.length > 20 
-      ? [messages[0], ...messages.slice(-19)] 
-      : messages
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contents,
+          systemInstruction: {
+            parts: [{ text: systemPrompt }],
+          },
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 500,
+          },
+        }),
+      }
+    )
 
-    const completion = await zai.chat.completions.create({
-      messages: trimmedMessages,
-      thinking: { type: 'disabled' },
-    })
+    if (!response.ok) {
+      const errText = await response.text()
+      console.error('Gemini API Error response:', errText)
+      throw new Error(`Gemini API returned status ${response.status}: ${errText}`)
+    }
 
-    const response = completion.choices?.[0]?.message?.content || 
+    const data = await response.json()
+    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 
       "I'm sorry, I couldn't process that. Please try again or contact us at support@mealicious.in"
 
-    return NextResponse.json({ success: true, response })
+    return NextResponse.json({ success: true, response: reply })
   } catch (error) {
     console.error('Chat API error:', error)
     return NextResponse.json(

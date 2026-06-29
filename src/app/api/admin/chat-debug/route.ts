@@ -1,94 +1,65 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdmin } from '@/lib/auth-server'
-import os from 'os'
-import path from 'path'
-import fs from 'fs/promises'
 
 export async function GET(req: NextRequest) {
   const { error } = await requireAdmin(req)
   if (error) return error
 
-  const homeDir = os.homedir()
-  const paths = [
-    { name: 'project-cwd', path: path.join(process.cwd(), '.z-ai-config') },
-    { name: 'user-home', path: path.join(homeDir, '.z-ai-config') },
-    { name: 'etc-config', path: '/etc/.z-ai-config' },
-  ]
-
-  const fileChecks = []
-  let loadedConfig: any = null
-
-  for (const p of paths) {
-    try {
-      const exists = await fs.access(p.path).then(() => true).catch(() => false)
-      let parsed: any = null
-      let readError: string | null = null
-      if (exists) {
-        try {
-          const str = await fs.readFile(p.path, 'utf8')
-          parsed = JSON.parse(str)
-          if (parsed.baseUrl && parsed.apiKey) {
-            loadedConfig = {
-              source: p.name,
-              baseUrl: parsed.baseUrl,
-              apiKeyMasked: parsed.apiKey ? `${parsed.apiKey.substring(0, 6)}...${parsed.apiKey.substring(parsed.apiKey.length - 4)}` : 'missing',
-            }
-          }
-        } catch (e: any) {
-          readError = e.message
-        }
+  const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY
+  if (!apiKey) {
+    return NextResponse.json({
+      success: false,
+      error: 'GEMINI_API_KEY or GOOGLE_API_KEY is not defined in environment variables.',
+      env: {
+        GEMINI_API_KEY: 'not set',
+        GOOGLE_API_KEY: 'not set',
       }
-      fileChecks.push({
-        name: p.name,
-        path: p.path,
-        exists,
-        isValid: !!(parsed && parsed.baseUrl && parsed.apiKey),
-        readError,
-      })
-    } catch (e: any) {
-      fileChecks.push({
-        name: p.name,
-        path: p.path,
-        exists: false,
-        isValid: false,
-        error: e.message,
-      })
-    }
+    })
   }
 
   let testResult: any = null
   try {
-    const ZAI = (await import('z-ai-web-dev-sdk')).default
-    let zai: any = null
-    if (process.env.ZAI_BASE_URL && process.env.ZAI_API_KEY) {
-      zai = new ZAI({ baseUrl: process.env.ZAI_BASE_URL, apiKey: process.env.ZAI_API_KEY })
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contents: [{ role: 'user', parts: [{ text: 'Hello' }] }],
+          generationConfig: { maxOutputTokens: 20 },
+        }),
+      }
+    )
+
+    if (!response.ok) {
+      const errText = await response.text()
+      testResult = {
+        success: false,
+        status: response.status,
+        error: errText,
+      }
     } else {
-      zai = await ZAI.create()
-    }
-    const response = await zai.chat.completions.create({
-      messages: [{ role: 'user', content: 'hello' }],
-      thinking: { type: 'disabled' },
-    })
-    testResult = {
-      success: true,
-      response: response.choices?.[0]?.message?.content ?? 'no response content',
+      const data = await response.json()
+      testResult = {
+        success: true,
+        response: data.candidates?.[0]?.content?.parts?.[0]?.text ?? 'no content',
+      }
     }
   } catch (e: any) {
     testResult = {
       success: false,
       error: e.message,
-      stack: e.stack,
     }
   }
 
   return NextResponse.json({
     success: true,
     env: {
-      ZAI_BASE_URL: process.env.ZAI_BASE_URL ? 'set' : 'not set',
-      ZAI_API_KEY: process.env.ZAI_API_KEY ? 'set' : 'not set',
+      GEMINI_API_KEY: process.env.GEMINI_API_KEY ? 'set (starts with ' + process.env.GEMINI_API_KEY.substring(0, 4) + '...)' : 'not set',
+      GOOGLE_API_KEY: process.env.GOOGLE_API_KEY ? 'set (starts with ' + process.env.GOOGLE_API_KEY.substring(0, 4) + '...)' : 'not set',
     },
-    fileChecks,
-    loadedConfig,
     testResult,
   })
 }
