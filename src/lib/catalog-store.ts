@@ -187,9 +187,16 @@ export const useCatalogStore = create<CatalogStore>()((set, get) => ({
   loadPublicProducts: async () => {
     try {
       const res = await fetch('/api/products')
-      const data = (await res.json()) as { products?: Product[] }
+      const data = (await res.json()) as { products?: Product[]; categories?: Category[] }
+      const updates: Partial<CatalogStore> = {}
       if (Array.isArray(data.products) && data.products.length > 0) {
-        set({ products: data.products })
+        updates.products = data.products
+      }
+      if (Array.isArray(data.categories) && data.categories.length > 0) {
+        updates.categories = data.categories
+      }
+      if (Object.keys(updates).length > 0) {
+        set(updates)
       }
     } catch {
       // Keep seed fallback

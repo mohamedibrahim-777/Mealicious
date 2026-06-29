@@ -9,7 +9,15 @@ export async function POST(req: NextRequest) {
     }
 
     const ZAI = (await import('z-ai-web-dev-sdk')).default
-    const zai = await ZAI.create()
+    let zai;
+    if (process.env.ZAI_BASE_URL && process.env.ZAI_API_KEY) {
+      zai = new ZAI({
+        baseUrl: process.env.ZAI_BASE_URL,
+        apiKey: process.env.ZAI_API_KEY,
+      });
+    } else {
+      zai = await ZAI.create()
+    }
 
     const systemPrompt = `You are Mealie, the friendly AI assistant for Mealicious Store (MEALICIOUS VENTURES PRIVATE LIMITED), a premium health snacks and dry fruits e-commerce brand based in India.
 
