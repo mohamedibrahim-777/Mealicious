@@ -26,7 +26,6 @@ import { useAppStore } from '@/lib/store'
 import { useCatalogStore } from '@/lib/catalog-store'
 import { testimonials } from '@/lib/data'
 import ProductCard from '@/components/mealicious/ProductCard'
-import ShuffleHero from '@/components/mealicious/ShuffleHero'
 
 /* ─────────────────────── animation helpers ─────────────────────── */
 
@@ -246,15 +245,8 @@ export default function HomePage() {
 
   return (
     <div className="flex flex-col">
-      {/* ──────── 1. Hero Section — Shuffle Hero ──────── */}
-      <ShuffleHero
-        title={heroTitle}
-        subtitle={heroSubtitle}
-        onShop={handleBannerClick}
-      />
-
-      {/* ──────── 1b. (legacy hero kept hidden for reference) ──────── */}
-      <section className="hidden relative overflow-hidden bg-gradient-to-br from-stone-900 via-stone-950 to-stone-900 border-b border-white/5">
+      {/* ──────── 1. Hero Section ──────── */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-stone-900 via-stone-950 to-stone-900 border-b border-white/5">
         {/* Glow ambient blurs */}
         <div className="absolute top-0 right-0 h-96 w-96 rounded-full bg-amber-500/10 blur-[100px]" />
         <div className="absolute bottom-0 left-0 h-96 w-96 rounded-full bg-orange-600/10 blur-[100px]" />
