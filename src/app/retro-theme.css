@@ -1,0 +1,104 @@
+/* ───────────────────────────────────────────────────────────────
+   RETRO THEME  (typeui.sh "retro" design skill)
+   Self-contained, design-only override layer.
+   To REVERT: delete this file and remove its import from layout.tsx.
+   ─────────────────────────────────────────────────────────────── */
+
+@import url('https://fonts.googleapis.com/css2?family=Macondo&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+/* ── Retro palette: blue + violet on white, dark ink text ── */
+:root,
+.dark {
+  --background: #ffffff;
+  --foreground: #111827;
+  --card: #ffffff;
+  --card-foreground: #111827;
+  --popover: #ffffff;
+  --popover-foreground: #111827;
+
+  --primary: #3b82f6;          /* blue — actions, links, active */
+  --primary-foreground: #ffffff;
+  --secondary: #8b5cf6;        /* violet — highlights, accents */
+  --secondary-foreground: #ffffff;
+
+  --muted: #f3f4f6;
+  --muted-foreground: #6b7280;
+  --accent: #ede9fe;           /* light violet */
+  --accent-foreground: #6d28d9;
+  --destructive: #dc2626;
+
+  --border: #e5e7eb;
+  --input: #e5e7eb;
+  --ring: #3b82f6;
+
+  --chart-1: #3b82f6;
+  --chart-2: #8b5cf6;
+  --chart-3: #16a34a;
+  --chart-4: #d97706;
+  --chart-5: #dc2626;
+
+  --sidebar: #ffffff;
+  --sidebar-foreground: #111827;
+  --sidebar-primary: #3b82f6;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #ede9fe;
+  --sidebar-accent-foreground: #6d28d9;
+  --sidebar-border: #e5e7eb;
+  --sidebar-ring: #3b82f6;
+}
+
+/* ── Typography: Macondo (hand-lettered, calligraphic) everywhere ──
+   The app maps --font-sans → --font-montserrat and
+   --font-serif → --font-cormorant (set on <body> by next/font).
+   Re-point those vars to Macondo so the whole token chain follows. */
+body {
+  --font-montserrat: 'Macondo', 'Comic Sans MS', cursive !important;
+  --font-cormorant: 'Macondo', 'Comic Sans MS', cursive !important;
+  font-family: 'Macondo', 'Comic Sans MS', cursive;
+}
+
+/* Keep code / data in a clean monospace per the retro spec */
+code, pre, kbd, samp, .font-mono {
+  font-family: 'JetBrains Mono', ui-monospace, monospace !important;
+}
+
+/* ── Remap the brand's hardcoded utility colors to the retro palette ──
+   Much of the UI uses literal `orange-*` / `amber-*` Tailwind classes
+   (buttons, prices, links) instead of theme tokens. Tailwind v4 resolves
+   e.g. `bg-orange-500` → var(--color-orange-500), so re-pointing those
+   scales recolors the whole site:  orange → blue,  amber → violet. */
+:root {
+  /* orange → blue */
+  --color-orange-50: #eff6ff;
+  --color-orange-100: #dbeafe;
+  --color-orange-200: #bfdbfe;
+  --color-orange-300: #93c5fd;
+  --color-orange-400: #60a5fa;
+  --color-orange-500: #3b82f6;
+  --color-orange-600: #2563eb;
+  --color-orange-700: #1d4ed8;
+  --color-orange-800: #1e40af;
+  --color-orange-900: #1e3a8a;
+  --color-orange-950: #172554;
+
+  /* amber → violet */
+  --color-amber-50: #f5f3ff;
+  --color-amber-100: #ede9fe;
+  --color-amber-200: #ddd6fe;
+  --color-amber-300: #c4b5fd;
+  --color-amber-400: #a78bfa;
+  --color-amber-500: #8b5cf6;
+  --color-amber-600: #7c3aed;
+  --color-amber-700: #6d28d9;
+  --color-amber-800: #5b21b6;
+  --color-amber-900: #4c1d95;
+  --color-amber-950: #2e1065;
+}
+
+/* ── Retro scrollbar accent ── */
+::-webkit-scrollbar-thumb {
+  background: #c7d2fe !important;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3b82f6 !important;
+}
