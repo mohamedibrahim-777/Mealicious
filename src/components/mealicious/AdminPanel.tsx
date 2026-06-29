@@ -1419,6 +1419,66 @@ function ProductDialog({
               placeholder="https://..."
             />
           </div>
+          <div className="border border-gray-200 rounded-lg p-3 bg-gray-50/50 space-y-3">
+            <h4 className="font-semibold text-sm text-gray-700">Nutritional Values (per 100g)</h4>
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+              <div>
+                <Label className="text-[11px] mb-1 block">Calories</Label>
+                <Input
+                  className="h-8 px-2 text-xs"
+                  placeholder="e.g. 340 kcal"
+                  value={form.nutrition?.calories ?? ''}
+                  onChange={(e) =>
+                    handle('nutrition', { ...form.nutrition, calories: e.target.value })
+                  }
+                />
+              </div>
+              <div>
+                <Label className="text-[11px] mb-1 block">Protein</Label>
+                <Input
+                  className="h-8 px-2 text-xs"
+                  placeholder="e.g. 15g"
+                  value={form.nutrition?.protein ?? ''}
+                  onChange={(e) =>
+                    handle('nutrition', { ...form.nutrition, protein: e.target.value })
+                  }
+                />
+              </div>
+              <div>
+                <Label className="text-[11px] mb-1 block">Total Fat</Label>
+                <Input
+                  className="h-8 px-2 text-xs"
+                  placeholder="e.g. 8g"
+                  value={form.nutrition?.fat ?? ''}
+                  onChange={(e) =>
+                    handle('nutrition', { ...form.nutrition, fat: e.target.value })
+                  }
+                />
+              </div>
+              <div>
+                <Label className="text-[11px] mb-1 block">Carbs</Label>
+                <Input
+                  className="h-8 px-2 text-xs"
+                  placeholder="e.g. 60g"
+                  value={form.nutrition?.carbs ?? ''}
+                  onChange={(e) =>
+                    handle('nutrition', { ...form.nutrition, carbs: e.target.value })
+                  }
+                />
+              </div>
+              <div>
+                <Label className="text-[11px] mb-1 block">Fiber</Label>
+                <Input
+                  className="h-8 px-2 text-xs"
+                  placeholder="e.g. 5g"
+                  value={form.nutrition?.fiber ?? ''}
+                  onChange={(e) =>
+                    handle('nutrition', { ...form.nutrition, fiber: e.target.value })
+                  }
+                />
+              </div>
+            </div>
+          </div>
           <div className="flex gap-4 text-sm">
             <label className="flex items-center gap-1">
               <input

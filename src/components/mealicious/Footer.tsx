@@ -108,9 +108,11 @@ export default function Footer() {
             <p className="mt-1 text-sm font-medium text-blue-400">
               Premium Health Snacks &amp; Dry Fruits
             </p>
+            <p className="mt-1 text-xs text-orange-400 font-medium">
+              Happiness for You. Nature's Goodness in Every Bite.
+            </p>
             <p className="mt-3 text-sm leading-relaxed text-gray-400">
-              We bring you the finest selection of premium dry fruits, nuts, and health snacks —
-              sourced from the best farms, packed with care, and delivered fresh to your doorstep.
+              Explore our range of flavoured makhana, millet-based chips, premium dry fruits, and wholesome snacks—made with quality ingredients, full of flavour, and perfect for healthy everyday snacking.
             </p>
             <div className="mt-5 flex gap-3">
               {socialLinks.map(({ icon: Icon, label, href }) => (
@@ -221,7 +223,7 @@ export default function Footer() {
       <div className="border-t border-gray-800">
         <div className="mx-auto max-w-7xl px-4 py-5 sm:px-6 lg:px-8">
           <p className="text-center text-xs text-gray-500">
-            &copy; 2024 Mealicious Ventures Private Limited. All rights reserved.
+            &copy; 2025 Mealicious Ventures Private Limited. All rights Reserved.
           </p>
         </div>
       </div>
